@@ -1,0 +1,4 @@
+/* Ensures the Angular Material wrapper natively honors full container width */
+.w-100 ::vcd-deep .mat-form-field-wrapper {
+  width: 100%;
+}

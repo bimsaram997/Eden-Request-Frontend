@@ -1,0 +1,51 @@
+<div class="container-fluid vh-100 d-flex align-items-center justify-content-center bg-light">
+    <div class="col-12 col-sm-8 col-md-5 col-lg-4 px-3">
+
+        <mat-card class="p-4 shadow-sm border-0">
+            <mat-card-header class="justify-content-center mb-4">
+                <mat-card-title class="fs-3 fw-bold text-primary text-center">🏨 Scandic Eden Staff Portal</mat-card-title>
+            </mat-card-header>
+
+            <mat-card-content>
+                <form [formGroup]="loginForm">
+
+                    <div class="mb-3">
+                        <mat-form-field appearance="outline" class="w-100">
+                            <mat-label>Email Address</mat-label>
+                            <input matInput type="email" name="email" formControlName="email"
+                                placeholder="example@mail.com" required>
+                            <mat-error *ngIf="loginForm.get('email')?.hasError('required')">
+                                Email address parameter details are required.
+                            </mat-error>
+                            <mat-error
+                                *ngIf="loginForm.get('email')?.hasError('email') && !loginForm.get('email')?.hasError('required')">
+                                Please provide a valid structural email entry.
+                            </mat-error>
+                            <mat-icon matSuffix>email</mat-icon>
+                        </mat-form-field>
+                    </div>
+
+                    <div class="mb-4">
+                        <mat-form-field appearance="outline" class="w-100">
+                            <mat-label>Security Password</mat-label>
+                            <input matInput type="password" formControlName="password" placeholder="••••">
+                            <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
+                                Please enter your authentication account password.
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button mat-flat-button color="primary" type="submit" class="py-2 fs-6"
+                            (click)="onLogin()">
+                            Sign In
+                        </button>
+                    </div>
+
+                </form>
+            </mat-card-content>
+
+        </mat-card>
+
+    </div>
+</div>
