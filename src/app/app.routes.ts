@@ -16,6 +16,12 @@ export const routes: Routes = [
         path: 'housekeeper-dashboard',
         loadComponent: () => import('./modules/housekeeping/housekeeping-dashbaord/housekeeping-dashbaord.component').then(m => m.HousekeepingDashbaordComponent)
       },
+       {
+      path: 'request-form',
+      loadComponent: () =>
+        import('./modules/housekeeping/housekeeping-dashbaord/components/request-form/request-form.component')
+          .then(m => m.RequestFormComponent)
+    }
 
       // 📝 Housekeeper Full Form Page (Opened by clicking the "Add New" button)
      

@@ -1,0 +1,23 @@
+<mat-toolbar class="app-toolbar">
+  <button mat-icon-button aria-label="Open menu">
+    <mat-icon>menu</mat-icon>
+  </button>
+
+  <span class="toolbar-title">Home Dashboard</span>
+
+  <span class="spacer"></span>
+
+  <button
+    mat-icon-button
+    [matMenuTriggerFor]="menu"
+    aria-label="Settings">
+    <mat-icon>settings</mat-icon>
+  </button>
+
+  <mat-menu #menu="matMenu">
+    <button mat-menu-item>
+      <mat-icon>exit_to_app</mat-icon>
+      <span>Log out</span>
+    </button>
+  </mat-menu>
+</mat-toolbar>
