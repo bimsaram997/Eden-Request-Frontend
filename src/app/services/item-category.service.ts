@@ -12,6 +12,6 @@ baseUrl = environment.baseUrl;
   constructor(private http: HttpClient) { }
 
   public getItemCategories(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/ItemCategory/getAll`);
+    return this.http.post(`${this.baseUrl}/ItemCategory/getAll`, {});
   }
 }

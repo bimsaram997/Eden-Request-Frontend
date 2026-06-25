@@ -13,10 +13,9 @@ baseUrl = environment.baseUrl;
   constructor(private http: HttpClient) { }
 
   public login(loginPayload: LoginRequest): Observable<any> {
-    const email = encodeURIComponent(loginPayload.email); // Safely encodes special characters like '@'
+    const email = encodeURIComponent(loginPayload.email); 
     const password = encodeURIComponent(loginPayload.password);
 
-    // Note: Passing an empty object `{}` as the body since the data is contained entirely in the URL path.
     return this.http.post<any>(`${this.baseUrl}/Employee/${email}/${password}`, {});
   }
 }

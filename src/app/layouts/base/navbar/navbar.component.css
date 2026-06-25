@@ -1,0 +1,31 @@
+.app-toolbar {
+  background-color: #3f51b5;
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.toolbar-title {
+  margin-left: 8px;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .toolbar-title {
+    font-size: 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .app-toolbar {
+    padding: 0 8px;
+  }
+}
