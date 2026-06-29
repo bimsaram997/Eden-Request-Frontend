@@ -1,0 +1,47 @@
+<mat-expansion-panel class="history-panel {{ req.status?.toLowerCase() }}">
+  
+  <mat-expansion-panel-header class="panel-header-grid">
+    <mat-panel-title>
+      <div>
+        <div class="room-title">Room {{ req.roomNumber }}</div>
+        <div class="req-meta">List #{{ req.roomListId }} • {{ req.createdAt | date:'dd/MM/yyyy hh:mm a' }}</div>
+      </div>
+    </mat-panel-title>
+    <mat-panel-description class="status-wrapper">
+      <span class="status-badge {{ req.status?.toLowerCase() }}">{{ req.status }}</span>
+    </mat-panel-description>
+  </mat-expansion-panel-header>
+
+  <div class="expanded-detail-content">
+    <h5 class="items-title">Material Lines Summary</h5>
+    <ul class="detail-item-list">
+      <li *ngFor="let item of req.items">
+        <span class="item-name">{{ item.itemName }}</span>
+        <span class="item-qty"><strong>{{ item.quantity }}</strong> {{ item.unitType }}</span>
+      </li>
+    </ul>
+    
+    <div class="request-footer-notes" *ngIf="req.notes">
+      <strong>Note:</strong> {{ req.notes }}
+    </div>
+
+    <div class="tl-action-footer" *ngIf="isTeamLeader">
+      <button mat-flat-button color="accent" [matMenuTriggerFor]="statusMenu">
+        <mat-icon>edit</mat-icon> Change Status
+      </button>
+
+      <mat-menu #statusMenu="matMenu">
+        <button mat-menu-item (click)="emitStatusUpdate('Approved')">
+          <mat-icon style="color: #0d6efd;">thumb_up</mat-icon> Approve Request
+        </button>
+        <button mat-menu-item (click)="emitStatusUpdate('Delivered')">
+          <mat-icon style="color: #198754;">local_shipping</mat-icon> Mark Delivered
+        </button>
+        <button mat-menu-item (click)="emitStatusUpdate('Rejected')">
+          <mat-icon style="color: #dc3545;">cancel</mat-icon> Reject Request
+        </button>
+      </mat-menu>
+    </div>
+
+  </div>
+</mat-expansion-panel>

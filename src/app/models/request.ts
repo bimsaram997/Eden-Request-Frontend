@@ -11,4 +11,5 @@ export interface PlaceBulkRequest {
     roomListId: number;
     roomNumber: string | null; // string? in C# translates to allowing null
     items: BulkLine[];
+    notes?: string; 
 }
