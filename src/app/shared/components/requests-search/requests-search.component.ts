@@ -6,6 +6,8 @@ import { ItemCategoryService } from '../../../services/item-category.service';
 import { Subscription } from 'rxjs';
 import { MATERIAL_COMPONENTS } from '../../utils/material-imports';
 import { ExtendedFilterPayload } from '../../../models/DTO';
+import { AuthService } from '../../../services/auth.service';
+import { EmployeeDto } from '../../../models/class';
 
 @Component({
   selector: 'app-requests-search',
@@ -22,10 +24,7 @@ export class RequestsSearchComponent implements OnInit {
     20: ['201', '202', '203']
   };
 
-  housekeepersList = [
-    { id: 42, displayName: 'Anna Johansson' },
-    { id: 43, displayName: 'Lars Virtanen' }
-  ];
+  housekeepersList:EmployeeDto[] = [];  
 
   statusesList = ['All', 'Pending', 'Approved', 'Delivered', 'Rejected'];
 
@@ -45,15 +44,21 @@ export class RequestsSearchComponent implements OnInit {
     private router: Router,
     private itemService: ItemService,
     private itemCategoryService: ItemCategoryService,
+    private authService: AuthService
   ) { }
 
 
 
   ngOnInit(): void {
+    const session = JSON.parse(localStorage.getItem('scandic_eden_session') || '{}');
+    this.isTeamLeader = (session.role || session.userRole) === 'TeamLeader';
     this.createRequestSearchForm();
     this.loadCategories();
+    this.loadEmployee();
 
   }
+
+  
 
   createRequestSearchForm() {
     this.filterForm = this.fb.group({
@@ -66,7 +71,7 @@ export class RequestsSearchComponent implements OnInit {
       status: [],
       categoryId: [],
       itemIds: [[]],
-      targetEmployeeIds: [],
+      targetEmployeeId: [],
       fromDate: [null],
       toDate: [null],
       fromTime: [null],
@@ -74,6 +79,22 @@ export class RequestsSearchComponent implements OnInit {
     });
   }
 
+  loadEmployee(): void {
+  const emSub = this.authService.loadAllEmployees().subscribe({
+    next: (data) => {
+      // Filter the data array to only include Housekeepers
+      this.housekeepersList = data.filter((emp: EmployeeDto) => emp.role === 'Housekeeper');
+      
+      // Moving the log inside the next block because subscribe is asynchronous
+      console.log('Housekeepers list loaded:', this.housekeepersList);
+    },
+    error: (err) => console.error('Error fetching employees:', err)
+  });
+  
+  this.subs.add(emSub);
+}
+
+    
   onListChange(): void {
     const selectedList = this.filterForm.get('listNumber')?.value;
     this.filterForm.get('roomNumber')?.setValue('');
@@ -119,7 +140,9 @@ export class RequestsSearchComponent implements OnInit {
       roomListId: values.listNumber ? parseInt(values.listNumber, 10) : null,
       status: values.status || 'All',
       categoryId: values.categoryId || null,
-      targetEmployeeId: values.targetEmployeeId || null,
+      targetEmployeeId: values.targetEmployeeId && (!Array.isArray(values.targetEmployeeId) || values.targetEmployeeId.length > 0) 
+      ? parseInt(values.targetEmployeeId.toString(), 10) 
+      : null,
       fromDate: values.fromDate || null,
       toDate: values.toDate || null,
       itemIds: values.itemIds && values.itemIds.length ? values.itemIds : [],
@@ -139,7 +162,7 @@ export class RequestsSearchComponent implements OnInit {
       statuses: [],
       categoryIds: [],
       itemIds: [],
-      targetEmployeeIds: [],
+      targetEmployeeId: [],
       fromDate: null,
       toDate: null
     });

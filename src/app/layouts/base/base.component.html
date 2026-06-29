@@ -1,4 +1,27 @@
-<div class="main-container">
-    <app-navbar></app-navbar>
-    <router-outlet></router-outlet>
+<div class="main-container d-flex flex-column vh-100">
+  <app-navbar (sidenavToggle)="isTeamLeaderUser ? toggleSidenav() : null"></app-navbar>
+
+  <div class="container-fluid flex-grow-1 p-0 m-0 d-flex flex-column overflow-hidden">
+    <div class="row g-0 flex-grow-1 flex-nowrap position-relative overflow-hidden">
+      
+      <div #sidebarDesktop
+           *ngIf="isTeamLeaderUser && isSidenavOpen" 
+           class="col-auto bg-light border-end d-none d-md-flex flex-column h-100"
+           style="width: 180px; z-index: 1030;">
+        <app-sidenavbar (sidenavClose)="isSidenavOpen = false"></app-sidenavbar>
+      </div>
+
+      <div #sidebarMobile
+           *ngIf="isTeamLeaderUser && isSidenavOpen" 
+           class="d-block d-md-none position-fixed top-0 start-0 h-100 bg-light border-end shadow"
+           style="width: 200px; z-index: 1050; margin-top: 56px;">
+        <app-sidenavbar (sidenavClose)="isSidenavOpen = false"></app-sidenavbar>
+      </div>
+
+      <main class="col h-100 overflow-y-auto p-3 bg-body-tertiary">
+        <router-outlet></router-outlet>
+      </main>
+
+    </div>
+  </div>
 </div>

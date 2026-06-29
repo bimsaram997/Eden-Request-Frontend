@@ -1,5 +1,5 @@
 <mat-toolbar class="app-toolbar">
-  <button mat-icon-button aria-label="Open menu">
+  <button mat-icon-button aria-label="Open menu" (click)="onToogleSlidenav()">
     <mat-icon>menu</mat-icon>
   </button>
 
@@ -15,7 +15,7 @@
   </button>
 
   <mat-menu #menu="matMenu">
-    <button mat-menu-item>
+    <button mat-menu-item (click)="logOut()">
       <mat-icon>exit_to_app</mat-icon>
       <span>Log out</span>
     </button>

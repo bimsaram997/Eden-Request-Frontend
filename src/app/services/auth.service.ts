@@ -18,4 +18,8 @@ baseUrl = environment.baseUrl;
 
     return this.http.post<any>(`${this.baseUrl}/Employee/${email}/${password}`, {});
   }
+
+   public loadAllEmployees(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/Employee/getAllEmployee`);
+  }
 }

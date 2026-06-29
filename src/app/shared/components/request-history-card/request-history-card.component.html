@@ -4,7 +4,16 @@
     <mat-panel-title>
       <div>
         <div class="room-title">Room {{ req.roomNumber }}</div>
-        <div class="req-meta">List #{{ req.roomListId }} • {{ req.createdAt | date:'dd/MM/yyyy hh:mm a' }}</div>
+        <div class="req-meta">
+          List {{ req.roomListId }} • {{ req.createdAt | date:'dd/MM/yyyy hh:mm a' }}
+          
+          <!-- Conditional Employee Name for Team Leaders -->
+          
+          <div *ngIf="isTeamLeader && req.name" class="employee-name-block">
+            Requested by: <strong>{{ req.name }}</strong>
+          </div>
+         
+        </div>
       </div>
     </mat-panel-title>
     <mat-panel-description class="status-wrapper">
@@ -30,17 +39,17 @@
         <mat-icon>edit</mat-icon> Change Status
       </button>
 
-      <mat-menu #statusMenu="matMenu">
-        <button mat-menu-item (click)="emitStatusUpdate('Approved')">
-          <mat-icon style="color: #0d6efd;">thumb_up</mat-icon> Approve Request
-        </button>
-        <button mat-menu-item (click)="emitStatusUpdate('Delivered')">
-          <mat-icon style="color: #198754;">local_shipping</mat-icon> Mark Delivered
-        </button>
-        <button mat-menu-item (click)="emitStatusUpdate('Rejected')">
-          <mat-icon style="color: #dc3545;">cancel</mat-icon> Reject Request
-        </button>
-      </mat-menu>
+    <mat-menu #statusMenu="matMenu">
+  <button 
+    mat-menu-item 
+    *ngFor="let option of statusMenuOptions" 
+    (click)="emitStatusUpdate(option.status)">
+    
+    <mat-icon [style.color]="option.color">{{ option.icon }}</mat-icon>
+    <span>{{ option.label }}</span>
+
+  </button>
+</mat-menu>
     </div>
 
   </div>

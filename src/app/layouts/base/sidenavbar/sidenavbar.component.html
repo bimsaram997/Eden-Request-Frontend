@@ -1,0 +1,20 @@
+<div class="w-100 h-100 d-flex flex-column">
+
+  <div class="flex-grow-1 overflow-auto">
+    <nav class="nav flex-column w-100 py-2">
+      <ng-container *ngFor="let menu of menuArray">
+        
+        <a *ngIf="menu.visible" 
+           class="nav-link text-dark px-3 py-2 border-bottom border-light-subtle d-block w-100 link-hover-effect" 
+           (click)="onMenuClick(menu)">
+          
+          <div class="d-flex align-items-center gap-2">
+            <span class="fw-semibold text-dark">{{menu.name}}</span>
+          </div>
+
+        </a>
+
+      </ng-container>
+    </nav>
+  </div>
+</div>
