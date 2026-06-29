@@ -14,5 +14,12 @@ export class RequestService {
   public placeBulkRequest( placeBulkRequest:PlaceBulkRequest ): Observable<any> {
     return this.http.post(`${this.myUrl}/Request/placeBulkRequest`, placeBulkRequest );
 }
+public getPagedHistory(employeeId: number, isTeamLeader: boolean, filterQuery: any): Observable<any> {
+    // 🚥 Passes the security flag through the URL query string mapping as required by [FromQuery] in C#
+    const urlString = `${this.myUrl}/Request/employee/${employeeId}/history?isTeamLeader=${isTeamLeader}`;
+
+    // 📦 Sends the combined pagination parameters and search arrays down in the request body payload
+    return this.http.post<any>(urlString, filterQuery);
+  }
 
 }

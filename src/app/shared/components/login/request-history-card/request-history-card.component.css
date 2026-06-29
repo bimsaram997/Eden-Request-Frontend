@@ -1,63 +1,4 @@
 /* ==========================================
-   1. GLOBAL CONTAINER & HEADER
-   ========================================== */
-.history-container {
-  max-width: 1200px; /* Wider boundary limit for desktop viewports */
-  margin: 0 auto;
-  padding: 20px;
-}
-
-.history-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.history-header h3 {
-  margin: 0;
-  font-size: 20px;
-  font-weight: 600;
-  color: #212529;
-}
-
-.bg-secondary{
-background-color: white !important;
-}
-
-.total-count {
-  font-size: 14px;
-  color: #6c757d;
-}
-
-/* ==========================================
-   2. RESPONSIVE GRID WRAPPER FOR THE ACCORDION
-   ========================================== */
-/* 📱 MOBILE VIEW (Default Setup) */
-.request-accordion {
-  display: grid;
-  grid-template-columns: 1fr; /* 1 panel per row */
-  gap: 12px;
-}
-
-/*  TABLET VIEW (Screens wider than 650px) */
-@media (min-width: 650px) {
-  .request-accordion {
-    grid-template-columns: repeat(2, 1fr); /* 2 panels side-by-side */
-    gap: 16px;
-    align-items: start; /* Prevents rows from stretching unevenly */
-  }
-}
-
-/*  DESKTOP VIEW (Screens wider than 1050px) */
-@media (min-width: 1050px) {
-  .request-accordion {
-    grid-template-columns: repeat(3, 1fr); /* 3 panels side-by-side */
-    gap: 20px;
-  }
-}
-
-/* ==========================================
    3. EXPANSION PANEL DESIGN MODIFICATIONS
    ========================================== */
 .history-panel {
@@ -172,4 +113,17 @@ background-color: white !important;
   color: #495057;
   line-height: 1.4;
   border-left: 3px solid #ced4da;
+}
+
+.tl-action-footer {
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1px solid #f1f3f5;
+  padding-top: 12px;
+}
+
+.tl-action-footer button {
+  font-weight: 600;
+  letter-spacing: 0.3px;
 }

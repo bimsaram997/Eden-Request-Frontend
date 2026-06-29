@@ -51,7 +51,8 @@ export class RequestFormComponent implements OnInit, OnDestroy {
     this.requestForm = this.fb.group({
       listNumber: ['', [Validators.required]],
       roomNumber: ['',],
-      requestedItems: this.fb.array([])
+      notes: [''],
+      requestedItems: this.fb.array([]),
     });
 
     this.itemSelectionForm = this.fb.group({
@@ -191,7 +192,8 @@ export class RequestFormComponent implements OnInit, OnDestroy {
       employeeId: Number(employeeId),
       roomListId: Number(masterFormValue.listNumber), 
       roomNumber: masterFormValue.roomNumber ? String(masterFormValue.roomNumber) : null,
-      items: itemsPayload
+      items: itemsPayload,
+      notes: masterFormValue.notes ? String(masterFormValue.notes) : ""
     };
 
     console.log('Sending compiled payload to C# endpoint structure:', submissionPayload);
