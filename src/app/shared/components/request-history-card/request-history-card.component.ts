@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { MATERIAL_COMPONENTS } from '../../../utils/material-imports';
+import { MATERIAL_COMPONENTS } from '../../utils/material-imports';
 
 
 @Component({

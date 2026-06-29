@@ -6,7 +6,7 @@ import { Subscription } from 'rxjs';
 
 import { RequestsSearchComponent } from '../../../../../shared/components/requests-search/requests-search.component';
 import { ExtendedFilterPayload } from '../../../../../models/DTO';
-import { RequestHistoryCardComponent } from '../../../../../shared/components/login/request-history-card/request-history-card.component';
+import { RequestHistoryCardComponent } from '../../../../../shared/components/request-history-card/request-history-card.component';
 
 @Component({
   selector: 'app-request-list',
