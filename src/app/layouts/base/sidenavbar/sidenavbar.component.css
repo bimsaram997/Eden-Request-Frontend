@@ -1,0 +1,8 @@
+.link-hover-effect {
+  cursor: pointer;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.link-hover-effect:hover {
+  background-color: #e9ecef; /* Standard Bootstrap gray-200 color */
+}

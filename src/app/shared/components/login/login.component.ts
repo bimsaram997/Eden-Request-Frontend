@@ -56,7 +56,7 @@ onLogin(): void {
 
         // 2. Conditional navigation matching the properties returned from your C# service
         if (employeeResponse.role === 'TeamLeader' || employeeResponse.isTeamLeader === true) {
-          //this.router.navigate(['/workspace/dashboard']);
+          this.router.navigate(['/workspace/leader-dashboard']);
         } else {
          this.router.navigate(['/workspace/housekeeper-dashboard']);
         }

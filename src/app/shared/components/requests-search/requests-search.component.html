@@ -57,7 +57,7 @@
           <mat-label>Housekeeper</mat-label>
           <mat-select formControlName="targetEmployeeId">
             <mat-option [value]="null">All Employees</mat-option>
-            <mat-option *ngFor="let hk of housekeepersList" [value]="hk.id">{{ hk.displayName }}</mat-option>
+            <mat-option *ngFor="let hk of housekeepersList" [value]="hk.id">{{ hk.name }}</mat-option>
           </mat-select>
         </mat-form-field>
       </div>

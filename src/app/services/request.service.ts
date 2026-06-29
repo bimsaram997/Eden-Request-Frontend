@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment.prod';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { PlaceBulkRequest } from '../models/request';
+import { PlaceBulkRequest, UpdateRquestHeaderRequest } from '../models/request';
 
 @Injectable({
   providedIn: 'root'
@@ -22,4 +22,7 @@ public getPagedHistory(employeeId: number, isTeamLeader: boolean, filterQuery: a
     return this.http.post<any>(urlString, filterQuery);
   }
 
+  public updateRequestStatus(id: number, payload:  UpdateRquestHeaderRequest): Observable<any> {
+    return this.http.put(`${this.myUrl}/Request/${id}`, payload);
+  }
 }

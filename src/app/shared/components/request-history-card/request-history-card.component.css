@@ -62,6 +62,7 @@
 .status-badge.approved { background-color: #cfe2ff; color: #084298; }
 .status-badge.delivered { background-color: #d1e7dd; color: #0f5132; }
 .status-badge.rejected { background-color: #f8d7da; color: #842029; }
+.status-badge.acknowledge { background-color: #f8d7da; color: #572084; }
 
 /* ==========================================
    4. INTERIOR EXPANDED PANEL DETAILS
@@ -126,4 +127,17 @@
 .tl-action-footer button {
   font-weight: 600;
   letter-spacing: 0.3px;
+}
+
+/* Styling for the new-line employee display */
+.employee-name-block {
+  margin-top: 4px;       /* Creates clean breathing room below the date line */
+  color: #495057;         /* Slightly darker than standard meta text for readability */
+  font-size: 13px;        /* Scales nicely between the title and meta sizes */
+  white-space: nowrap;    /* FORCES "Requested by: James Anderson" to stay on the same line */
+}
+
+.employee-name-block strong {
+  font-weight: 600;
+  color: #212529;
 }

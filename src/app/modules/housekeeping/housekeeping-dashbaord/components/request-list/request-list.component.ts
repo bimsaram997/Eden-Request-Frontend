@@ -37,12 +37,13 @@ export class RequestListComponent implements OnInit, OnDestroy {
     toTime: null,
     fromTime: null
   };
+  session: any;
 
   constructor(private requestService: RequestService) { }
 
   ngOnInit(): void {
-    const session = JSON.parse(localStorage.getItem('scandic_eden_session') || '{}');
-    this.isTeamLeaderUser = (session.role || session.userRole) === 'TeamLeader';
+     this.session = JSON.parse(localStorage.getItem('scandic_eden_session') || '{}');
+    this.isTeamLeaderUser = (this.session.role || this.session.userRole) === 'TeamLeader';
 
     // Initial data fetch happens automatically when the child component initializes and emits
     this.fetchHistoryPage();
@@ -105,6 +106,33 @@ export class RequestListComponent implements OnInit, OnDestroy {
       });
 
     this.subs.add(historySub);
+  }
+
+  handleStatusUpdate(event: { requestId: number, currentStatus: string, newStatus: string }): void {
+  const current = event.currentStatus;
+  const next = event.newStatus;
+    if (current === 'Pending' && next !== 'Acknowledge') {
+    alert('Cannot change status! A pending request must be "Acknowledged"  before any other actions can be taken.');
+    // If you use MatSnackBar, you can replace the alert above with:
+    // this.snackBar.open('Pending requests must be Approved first.', 'Close', { duration: 3000 });
+    return; // Halt execution early
+  }
+    console.log(`Updating request ${event.requestId} to status: ${event.newStatus}`);
+    const payload = {
+      status: event.newStatus,
+      updatedBy: this.session.id || this.session.employeeId
+    };
+    // Call your backend API service here to save changes
+    this.requestService.updateRequestStatus(event.requestId, payload).subscribe({
+      next: (response) => {
+        console.log('Status updated successfully in backend!');
+        this.fetchHistoryPage(); // Refresh the list to reflect the new status
+        // Optional: Refresh your lists or local array data here
+      },
+      error: (err) => {
+        console.error('Failed to update status:', err);
+      }
+    });
   }
 
   ngOnDestroy(): void {
