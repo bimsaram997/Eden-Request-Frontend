@@ -7,6 +7,7 @@ import { Subscription } from 'rxjs';
 import { RequestsSearchComponent } from '../../../../../shared/components/requests-search/requests-search.component';
 import { ExtendedFilterPayload } from '../../../../../models/DTO';
 import { RequestHistoryCardComponent } from '../../../../../shared/components/request-history-card/request-history-card.component';
+import { NotificationServiceService } from '../../../../../services/notification-service.service';
 
 @Component({
   selector: 'app-request-list',
@@ -23,7 +24,7 @@ export class RequestListComponent implements OnInit, OnDestroy {
   userRequests: any[] = [];
 
   isTeamLeaderUser = false;
-  private subs = new Subscription();
+  private subs:any[] = [];
 
   activeFilters: ExtendedFilterPayload = {
     roomSearch: null,
@@ -38,8 +39,11 @@ export class RequestListComponent implements OnInit, OnDestroy {
     fromTime: null
   };
   session: any;
+  notificationSub: any;
 
-  constructor(private requestService: RequestService) { }
+  constructor(private requestService: RequestService,
+              private notificationService: NotificationServiceService
+  ) { }
 
   ngOnInit(): void {
      this.session = JSON.parse(localStorage.getItem('scandic_eden_session') || '{}');
@@ -47,7 +51,26 @@ export class RequestListComponent implements OnInit, OnDestroy {
 
     // Initial data fetch happens automatically when the child component initializes and emits
     this.fetchHistoryPage();
+    this.changeDetection(); // Set up real-time updates via SignalR
+    
   }
+
+changeDetection(): void {
+  const requestSub = this.notificationService.leaderNewRequests$.subscribe({
+    next: () => this.fetchHistoryPage(),
+    error: (err: any) => console.error('Leader stream error:', err),
+    complete: () => {}
+  });
+
+  const statusSub = this.notificationService.housekeeperStatusUpdates$.subscribe({
+    next: () => this.fetchHistoryPage(),
+    error: (err: any) => console.error('Housekeeper stream error:', err),
+    complete: () => {}
+  });
+
+  this.subs.push(requestSub);
+  this.subs.push(statusSub);
+}
 
   onFilterCriteriaChanged(payload: ExtendedFilterPayload): void {
     this.activeFilters = payload;
@@ -105,7 +128,7 @@ export class RequestListComponent implements OnInit, OnDestroy {
         error: (err) => console.error('Failed fetching filtered request registry streams:', err)
       });
 
-    this.subs.add(historySub);
+    this.subs.push(historySub);
   }
 
   handleStatusUpdate(event: { requestId: number, currentStatus: string, newStatus: string }): void {
@@ -135,7 +158,11 @@ export class RequestListComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy(): void {
-    this.subs.unsubscribe(); // Clean up lingering stream observations to prevent memory leaks
-  }
+ ngOnDestroy(): void {
+  this.subs.forEach((sub: any) => {
+    if (sub && typeof sub.unsubscribe === 'function') {
+      sub.unsubscribe();
+    }
+  });
+}
 }

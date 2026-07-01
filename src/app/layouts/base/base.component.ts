@@ -1,8 +1,10 @@
-import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { RouterOutlet } from "@angular/router";
 import { NavbarComponent } from "./navbar/navbar.component";
 import { SidenavbarComponent } from './sidenavbar/sidenavbar.component';
 import { MATERIAL_COMPONENTS } from '../../shared/utils/material-imports';
+import { NotificationServiceService } from '../../services/notification-service.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-base',
@@ -11,17 +13,58 @@ import { MATERIAL_COMPONENTS } from '../../shared/utils/material-imports';
   templateUrl: './base.component.html',
   styleUrl: './base.component.css'
 })
-export class BaseComponent {
-isTeamLeaderUser: boolean = false;
+export class BaseComponent implements OnInit, OnDestroy {
+  private activeSubscriptions: any[] = [];
+  isTeamLeaderUser: boolean = false;
   public isSidenavOpen = false;
 
   // Grab the sidebar elements out of the layout template dynamically
   @ViewChild('sidebarDesktop', { static: false }) sidebarDesktop!: ElementRef;
   @ViewChild('sidebarMobile', { static: false }) sidebarMobile!: ElementRef;
 
+  constructor(private notificationService: NotificationServiceService,
+    private snackBar: MatSnackBar
+  ) { }
+
   ngOnInit(): void {
     const session = JSON.parse(localStorage.getItem('scandic_eden_session') || '{}');
     this.isTeamLeaderUser = (session.role || session.userRole) === 'TeamLeader';
+
+    const email = session.email || '';
+    const role = session.role || session.userRole || 'Housekeeper';
+this.notificationService.startConnection(email, role);
+    if (role === "Housekeeper") {
+
+      
+      if (role == "Housekeeper") {
+        const statusSub = this.notificationService.housekeeperStatusUpdates$.subscribe({
+          next: (update) => {
+            this.snackBar.open(`⚡ A Team Leader updated your Room ${update.roomNumber} request to: ${update.status}`, 'OK', {
+              duration: 6000
+            });
+            //this.refreshMyTasks();
+          },
+          // Add these two lines to satisfy the IStreamSubscriber interface requirements:
+          error: (err) => console.error('SignalR Stream Error:', err),
+          complete: () => console.log('SignalR Stream Completed')
+        }) as any;
+
+        this.activeSubscriptions.push(statusSub);
+      }
+    } else if (role === "TeamLeader") {
+       const requestSub = this.notificationService.leaderNewRequests$.subscribe({
+      next: (request) => {
+        this.snackBar.open(`🚨 Housekeeper (${request.createdBy}) created a request for Room ${request.roomNumber}!`, 'CLOSE', {
+          duration: 6000
+        });
+        //this.refreshRequestGrid(); // Reloads your admin table
+      },
+      error: (err) => console.error('Leader stream error:', err),
+      complete: () => { }
+    }) as any;
+
+    this.activeSubscriptions.push(requestSub);
+    }
   }
 
   toggleSidenav(): void {
@@ -42,14 +85,23 @@ isTeamLeaderUser: boolean = false;
     const clickedInsideMobile = this.sidebarMobile?.nativeElement?.contains(clickedElement);
 
     // Identify navbar elements/triggers to make sure toggle buttons don't cross-cancel
-    const clickedNavbarToggle = clickedElement.closest('.navbar-toggler') || 
-                                 clickedElement.closest('.bi-list') ||
-                                 clickedElement.closest('app-navbar');
+    const clickedNavbarToggle = clickedElement.closest('.navbar-toggler') ||
+      clickedElement.closest('.bi-list') ||
+      clickedElement.closest('app-navbar');
 
     // If the user clicked outside the side bars, and didn't touch the toggle trigger, close it!
     if (!clickedInsideDesktop && !clickedInsideMobile && !clickedNavbarToggle) {
       this.isSidenavOpen = false;
     }
+  }
+
+  ngOnDestroy(): void {
+    // 🟢 4. FIX: Safely loop and unsubscribe individually without throwing errors
+    this.activeSubscriptions.forEach(sub => {
+      if (sub && typeof sub.unsubscribe === 'function') {
+        sub.unsubscribe();
+      }
+    });
   }
 
 }
