@@ -1,0 +1,1 @@
+importScripts('./sw-custom.js', './ngsw-worker.js');

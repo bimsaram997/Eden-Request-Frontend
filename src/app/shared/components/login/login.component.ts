@@ -1,31 +1,39 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router'; // 👈 Added ActivatedRoute here
 import { MATERIAL_COMPONENTS } from '../../utils/material-imports';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
 import { LoginRequest } from '../../../models/request';
+import { NotificationServiceService } from '../../../services/notification-service.service';
+import { PushNotificationService } from '../../../services/push-notification.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [RouterModule,
-    MATERIAL_COMPONENTS],
+  imports: [RouterModule, MATERIAL_COMPONENTS],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
-export class LoginComponent implements OnInit, OnDestroy{
-loginForm!: FormGroup;
+export class LoginComponent implements OnInit, OnDestroy {
+  loginForm!: FormGroup;
   subscription: Subscription[] = [];
+  returnUrl: string = ''; // 🚀 Track deep-link paths securely across login validation events
 
-  constructor(private fb: FormBuilder,
+  constructor(
+    private fb: FormBuilder,
     private router: Router,
-  private authService: AuthService,) {
+    private route: ActivatedRoute, // 👈 Inject ActivatedRoute here
+    private authService: AuthService,
+    private pushService: PushNotificationService,
+    private notificationService: NotificationServiceService
+  ) {}
 
-  }
-
-   ngOnInit() {
+  ngOnInit() {
     this.createFormGroup();
+
+    // 🚀 Grab the returnUrl query parameter string if it was appended by the route guard
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '';
   }
 
   createFormGroup() {
@@ -34,10 +42,10 @@ loginForm!: FormGroup;
       password: ['', [Validators.required]]
     });
   }
-onLogin(): void {
-    // Guard tracking form validity state
+
+  onLogin(): void {
     if (this.loginForm.invalid) {
-      this.loginForm.markAllAsTouched(); // Force validation styles to render immediately
+      this.loginForm.markAllAsTouched(); 
       return;
     }
 
@@ -46,29 +54,34 @@ onLogin(): void {
       password: this.loginForm.value.password
     };
 
-    // Submitting payload directly to the data-transport service layer
     this.authService.login(payload).subscribe({
       next: (employeeResponse) => {
         console.log('Backend verified profile payload:', employeeResponse);
-        
-        // 1. Storage management is completed entirely within the component
-        localStorage.setItem('scandic_eden_session', JSON.stringify(employeeResponse));
 
-        // 2. Conditional navigation matching the properties returned from your C# service
-        if (employeeResponse.role === 'TeamLeader' || employeeResponse.isTeamLeader === true) {
-          this.router.navigate(['/workspace/leader-dashboard']);
+        localStorage.setItem('scandic_eden_session', JSON.stringify(employeeResponse));
+        
+        // Links the browser token exclusively to this active user row
+        this.pushService.subscribeUserDevice(employeeResponse.id);
+
+        // 🚀 THE REDIRECT FIX: Check if a dynamic target deep-link route is stored
+        if (this.returnUrl) {
+          console.log(`Redirecting user straight to original destination: ${this.returnUrl}`);
+          this.router.navigateByUrl(this.returnUrl);
         } else {
-         this.router.navigate(['/workspace/housekeeper-dashboard']);
+          // Standard conditional fallback matching rules
+          if (employeeResponse.role === 'TeamLeader' || employeeResponse.isTeamLeader === true) {
+            this.router.navigate(['/workspace/leader-dashboard']);
+          } else {
+            this.router.navigate(['/workspace/housekeeper-dashboard']);
+          }
         }
       },
       error: (err) => {
         console.error('API connection or credentials rejected:', err);
-        // Extracts the explicit backend ex.Message string if provided by your try/catch block
         alert(err.error || 'Authentication failed. Please verify your credentials.');
       }
     });
   }
 
-
-   ngOnDestroy(): void {}
+  ngOnDestroy(): void { }
 }

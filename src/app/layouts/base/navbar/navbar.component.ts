@@ -1,6 +1,7 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { MATERIAL_COMPONENTS } from '../../../shared/utils/material-imports';
+import { NotificationServiceService } from '../../../services/notification-service.service';
 
 @Component({
   selector: 'app-navbar',
@@ -12,7 +13,7 @@ import { MATERIAL_COMPONENTS } from '../../../shared/utils/material-imports';
 export class NavbarComponent implements OnInit{
 @Output() public sidenavToggle = new EventEmitter();
 
-constructor(private router: Router,) { }
+constructor(private router: Router, private notificationService: NotificationServiceService ) { }
 
 ngOnInit(): void {
   }
@@ -21,7 +22,11 @@ ngOnInit(): void {
   }
 
   public logOut(): void {
+    const currentEmail = JSON.parse(localStorage.getItem('scandic_eden_session') || '{}').email;
+    this.notificationService.stopConnection(currentEmail);
     localStorage.removeItem('scandic_eden_session');
-    this.router.navigate(['']);
+    this.router.navigate(['']).then(() => {
+      window.location.reload();
+    });
   }
 }
