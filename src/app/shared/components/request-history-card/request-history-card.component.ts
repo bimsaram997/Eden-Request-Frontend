@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MATERIAL_COMPONENTS } from '../../utils/material-imports';
 import { RequestStatus } from '../../../models/enum';
 import { StatusMenuOption } from '../../../models/utill-support';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -14,7 +15,7 @@ import { StatusMenuOption } from '../../../models/utill-support';
 export class RequestHistoryCardComponent {
   @Input({ required: true }) req!: any;
   @Output() statusChanged = new EventEmitter<{ requestId: number, currentStatus: string, newStatus: string }>();
-
+  @Output() viewDetails = new EventEmitter<any>();
   isTeamLeader = false;
 
   statusMenuOptions: StatusMenuOption[] = [
@@ -23,6 +24,7 @@ export class RequestHistoryCardComponent {
     { status: RequestStatus.Delivered, label: 'Mark Delivered', icon: 'local_shipping', color: '#198754' },
     { status: RequestStatus.Rejected, label: 'Reject Request', icon: 'cancel', color: '#dc3545' }
   ];
+  constructor(private router: Router) {}  
 
   ngOnInit(): void {
     // Check user role from session storage
@@ -36,5 +38,11 @@ export class RequestHistoryCardComponent {
   // Simple handler method to broadcast action events upward
   emitStatusUpdate(status: string): void {
     this.statusChanged.emit({ requestId: this.req.id, currentStatus: this.req.status, newStatus: status });
+  }
+
+  navigateToDetails(event: Event): void {
+    event.stopPropagation(); // Stops the expansion panel from expanding/collapsing when clicking the button
+    this.viewDetails.emit(this.req);
+    this.router.navigate(['/workspace/requests-component', this.req.id]);
   }
 }

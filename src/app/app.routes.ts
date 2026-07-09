@@ -34,7 +34,12 @@ export const routes: Routes = [
        {
         path: 'requests-list',
         loadComponent: () => import('./modules/housekeeping/housekeeping-dashbaord/components/request-list/request-list.component').then(m => m.RequestListComponent)
+      },
+      {
+      path: 'requests-component/:id',
+      loadComponent: () => import('./shared/components/request-detail/request-detail.component').then(m => m.RequestDetailComponent)
       }
+      
     ]
   },
   { path: '', redirectTo: 'login', pathMatch: 'full' },

@@ -1,0 +1,92 @@
+import { Component, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { MATERIAL_COMPONENTS } from '../../utils/material-imports';
+import { RequestHeader } from '../../../models/class';
+import { RequestService } from '../../../services/request.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
+
+@Component({
+  selector: 'app-request-detail',
+  standalone: true,
+  imports: [MATERIAL_COMPONENTS],
+  templateUrl: './request-detail.component.html',
+  styleUrl: './request-detail.component.css'
+})
+export class RequestDetailComponent implements OnInit, OnDestroy {
+  private subs: Subscription[] = [];
+  requestItem!: RequestHeader;
+
+  @Input() req!: any;
+  @Output() closeDetail = new EventEmitter<void>();
+
+  isTeamLeader = false;
+  requestId!: number;
+
+  constructor(
+    private requestService: RequestService, 
+    private route: ActivatedRoute,
+    private router: Router
+  ) { }
+
+  ngOnInit(): void {
+    const session = JSON.parse(localStorage.getItem('scandic_eden_session') || '{}');
+    const userRole = session.role || session.Role;
+    this.isTeamLeader = userRole === 'TeamLeader';
+
+    // Normal routing setup when component initializes fresh
+    const routeSub = this.route.paramMap.subscribe(params => {
+      const idStr = params.get('id');
+      if (idStr) {
+        this.requestId = +idStr;
+        this.loadRequestDetails(this.requestId);
+      }
+    });
+    this.subs.push(routeSub);
+  }
+
+  // 🚀 INTERCEPT BACKGROUND PUSH MESSAGES
+  @HostListener('window:message', ['$event'])
+  onServiceWorkerMessage(event: MessageEvent) {
+    if (event.data && event.data.type === 'NOTIFICATION_CLICKED') {
+      const newId = event.data.requestId;
+      console.log(`Active session push intercepted for request ID: ${newId}`);
+      
+      if (newId && newId !== this.requestId) {
+        this.requestId = newId;
+        
+        // 1. Fetch data for the new request ID directly
+        this.loadRequestDetails(this.requestId);
+        
+        // 2. Cleanly update the browser URL path without triggering a hard reload or guard check
+        this.router.navigate(['/workspace/requests-list', this.requestId], { 
+          replaceUrl: true 
+        });
+      }
+    }
+  }
+
+  loadRequestDetails(requestId: number): void {
+    const reqSub = this.requestService.getRequestById(requestId).subscribe({
+      next: (data: RequestHeader) => {
+        this.requestItem = data;
+      },
+      error: (err) => {
+        console.error('Failed to load item details', err);
+      }
+    });
+    this.subs.push(reqSub);
+  }
+
+  onBack(): void {
+    this.closeDetail.emit();
+    this.router.navigate(['/workspace/requests-list']);
+  }
+
+  ngOnDestroy(): void {
+    this.subs.forEach((sub: Subscription) => {
+      if (sub && typeof sub.unsubscribe === 'function') {
+        sub.unsubscribe();
+      }
+    });
+  }
+}
