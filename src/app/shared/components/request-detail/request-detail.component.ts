@@ -79,7 +79,11 @@ export class RequestDetailComponent implements OnInit, OnDestroy {
 
   onBack(): void {
     this.closeDetail.emit();
-    this.router.navigate(['/workspace/requests-list']);
+    if (this.isTeamLeader) {
+      this.router.navigate(['/workspace/requests-list']);
+    } else {  
+    this.router.navigate(['/workspace/housekeeper-dashboard']);
+    }
   }
 
   ngOnDestroy(): void {
