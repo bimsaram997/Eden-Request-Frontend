@@ -12,12 +12,10 @@ baseUrl = environment.baseUrl;
 
   constructor(private http: HttpClient) { }
 
-  public login(loginPayload: LoginRequest): Observable<any> {
-    const email = encodeURIComponent(loginPayload.email); 
-    const password = encodeURIComponent(loginPayload.password);
-
-    return this.http.post<any>(`${this.baseUrl}/Employee/${email}/${password}`, {});
-  }
+ public login(loginPayload: LoginRequest): Observable<any> {
+  // 🚀 Pass payload directly as the POST body object. Cleaner, safer, and Firefox friendly!
+  return this.http.post<any>(`${this.baseUrl}/Employee/login`, loginPayload);
+}
 
    public loadAllEmployees(): Observable<any> {
     return this.http.get(`${this.baseUrl}/Employee/getAllEmployee`);

@@ -25,4 +25,8 @@ public getPagedHistory(employeeId: number, isTeamLeader: boolean, filterQuery: a
   public updateRequestStatus(id: number, payload:  UpdateRquestHeaderRequest): Observable<any> {
     return this.http.put(`${this.myUrl}/Request/${id}`, payload);
   }
+
+   public getRequestById(id: number): Observable<any> {
+    return this.http.get(`${this.myUrl}/Request/${id}`);
+  }
 }

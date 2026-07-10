@@ -7,20 +7,28 @@
         <div class="req-meta">
           List {{ req.roomListId }} • {{ req.createdAt | date:'dd/MM/yyyy hh:mm a' }}
           
-          <!-- Conditional Employee Name for Team Leaders -->
-          
           <div *ngIf="isTeamLeader && req.name" class="employee-name-block">
             Requested by: <strong>{{ req.name }}</strong>
           </div>
-         
         </div>
       </div>
     </mat-panel-title>
+    
     <mat-panel-description class="status-wrapper">
       <span class="status-badge {{ req.status?.toLowerCase() }}">{{ req.status }}</span>
+      
+      <button 
+        mat-icon-button 
+        color="primary" 
+        class="details-nav-btn"
+        matTooltip="Open Full Details View"
+        (click)="navigateToDetails($event)">
+        <mat-icon>visibility</mat-icon>
+      </button>
     </mat-panel-description>
   </mat-expansion-panel-header>
 
+  <!-- Expanded quick look contents -->
   <div class="expanded-detail-content">
     <h5 class="items-title">Material Lines Summary</h5>
     <ul class="detail-item-list">
@@ -39,18 +47,15 @@
         <mat-icon>edit</mat-icon> Change Status
       </button>
 
-    <mat-menu #statusMenu="matMenu">
-  <button 
-    mat-menu-item 
-    *ngFor="let option of statusMenuOptions" 
-    (click)="emitStatusUpdate(option.status)">
-    
-    <mat-icon [style.color]="option.color">{{ option.icon }}</mat-icon>
-    <span>{{ option.label }}</span>
-
-  </button>
-</mat-menu>
+      <mat-menu #statusMenu="matMenu">
+        <button 
+          mat-menu-item 
+          *ngFor="let option of statusMenuOptions" 
+          (click)="emitStatusUpdate(option.status)">
+          <mat-icon [style.color]="option.color">{{ option.icon }}</mat-icon>
+          <span>{{ option.label }}</span>
+        </button>
+      </mat-menu>
     </div>
-
   </div>
 </mat-expansion-panel>

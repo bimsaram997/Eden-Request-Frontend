@@ -5,6 +5,7 @@ import { MATERIAL_COMPONENTS } from '../../../shared/utils/material-imports';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationServiceService } from '../../../services/notification-service.service';
 import { Subscription } from 'rxjs';
+import { PushNotificationService } from '../../../services/push-notification.service';
 
 @Component({
   selector: 'app-housekeeping-dashbaord',
@@ -19,7 +20,8 @@ export class HousekeepingDashbaordComponent implements OnInit, OnDestroy   {
 
   constructor(private router: Router,
     private notificationService: NotificationServiceService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private pushService: PushNotificationService
   ) { }
 
 
@@ -29,27 +31,25 @@ export class HousekeepingDashbaordComponent implements OnInit, OnDestroy   {
 
 
   ngOnInit(): void {
-    this.session = JSON.parse(localStorage.getItem('scandic_eden_session') || '{}');
-    const email = this.session.email || '';
-    const role = this.session.role || this.session.userRole || 'Housekeeper';
+  //   setTimeout(() => {
+  //   this.session = JSON.parse(localStorage.getItem('scandic_eden_session') || '{}');
+    
+  //   console.log("📦 Loaded session object post-login:", this.session);
 
-    // this.notificationService.startConnection(email, role);
-    // if(role == "Housekeeper") {
-    //   const statusSub = this.notificationService.housekeeperStatusUpdates$.subscribe({
-    //   next: (update) => {
-    //     this.snackBar.open(`⚡ A Team Leader updated your Room ${update.roomNumber} request to: ${update.status}`, 'OK', {
-    //       duration: 6000
-    //     });
-    //     //this.refreshMyTasks();
-    //   },
-    //   // Add these two lines to satisfy the IStreamSubscriber interface requirements:
-    //   error: (err) => console.error('SignalR Stream Error:', err),
-    //   complete: () => console.log('SignalR Stream Completed')
-    // }) as any;
+  //   const email = this.session.email || '';
+  //   const role = this.session.role || this.session.userRole || 'Housekeeper';
+    
+  //   // Explicitly fallback across all common property names to protect identity
+  //   const currentEmployeeId = this.session.id || this.session.employeeId || this.session.userId || null;
 
-    // this.activeSubscriptions.push(statusSub);
-    // }
+  //   console.log(`👤 Current Employee ID located: ${currentEmployeeId}`);
 
+  //   if (currentEmployeeId) {
+  //     this.pushService.subscribeUserDevice(currentEmployeeId);
+  //   } else {
+  //     console.warn("⚠️ Could not register push notifications: currentEmployeeId missing from localStorage.");
+  //   }
+  // }, 300);
     
   }
 

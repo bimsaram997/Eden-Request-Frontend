@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './auth.guard';
 
 export const routes: Routes = [
   {
@@ -7,6 +8,7 @@ export const routes: Routes = [
   },
   {
     path: 'workspace',
+    canActivate: [authGuard],
     loadComponent: () => import('./layouts/base/base.component').then(m => m.BaseComponent),
     children: [
       { path: '', redirectTo: 'housekeeper-dashboard', pathMatch: 'full' },
@@ -32,7 +34,12 @@ export const routes: Routes = [
        {
         path: 'requests-list',
         loadComponent: () => import('./modules/housekeeping/housekeeping-dashbaord/components/request-list/request-list.component').then(m => m.RequestListComponent)
+      },
+      {
+      path: 'requests-component/:id',
+      loadComponent: () => import('./shared/components/request-detail/request-detail.component').then(m => m.RequestDetailComponent)
       }
+      
     ]
   },
   { path: '', redirectTo: 'login', pathMatch: 'full' },

@@ -141,3 +141,36 @@
   font-weight: 600;
   color: #212529;
 }
+
+.status-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-left: auto;
+  gap: 12px;
+}
+
+/* 🚀 Navigation Link Button Layout rules */
+.details-nav-btn {
+  width: 36px !important;
+  height: 36px !important;
+  line-height: 36px !important;
+  color: #3f51b5; /* Primary accent theme visibility */
+  margin-top: -10px;
+}
+
+.details-nav-btn mat-icon {
+  font-size: 20px !important;
+  width: 20px !important;
+  height: 20px !important;
+}
+
+@media (max-width: 576px) {
+  .status-wrapper {
+    gap: 6px;
+  }
+  .details-nav-btn {
+    width: 32px !important;
+    height: 32px !important;
+  }
+}
