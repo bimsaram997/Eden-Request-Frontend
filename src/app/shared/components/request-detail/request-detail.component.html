@@ -4,9 +4,9 @@
     <button mat-icon-button (click)="onBack()" aria-label="Go back to list">
       <mat-icon>arrow_back</mat-icon>
     </button>
-    <span>Room {{ requestItem?.roomNumber }} Request Details</span>
+    <span>Room {{ requestItem.roomNumber }} Request Details</span>
     <span class="spacer"></span>
-    <span class="status-badge {{ requestItem?.status?.toLowerCase() }}">{{ requestItem?.status }}</span>
+    <span class="status-badge {{ requestItem.status.toLowerCase() }}">{{ requestItem.status }}</span>
   </mat-toolbar>
 
   <div class="detail-scroll-body">
@@ -16,23 +16,23 @@
         <div class="meta-grid">
           <div class="meta-item">
             <span class="meta-label">List Identifier</span>
-            <span class="meta-value">#{{ requestItem?.roomListId }}</span>
+            <span class="meta-value">#{{ requestItem.roomListId }}</span>
           </div>
           <div class="meta-item">
             <span class="meta-label">Submitted On</span>
-            <span class="meta-value">{{ requestItem?.createdAt | date:'dd/MM/yyyy hh:mm a' }}</span>
+            <span class="meta-value">{{ requestItem.createdAt | date:'dd/MM/yyyy hh:mm a' }}</span>
           </div>
-          <div class="meta-item" *ngIf="requestItem?.employee?.name">
+          <div class="meta-item" *ngIf="requestItem.employee?.name">
             <span class="meta-label">Requested By</span>
-            <span class="meta-value">{{ requestItem?.employee?.name }}</span>
+            <span class="meta-value">{{ requestItem.employee?.name }}</span>
           </div>
-          <div class="meta-item" *ngIf="requestItem?.updatedBy?.name">
+          <div class="meta-item" *ngIf="requestItem.updatedBy?.name">
             <span class="meta-label">Updated By</span>
-            <span class="meta-value">{{ requestItem?.updatedBy?.name }}</span>
+            <span class="meta-value">{{ requestItem.updatedBy?.name }}</span>
           </div>
-          <div class="meta-item" *ngIf="requestItem?.updatedAt">
+          <div class="meta-item" *ngIf="requestItem.updatedAt">
             <span class="meta-label">Updated At</span>
-            <span class="meta-value">{{ requestItem?.updatedAt | date:'dd/MM/yyyy hh:mm a' }}</span>
+            <span class="meta-value">{{ requestItem.updatedAt | date:'dd/MM/yyyy hh:mm a' }}</span>
           </div>
         </div>
       </mat-card-content>
@@ -59,7 +59,7 @@
       <h3 class="section-title">Housekeeper Notes</h3>
       <div class="notes-bubble">
         <mat-icon>chat_bubble_outline</mat-icon>
-        <p>{{ requestItem?.notes }}</p>
+        <p>{{ requestItem.notes }}</p>
       </div>
     </div>
   </div>
