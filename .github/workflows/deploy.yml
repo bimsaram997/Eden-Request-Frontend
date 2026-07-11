@@ -1,0 +1,45 @@
+name: Test Pipeline Build
+
+on:
+  push:
+    branches:
+      - master      # Triggers when code is merged directly into master
+      - dev         # Triggers when code is merged directly into dev
+  pull_request:
+    branches:
+      - dev         # Triggers the moment a PR is opened targeting dev
+      - master      # Triggers the moment a PR is opened targeting master
+
+jobs:
+  validate-pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set Environment Profile
+        id: set-env
+        run: |
+          # If the target branch of a PR or the pushed branch is 'dev', use development profile.
+          if [ "${{ github.base_ref }}" = "dev" ] || [ "${{ github.ref_name }}" = "dev" ]; then
+            echo "profile=development" >> $GITHUB_OUTPUT
+            echo "Building with DEVELOPMENT configuration"
+          else
+            echo "profile=production" >> $GITHUB_OUTPUT
+            echo "Building with PRODUCTION configuration"
+          fi
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Test Docker Build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false # Purely validates that the build succeeds
+          build-args: |
+            APP_ENV=${{ steps.set-env.outputs.profile }}
+          tags: frontend-test:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

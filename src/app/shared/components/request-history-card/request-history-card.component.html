@@ -43,19 +43,34 @@
     </div>
 
     <div class="tl-action-footer" *ngIf="isTeamLeader">
-      <button mat-flat-button color="accent" [matMenuTriggerFor]="statusMenu">
-        <mat-icon>edit</mat-icon> Change Status
-      </button>
+  <!-- Disable the button and change behavior dynamically when isLoading is true -->
+  <button 
+    mat-flat-button 
+    color="accent" 
+    [disabled]="isLoading" 
+    [matMenuTriggerFor]="isLoading ? null : statusMenu">
+    
+    <!-- Show spinner when loading, otherwise show the edit icon -->
+    <mat-spinner 
+      *ngIf="isLoading" 
+      diameter="20" 
+      class="button-spinner-inline me-2 d-inline-block">
+    </mat-spinner>
+    <mat-icon *ngIf="!isLoading">edit</mat-icon> 
+    
+    <!-- Dynamically update button text -->
+    <span>{{ isLoading ? 'Updating...' : 'Change Status' }}</span>
+  </button>
 
-      <mat-menu #statusMenu="matMenu">
-        <button 
-          mat-menu-item 
-          *ngFor="let option of statusMenuOptions" 
-          (click)="emitStatusUpdate(option.status)">
-          <mat-icon [style.color]="option.color">{{ option.icon }}</mat-icon>
-          <span>{{ option.label }}</span>
-        </button>
-      </mat-menu>
-    </div>
+  <mat-menu #statusMenu="matMenu">
+    <button 
+      mat-menu-item 
+      *ngFor="let option of statusMenuOptions" 
+      (click)="emitStatusUpdate(option.status)">
+      <mat-icon [style.color]="option.color">{{ option.icon }}</mat-icon>
+      <span>{{ option.label }}</span>
+    </button>
+  </mat-menu>
+</div>
   </div>
 </mat-expansion-panel>

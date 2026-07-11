@@ -1,15 +1,16 @@
 import { Injectable } from '@angular/core';
-import { environment } from '../../environments/environment.prod';
+
 import { SwPush } from '@angular/service-worker';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router'; 
+import { environment } from '../../environments/environment.development';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PushNotificationService {
 
-  readonly VAPID_PUBLIC_KEY = "BJG4RvGGTYeHowRny5MucqHnxv5lhEP-fDc1rsHjAzidA0NtncIu0h4SxTc-4gksM9IkBYcod3wP0rU8WsuNVTY";
+  readonly VAPID_PUBLIC_KEY = "BJgz5-wimo-WkGZNovZajYZtoKvExMVqbHH5p6xL5DbL7Y6xx1Ri-4vZrtZI-EI0h-cckCRa7GfBibr-FF3zG_A";
   
   baseUrl = environment.baseUrl;
 

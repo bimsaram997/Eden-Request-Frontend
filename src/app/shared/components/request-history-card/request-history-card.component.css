@@ -174,3 +174,11 @@
     height: 32px !important;
   }
 }
+
+.button-spinner-inline {
+  vertical-align: middle;
+  display: inline-block;
+}
+::v-deep .button-spinner-inline circle {
+  stroke: currentColor !important; /* Forces the spinner color to match the button text text color */
+}
