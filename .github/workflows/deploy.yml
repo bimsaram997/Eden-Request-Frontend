@@ -1,17 +1,17 @@
-name: Test Pipeline Build
+name: Test and Deploy Frontend
 
 on:
   push:
     branches:
-      - master      # Triggers when code is merged directly into master
-      - dev         # Triggers when code is merged directly into dev
+      - dev
+      - master
   pull_request:
     branches:
-      - dev         # Triggers the moment a PR is opened targeting dev
-      - master      # Triggers the moment a PR is opened targeting master
+      - dev
+      - master
 
 jobs:
-  validate-pipeline:
+  validate-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -20,13 +20,10 @@ jobs:
       - name: Set Environment Profile
         id: set-env
         run: |
-          # If the target branch of a PR or the pushed branch is 'dev', use development profile.
           if [ "${{ github.base_ref }}" = "dev" ] || [ "${{ github.ref_name }}" = "dev" ]; then
             echo "profile=development" >> $GITHUB_OUTPUT
-            echo "Building with DEVELOPMENT configuration"
           else
             echo "profile=production" >> $GITHUB_OUTPUT
-            echo "Building with PRODUCTION configuration"
           fi
 
       - name: Set up Docker Buildx
@@ -37,9 +34,24 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          push: false # Purely validates that the build succeeds
+          push: false
           build-args: |
             APP_ENV=${{ steps.set-env.outputs.profile }}
           tags: frontend-test:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      # --- DEPLOYMENT STEP ---
+      # This only triggers on a direct PUSH or MERGE (not on raw Pull Requests)
+      
+      - name: Trigger Render Dev Deployment
+        if: github.event_name == 'push' && github.ref_name == 'dev'
+        run: |
+          echo "Deploying to Render Development Environment..."
+          curl -X POST "${{ secrets.RENDER_DEV_FRONTEND_DEPLOY_HOOK }}"
+
+      - name: Trigger Render Prod Deployment
+        if: github.event_name == 'push' && github.ref_name == 'master'
+        run: |
+          echo "Deploying to Render Production Environment..."
+          curl -X POST "${{ secrets.RENDER_PROD_FRONTEND_DEPLOY_HOOK }}"
