@@ -14,6 +14,7 @@
   <mat-accordion class="request-accordion" multi="true">
     <app-request-history-card
       *ngFor="let requestItem of userRequests" 
+      [isLoading]="updatingRequestIds.has(requestItem.id)"
       [req]="requestItem" (statusChanged)="handleStatusUpdate($event)">
     </app-request-history-card>
   </mat-accordion>

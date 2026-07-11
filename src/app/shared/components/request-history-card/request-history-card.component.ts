@@ -17,6 +17,7 @@ export class RequestHistoryCardComponent {
   @Output() statusChanged = new EventEmitter<{ requestId: number, currentStatus: string, newStatus: string }>();
   @Output() viewDetails = new EventEmitter<any>();
   isTeamLeader = false;
+  @Input() isLoading = false;
 
   statusMenuOptions: StatusMenuOption[] = [
     { status: RequestStatus.Pending, label: 'Set to Pending', icon: 'hourglass_empty', color: '#ffc107' },

@@ -25,6 +25,8 @@ export class RequestListComponent implements OnInit, OnDestroy {
 
   isTeamLeaderUser = false;
   private subs:any[] = [];
+updatingRequestIds = new Set<number>();
+  isUpdating = false;
 
   activeFilters: ExtendedFilterPayload = {
     roomSearch: null,
@@ -134,30 +136,52 @@ changeDetection(): void {
   handleStatusUpdate(event: { requestId: number, currentStatus: string, newStatus: string }): void {
   const current = event.currentStatus;
   const next = event.newStatus;
-    if (current === 'Pending' && next !== 'Acknowledge') {
-    alert('Cannot change status! A pending request must be "Acknowledged"  before any other actions can be taken.');
-    // If you use MatSnackBar, you can replace the alert above with:
-    // this.snackBar.open('Pending requests must be Approved first.', 'Close', { duration: 3000 });
-    return; // Halt execution early
-  }
-    console.log(`Updating request ${event.requestId} to status: ${event.newStatus}`);
-    const payload = {
-      status: event.newStatus,
-      updatedBy: this.session.id || this.session.employeeId
-    };
-    // Call your backend API service here to save changes
-    this.requestService.updateRequestStatus(event.requestId, payload).subscribe({
-      next: (response) => {
-        console.log('Status updated successfully in backend!');
-        this.fetchHistoryPage(); // Refresh the list to reflect the new status
-        // Optional: Refresh your lists or local array data here
-      },
-      error: (err) => {
-        console.error('Failed to update status:', err);
-      }
-    });
+
+  // 1. SILENT GUARD: If this specific card is already updating, immediately ignore additional duplicate events
+  if (this.updatingRequestIds.has(event.requestId)) {
+    return;
   }
 
+  // 2. REDUNDANCY GUARD: Stop network requests if the dropdown value hasn't actually changed
+  if (current === next) {
+    console.warn(`Request ${event.requestId} status change ignored: target state matches current state.`);
+    return;
+  }
+
+  // Business Logic Guard
+  if (current === 'Pending' && next !== 'Acknowledge') {
+    alert('Cannot change status! A pending request must be "Acknowledged" before any other actions can be taken.');
+    return; 
+  }
+
+  console.log(`Updating request ${event.requestId} to status: ${event.newStatus}`);
+  
+  const payload = {
+    status: event.newStatus,
+    updatedBy: this.session.id || this.session.employeeId
+  };
+
+  // 3. LOCK: Drop this request ID into our tracking set to shut down ghost events
+  this.updatingRequestIds.add(event.requestId);
+
+  this.requestService.updateRequestStatus(event.requestId, payload).subscribe({
+    next: (response) => {
+      console.log('Status updated successfully in backend!');
+      
+      // The array update triggers accordion DOM structural updates safely now
+      this.fetchHistoryPage(); 
+      
+      // 4. UNLOCK: Clear tracking after the operation concludes successfully
+      this.updatingRequestIds.delete(event.requestId); 
+    },
+    error: (err) => {
+      console.error('Failed to update status:', err);
+      this.fetchHistoryPage();
+      // 5. UNLOCK ON FAILURE: Ensure the user can try again if the API fails
+      this.updatingRequestIds.delete(event.requestId); 
+    }
+  });
+}
  ngOnDestroy(): void {
   this.subs.forEach((sub: any) => {
     if (sub && typeof sub.unsubscribe === 'function') {
