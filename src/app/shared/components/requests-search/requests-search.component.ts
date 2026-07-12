@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ItemService } from '../../../services/item.service';
@@ -17,6 +17,7 @@ import { EmployeeDto } from '../../../models/class';
   styleUrl: './requests-search.component.css'
 })
 export class RequestsSearchComponent implements OnInit {
+  @Input() isSearching: boolean = false;
   @Output() filtersChanged = new EventEmitter<ExtendedFilterPayload>();
 
   listRoomsMap: { [key: number]: string[] } = {

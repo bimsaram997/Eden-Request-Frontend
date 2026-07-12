@@ -1,12 +1,29 @@
-<div class="detail-container">
+<div class="detail-container" *ngIf="requestItem">
   <!-- Device Friendly Header with Back Control -->
   <mat-toolbar class="detail-toolbar" color="primary">
     <button mat-icon-button (click)="onBack()" aria-label="Go back to list">
       <mat-icon>arrow_back</mat-icon>
     </button>
-    <span>Room {{ requestItem?.roomNumber }} Request Details</span>
+    <span class="toolbar-title">Room {{ requestItem.roomNumber }} Details</span>
     <span class="spacer"></span>
-    <span class="status-badge {{ requestItem?.status?.toLowerCase() }}">{{ requestItem?.status }}</span>
+    
+    <!-- 🎛️ Status + Desktop Edit Button Group -->
+    <div class="toolbar-actions">
+      <span class="status-badge {{ requestItem.status?.toLowerCase() }}">{{ requestItem.status }}</span>
+      
+      <!-- Desktop Only Status Button -->
+      <button 
+        mat-flat-button 
+        color="accent" 
+        class="desktop-action-btn"
+        *ngIf="isTeamLeader"
+        [disabled]="isLoading" 
+        [matMenuTriggerFor]="isLoading ? null : statusMenu">
+        <mat-spinner *ngIf="isLoading" diameter="18" class="button-spinner-inline me-2 d-inline-block"></mat-spinner>
+        <mat-icon *ngIf="!isLoading">edit</mat-icon> 
+        <span>{{ isLoading ? 'Updating...' : 'Change Status' }}</span>
+      </button>
+    </div>
   </mat-toolbar>
 
   <div class="detail-scroll-body">
@@ -16,23 +33,23 @@
         <div class="meta-grid">
           <div class="meta-item">
             <span class="meta-label">List Identifier</span>
-            <span class="meta-value">#{{ requestItem?.roomListId }}</span>
+            <span class="meta-value">#{{ requestItem.roomListId }}</span>
           </div>
           <div class="meta-item">
             <span class="meta-label">Submitted On</span>
-            <span class="meta-value">{{ requestItem?.createdAt | date:'dd/MM/yyyy hh:mm a' }}</span>
+            <span class="meta-value">{{ requestItem.createdAt | date:'dd/MM/yyyy hh:mm a' }}</span>
           </div>
-          <div class="meta-item" *ngIf="requestItem?.employee?.name">
+          <div class="meta-item" *ngIf="requestItem.employee?.name">
             <span class="meta-label">Requested By</span>
-            <span class="meta-value">{{ requestItem?.employee?.name }}</span>
+            <span class="meta-value text-truncate">{{ requestItem.employee?.name }}</span>
           </div>
-          <div class="meta-item" *ngIf="requestItem?.updatedBy?.name">
+          <div class="meta-item" *ngIf="requestItem.updatedBy?.name">
             <span class="meta-label">Updated By</span>
-            <span class="meta-value">{{ requestItem?.updatedBy?.name }}</span>
+            <span class="meta-value text-truncate">{{ requestItem.updatedBy?.name }}</span>
           </div>
-          <div class="meta-item" *ngIf="requestItem?.updatedAt">
+          <div class="meta-item" *ngIf="requestItem.updatedAt">
             <span class="meta-label">Updated At</span>
-            <span class="meta-value">{{ requestItem?.updatedAt | date:'dd/MM/yyyy hh:mm a' }}</span>
+            <span class="meta-value">{{ requestItem.updatedAt | date:'dd/MM/yyyy hh:mm a' }}</span>
           </div>
         </div>
       </mat-card-content>
@@ -43,7 +60,7 @@
     <mat-card class="items-card">
       <mat-card-content class="no-padding">
         <mat-list>
-          <mat-list-item *ngFor="let item of requestItem?.lines" class="supply-list-item">
+          <mat-list-item *ngFor="let item of requestItem.lines" class="supply-list-item">
             <mat-icon matListItemIcon color="primary">inventory_2</mat-icon>
             <div matListItemTitle class="item-name">{{ item.item?.name }}</div>
             <div matListItemMeta class="item-qty">
@@ -55,12 +72,37 @@
     </mat-card>
 
     <!-- Contextual Note Attachment Block -->
-    <div class="notes-wrapper" *ngIf="requestItem?.notes">
+    <div class="notes-wrapper" *ngIf="requestItem.notes">
       <h3 class="section-title">Housekeeper Notes</h3>
       <div class="notes-bubble">
         <mat-icon>chat_bubble_outline</mat-icon>
-        <p>{{ requestItem?.notes }}</p>
+        <p>{{ requestItem.notes }}</p>
       </div>
     </div>
+
+    <!-- 📱 MOBILE ONLY INLINE FOOTER (Moved inside scroll body) -->
+    <div class="mobile-action-container" *ngIf="isTeamLeader">
+      <button 
+        mat-flat-button 
+        color="accent" 
+        class="w-100 py-3 status-action-btn"
+        [disabled]="isLoading" 
+        [matMenuTriggerFor]="isLoading ? null : statusMenu">
+        <mat-spinner *ngIf="isLoading" diameter="20" class="button-spinner-inline me-2 d-inline-block"></mat-spinner>
+        <mat-icon *ngIf="!isLoading">edit</mat-icon> 
+        <span>{{ isLoading ? 'Updating...' : 'Change Status' }}</span>
+      </button>
+    </div>
   </div>
+
+  <!-- Shared Menu Context Template -->
+  <mat-menu #statusMenu="matMenu">
+    <button 
+      mat-menu-item 
+      *ngFor="let option of statusMenuOptions" 
+      (click)="handleStatusUpdate(option.status)">
+      <mat-icon [style.color]="option.color">{{ option.icon }}</mat-icon>
+      <span>{{ option.label }}</span>
+    </button>
+  </mat-menu>
 </div>

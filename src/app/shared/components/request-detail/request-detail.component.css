@@ -1,16 +1,29 @@
 .detail-container {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  width: 100%;
   background-color: #f8f9fa;
+  box-sizing: border-box;
+  min-height: auto; 
 }
 
 .detail-toolbar {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   z-index: 2;
+  min-width: 0;
+}
+
+.toolbar-title {
+  font-size: 16px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  flex: 1;
 }
 
 .spacer {
@@ -18,13 +31,11 @@
 }
 
 .detail-scroll-body {
-  flex: 1;
-  overflow-y: auto;
   padding: 16px;
   box-sizing: border-box;
 }
 
-/* Metadata Panel Layout */
+/* Metadata Configuration Block */
 .meta-card {
   margin-bottom: 20px;
   border-radius: 8px !important;
@@ -32,13 +43,14 @@
 
 .meta-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
   gap: 16px;
 }
 
 .meta-item {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .meta-label {
@@ -56,7 +68,13 @@
   margin-top: 2px;
 }
 
-/* Sections Structure */
+.text-truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Requested Supplies Structure */
 .section-title {
   font-size: 13px;
   font-weight: 700;
@@ -98,7 +116,6 @@
   color: #6c757d;
 }
 
-/* Context Notes Styling */
 .notes-bubble {
   display: flex;
   gap: 12px;
@@ -107,6 +124,7 @@
   border-radius: 8px;
   border-left: 4px solid #ced4da;
   box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  margin-bottom: 20px;
 }
 
 .notes-bubble mat-icon {
@@ -118,16 +136,18 @@
   font-size: 14px;
   color: #495057;
   line-height: 1.5;
+  word-break: break-word;
 }
 
-/* Status Badges */
+/* Status Element Actions */
 .status-badge {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
-  padding: 4px 12px;
+  padding: 4px 10px;
   border-radius: 20px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  white-space: nowrap;
 }
 
 .status-badge.pending { background-color: #fff3cd; color: #664d03; }
@@ -135,12 +155,75 @@
 .status-badge.delivered { background-color: #d1e7dd; color: #0f5132; }
 .status-badge.rejected { background-color: #f8d7da; color: #842029; }
 
-/* 📱 Small-Screen Adjustments */
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.desktop-action-btn {
+  height: 36px !important;
+  font-weight: 600;
+  font-size: 13px;
+  border-radius: 6px !important;
+  display: inline-flex !important;
+  align-items: center;
+}
+
+/* 📱 Inline Mobile Button Wrapping Box */
+.mobile-action-container {
+  margin-top: 24px;
+  width: 100%;
+}
+
+.status-action-btn {
+  height: 48px !important;
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.3px;
+  border-radius: 8px !important;
+}
+
+.button-spinner-inline {
+  vertical-align: middle;
+}
+
+/* ==========================================================================
+   5. Media Query Breakpoints
+   ========================================================================== */
+
+@media (min-width: 577px) {
+  /* Hide the full width action button container on desktop panels */
+  .mobile-action-container {
+    display: none !important;
+  }
+  
+  .detail-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    background: #ffffff;
+    padding-bottom: 24px;
+  }
+}
+
 @media (max-width: 576px) {
+  /* Hide upper header button option on smartphones */
+  .desktop-action-btn {
+    display: none !important;
+  }
+
   .detail-scroll-body {
     padding: 12px;
   }
+  
   .meta-grid {
+    grid-template-columns: 1fr 1fr;
     gap: 12px;
+  }
+  
+  .toolbar-title {
+    font-size: 15px;
   }
 }

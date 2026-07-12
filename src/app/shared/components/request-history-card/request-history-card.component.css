@@ -18,10 +18,10 @@
 /* Flex adjustment inside the Angular Material header layout block */
 .panel-header-grid {
   padding: 16px !important;
-  height: auto !important; /* Allows dynamic height calculation on text wrap */
+  height: auto !important; 
 }
 
-/* Forces content and status badge to stay on opposite sides */
+/* 🚨 THIS EXACT LINE IN YOUR REQUEST-HISTORY-CARD CSS IS THE CULPRIT: */
 ::ng-deep .panel-header-grid .mat-content {
   display: flex !important;
   justify-content: space-between !important;
@@ -131,10 +131,11 @@
 
 /* Styling for the new-line employee display */
 .employee-name-block {
-  margin-top: 4px;       /* Creates clean breathing room below the date line */
-  color: #495057;         /* Slightly darker than standard meta text for readability */
-  font-size: 13px;        /* Scales nicely between the title and meta sizes */
-  white-space: nowrap;    /* FORCES "Requested by: James Anderson" to stay on the same line */
+  margin-top: 4px;       
+  color: #495057;         
+  font-size: 13px;        
+  white-space: normal; /* Allow text to drop to a new line gracefully */
+  word-break: break-word;
 }
 
 .employee-name-block strong {

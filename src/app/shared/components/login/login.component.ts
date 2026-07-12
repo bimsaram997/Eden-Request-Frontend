@@ -19,6 +19,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   loginForm!: FormGroup;
   subscription: Subscription[] = [];
   returnUrl: string = ''; // 🚀 Track deep-link paths securely across login validation events
+isLoading: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -44,8 +45,10 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   onLogin(): void {
+    this.isLoading = true; 
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched(); 
+      this.isLoading = false; // Reset loading state
       return;
     }
 
@@ -56,6 +59,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
     this.authService.login(payload).subscribe({
       next: (employeeResponse) => {
+        this.isLoading = false; // Reset loading state
         console.log('Backend verified profile payload:', employeeResponse);
 
         localStorage.setItem('scandic_eden_session', JSON.stringify(employeeResponse));
@@ -78,6 +82,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         console.error('API connection or credentials rejected:', err);
+        this.isLoading = false; // Reset loading state
         alert(err.error || 'Authentication failed. Please verify your credentials.');
       }
     });

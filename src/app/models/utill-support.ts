@@ -6,3 +6,4 @@ export interface StatusMenuOption {
   icon: string;
   color: string;
 }
+

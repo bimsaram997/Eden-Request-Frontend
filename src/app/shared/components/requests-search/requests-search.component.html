@@ -92,13 +92,35 @@
       </div>
 
       <div class="col-12 col-md text-md-end mt-2 mt-md-0 d-flex gap-2 justify-content-md-end">
-        <button mat-flat-button color="primary" class="responsive-btn py-2 flex-grow-1 flex-md-grow-0" (click)="applyFilters()">
-          <mat-icon>search</mat-icon> Search
-        </button>
-        <button mat-stroked-button color="warn" class="responsive-btn py-2 flex-grow-1 flex-md-grow-0" (click)="resetFilters()">
-          <mat-icon>clear_all</mat-icon> Clear
-        </button>
-      </div>
+  
+  <!-- 🛡️ SEARCH BUTTON WITH NETWORK LOCK -->
+  <button 
+    mat-flat-button 
+    color="primary" 
+    class="responsive-btn py-2 flex-grow-1 flex-md-grow-0" 
+    [disabled]="isSearching"
+    (click)="applyFilters()">
+    
+    <mat-spinner 
+      *ngIf="isSearching" 
+      diameter="18" 
+      class="button-spinner-inline me-2 d-inline-block">
+    </mat-spinner>
+    
+    <mat-icon *ngIf="!isSearching">search</mat-icon> 
+    <span>{{ isSearching ? 'Searching...' : 'Search' }}</span>
+  </button>
+
+  <button 
+    mat-stroked-button 
+    color="warn" 
+    class="responsive-btn py-2 flex-grow-1 flex-md-grow-0" 
+    [disabled]="isSearching"
+    (click)="resetFilters()">
+    <mat-icon>clear_all</mat-icon> Clear
+  </button>
+  
+</div>
 
     </div>
   </div>
