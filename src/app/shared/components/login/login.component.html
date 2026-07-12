@@ -36,10 +36,26 @@
                     </div>
 
                     <div class="d-grid gap-2">
-                        <button mat-flat-button color="primary" type="submit" class="py-2 fs-6"
-                            (click)="onLogin()">
-                            Sign In
-                        </button>
+
+
+                          <button 
+    mat-flat-button 
+    color="primary" 
+    class="responsive-btn py-2 flex-grow-1 flex-md-grow-0" 
+    [disabled]="isLoading"
+    (click)="onLogin()">
+    
+    <mat-spinner 
+      *ngIf="isLoading" 
+      diameter="18" 
+      class="button-spinner-inline me-2 d-inline-block">
+    </mat-spinner>
+    
+    <mat-icon *ngIf="!isLoading">login</mat-icon> 
+    <span>{{ isLoading ? 'Loading...' : 'Sign In' }}</span>
+  </button>
+
+  
                     </div>
 
                 </form>

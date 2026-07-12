@@ -79,20 +79,20 @@
         <p>{{ requestItem.notes }}</p>
       </div>
     </div>
-  </div>
 
-  <!-- 📱 MOBILE ONLY STICKY FOOTER -->
-  <div class="sticky-action-footer" *ngIf="isTeamLeader">
-    <button 
-      mat-flat-button 
-      color="accent" 
-      class="w-100 py-3 status-action-btn"
-      [disabled]="isLoading" 
-      [matMenuTriggerFor]="isLoading ? null : statusMenu">
-      <mat-spinner *ngIf="isLoading" diameter="20" class="button-spinner-inline me-2 d-inline-block"></mat-spinner>
-      <mat-icon *ngIf="!isLoading">edit</mat-icon> 
-      <span>{{ isLoading ? 'Updating...' : 'Change Status' }}</span>
-    </button>
+    <!-- 📱 MOBILE ONLY INLINE FOOTER (Moved inside scroll body) -->
+    <div class="mobile-action-container" *ngIf="isTeamLeader">
+      <button 
+        mat-flat-button 
+        color="accent" 
+        class="w-100 py-3 status-action-btn"
+        [disabled]="isLoading" 
+        [matMenuTriggerFor]="isLoading ? null : statusMenu">
+        <mat-spinner *ngIf="isLoading" diameter="20" class="button-spinner-inline me-2 d-inline-block"></mat-spinner>
+        <mat-icon *ngIf="!isLoading">edit</mat-icon> 
+        <span>{{ isLoading ? 'Updating...' : 'Change Status' }}</span>
+      </button>
+    </div>
   </div>
 
   <!-- Shared Menu Context Template -->
