@@ -2,9 +2,12 @@
    1. GLOBAL CONTAINER & HEADER
    ========================================== */
 .history-container {
-  max-width: 1200px; /* Wider boundary limit for desktop viewports */
+  max-width: 1200px; 
   margin: 0 auto;
   padding: 20px;
+  width: 100%;
+  overflow-x: hidden; /* Safeguards layout margins from popping out of the screen view */
+  box-sizing: border-box;
 }
 
 .history-header {
