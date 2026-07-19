@@ -1,1 +1,2 @@
-importScripts('./sw-custom.js', './ngsw-worker.js');
+importScripts('./sw-custom.js');
+importScripts('./ngsw-worker.js');

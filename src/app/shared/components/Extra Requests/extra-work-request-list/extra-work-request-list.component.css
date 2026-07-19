@@ -1,0 +1,283 @@
+
+/* ==========================================
+   1. GLOBAL CONTAINER & HEADER
+   ========================================== */
+.history-container {
+  max-width: 1200px; 
+  margin: 0 auto;
+  padding: 20px;
+  width: 100%;
+  overflow-x: hidden; /* Safeguards layout margins from popping out of the screen view */
+  box-sizing: border-box;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.history-header h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #212529;
+}
+
+.bg-secondary{
+background-color: white !important;
+}
+
+.total-count {
+  font-size: 14px;
+  color: #6c757d;
+}
+
+/* ==========================================
+   2. RESPONSIVE GRID WRAPPER FOR THE ACCORDION
+   ========================================== */
+/* 📱 MOBILE VIEW (Default Setup) */
+.request-accordion {
+  display: grid;
+  grid-template-columns: 1fr; /* 1 panel per row */
+  gap: 12px;
+}
+
+/*  TABLET VIEW (Screens wider than 650px) */
+@media (min-width: 650px) {
+  .request-accordion {
+    grid-template-columns: repeat(2, 1fr); /* 2 panels side-by-side */
+    gap: 16px;
+    align-items: start; /* Prevents rows from stretching unevenly */
+  }
+}
+
+/*  DESKTOP VIEW (Screens wider than 1050px) */
+@media (min-width: 1050px) {
+  .request-accordion {
+    grid-template-columns: repeat(3, 1fr); /* 3 panels side-by-side */
+    gap: 20px;
+  }
+}
+
+/* ==========================================
+   3. EXPANSION PANEL DESIGN MODIFICATIONS
+   ========================================== */
+.history-panel {
+  background: #ffffff;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+  border-left: 6px solid #dee2e6; /* Left indicator status accent bar */
+  overflow: hidden;
+}
+
+/* Color codes mapping across your C# data statuses */
+.history-panel.pending { border-left-color: #ffc107; }
+.history-panel.approved { border-left-color: #0d6efd; }
+.history-panel.delivered { border-left-color: #198754; }
+.history-panel.rejected { border-left-color: #dc3545; }
+
+/* Flex adjustment inside the Angular Material header layout block */
+.panel-header-grid {
+  padding: 16px !important;
+  height: auto !important; /* Allows dynamic height calculation on text wrap */
+}
+
+/* Forces content and status badge to stay on opposite sides */
+::ng-deep .panel-header-grid .mat-content {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  width: 100%;
+}
+
+.room-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: #212529;
+}
+
+.req-meta {
+  font-size: 12px;
+  color: #6c757d;
+  margin-top: 2px;
+}
+
+.status-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  margin-left: 12px;
+}
+
+/* Status Badges styling adjustments */
+.status-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.status-badge.pending { background-color: #fff3cd; color: #664d03; }
+.status-badge.approved { background-color: #cfe2ff; color: #084298; }
+.status-badge.delivered { background-color: #d1e7dd; color: #0f5132; }
+.status-badge.rejected { background-color: #f8d7da; color: #842029; }
+
+/* ==========================================
+   4. INTERIOR EXPANDED PANEL DETAILS
+   ========================================== */
+.expanded-detail-content {
+  padding: 12px 4px 4px 4px;
+  border-top: 1px dashed #e9ecef;
+}
+
+.items-title {
+  margin: 0 0 10px 0;
+  font-size: 12px;
+  font-weight: bold;
+  color: #868e96;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.detail-item-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.detail-item-list li {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #f1f3f5;
+  font-size: 14px;
+  color: #343a40;
+}
+
+.detail-item-list li:last-child {
+  border-bottom: none;
+}
+
+.item-qty strong {
+  color: #3f51b5;
+  font-weight: 600;
+}
+
+.request-footer-notes {
+  margin-top: 14px;
+  padding: 10px 12px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #495057;
+  line-height: 1.4;
+  border-left: 3px solid #ced4da;
+}
+/* Add these styles to your existing CSS file */
+
+.filter-toggle-group .btn {
+  font-weight: 600;
+  font-size: 14px;
+  border-radius: 6px;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Enforce rounded corners on outer button edges */
+.filter-toggle-group .btn:first-child {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
+
+.filter-toggle-group .btn:last-child {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+/* Responsive adjustments for narrow layouts */
+@media (max-width: 576px) {
+  .history-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+  }
+  
+  .toggle-badge-group {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+
+  .filter-toggle-group {
+    width: 100%;
+    display: flex;
+  }
+
+  .filter-toggle-group .btn {
+    flex: 1;
+  }
+  
+  .total-count {
+    text-align: center;
+  }
+}
+
+/* Custom Header Typography style helper */
+.page-section-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #212529;
+}
+
+/* Base button-toggle group styles */
+.filter-toggle-group .btn {
+  font-weight: 600;
+  font-size: 14px;
+  border-radius: 6px;
+  transition: all 0.2s ease-in-out;
+}
+
+.filter-toggle-group .btn:first-child {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
+
+.filter-toggle-group .btn:last-child {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+/* Ensure background is white and clean */
+.bg-secondary {
+  background-color: #ffffff !important;
+}
+
+/* 📱 Responsive Adjustments: Screens narrower than 768px (Tablet & Mobile) */
+@media (max-width: 767.98px) {
+  .w-100-mobile {
+    width: 100% !important;
+  }
+  
+  .filter-toggle-group {
+    flex-grow: 1;
+  }
+  
+  .filter-toggle-group .btn {
+    text-align: center;
+  }
+
+  .total-count {
+    white-space: nowrap;
+  }
+}

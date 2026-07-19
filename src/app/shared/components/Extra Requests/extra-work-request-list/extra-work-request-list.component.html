@@ -1,0 +1,80 @@
+<div class="history-container py-3">
+  <div class="row mb-4 align-items-center">
+    <div class="col col-sm-8">
+      <h2 class="m-0 fs-4 fw-bold text-secondary">Extra Work Requests</h2>
+    </div>
+    <div class="col-auto text-end mt-1" *ngIf="isTeamLeaderUser">
+            <button 
+                mat-raised-button 
+                color="primary" 
+                class="py-2 px-4 fs-6 rounded-1" 
+                (click)="routeToExtraWorkRequest()">
+                ➕ Add  Extra Work Request
+            </button>
+        </div>
+  </div>
+
+  <div class="mb-4">
+    <app-extra-work-request-search (filtersChanged)="onFilterCriteriaChanged($event)" [isSearching]="isSearching"></app-extra-work-request-search>
+  </div>
+
+  <!-- 🛠️ Fixed Header Layout using structural columns -->
+  <div class="row align-items-center mb-4 g-3">
+    <!-- Left Column: Dynamic Header Title -->
+    <div class="col-12 col-md-5 col-lg-6">
+      <h3 class="m-0 page-section-title">📋 {{ isToday ? "Today's Requests" : "Past Requests" }}</h3>
+    </div>
+    
+    <!-- Right Column: Controls Group (Toggle Buttons + Counter Badge) locked to the right -->
+    <div class="col-12 col-md-7 col-lg-6 d-flex justify-content-md-end align-items-center">
+      <div class="d-flex align-items-center gap-2 w-100-mobile justify-content-between justify-content-md-end">
+        
+        <!-- Toggle buttons -->
+        <div class="btn-group filter-toggle-group" role="group" aria-label="Request Time Period">
+          <button 
+            type="button" 
+            class="btn btn-outline-primary py-2 px-3 fs-7"
+            [class.active]="isToday === true"
+            (click)="selectTodayTab()">
+            Today
+          </button>
+          <button 
+            type="button" 
+            class="btn btn-outline-primary py-2 px-3 fs-7"
+            [class.active]="isToday === false"
+            (click)="selectPastTab()">
+            Past
+          </button>
+        </div>
+
+        <!-- Total Count Badge -->
+        <span class="badge bg-secondary total-count p-2 fs-6 border text-muted">
+          Total: {{ totalRecords }}
+        </span>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Cards Grid Layout -->
+  <div class="row">
+    <mat-accordion class="request-accordion w-100" multi="true">
+      <app-extra-work-request-card
+        *ngFor="let requestItem of extrWorkRequests" 
+        [isLoading]="updatingRequestIds.has(requestItem.id)"
+        [req]="requestItem" 
+        (statusChanged)="handleStatusUpdate($event)">
+      </app-extra-work-request-card>
+    </mat-accordion>
+  </div>
+
+  <div class="paginator-wrapper mt-4 d-flex justify-content-center">
+    <mat-paginator 
+      [length]="totalRecords"
+      [pageSize]="pageSize"
+      [hidePageSize]="true"
+      aria-label="Select history page"
+      (page)="onPageChange($event)">
+    </mat-paginator>
+  </div>
+</div>

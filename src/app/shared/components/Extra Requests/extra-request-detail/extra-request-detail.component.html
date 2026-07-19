@@ -1,0 +1,108 @@
+<div class="detail-container" *ngIf="extraWorkRequest">
+  <!-- Device Friendly Header with Back Control -->
+  <mat-toolbar class="detail-toolbar" color="primary">
+    <button mat-icon-button (click)="onBack()" aria-label="Go back to list">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <span class="toolbar-title">Extra Request work for {{ extraWorkRequest.roomNumber }} Details</span>
+    <span class="spacer"></span>
+    
+    <!-- 🎛️ Status + Desktop Edit Button Group -->
+    <div class="toolbar-actions">
+      <span class="status-badge {{ extraWorkRequest.status?.toLowerCase() }}">{{ extraWorkRequest.status }}</span>
+      
+      <!-- Desktop Only Status Button -->
+      <button 
+        mat-flat-button 
+        color="accent" 
+        class="desktop-action-btn"
+        *ngIf="!isTeamLeader"
+        [disabled]="isLoading" 
+        [matMenuTriggerFor]="isLoading ? null : statusMenu">
+        <mat-spinner *ngIf="isLoading" diameter="18" class="button-spinner-inline me-2 d-inline-block"></mat-spinner>
+        <mat-icon *ngIf="!isLoading">edit</mat-icon> 
+        <span>{{ isLoading ? 'Updating...' : 'Change Status' }}</span>
+      </button>
+    </div>
+  </mat-toolbar>
+
+  <div class="detail-scroll-body">
+    <!-- Meta Info Information Panel -->
+    <mat-card class="meta-card">
+      <mat-card-content>
+        <div class="meta-grid">
+          <div class="meta-item">
+            <span class="meta-label">List Number</span>
+            <span class="meta-value">#{{ extraWorkRequest.listNumber }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Submitted On</span>
+            <span class="meta-value">{{ extraWorkRequest.addedDate | date:'dd/MM/yyyy hh:mm a' }}</span>
+          </div>
+          <div class="meta-item" *ngIf="extraWorkRequest.assignedToEmployee">
+            <span class="meta-label">Requested By</span>
+            <span class="meta-value text-truncate">{{ extraWorkRequest.requestedByEmployee }}</span>
+          </div>
+          <div class="meta-item" *ngIf="extraWorkRequest.updatedByEmployee">
+            <span class="meta-label">Updated By</span>
+            <span class="meta-value text-truncate">{{ extraWorkRequest.updatedByEmployee }} {{isTeamLeader ? "": "(Me)"}}</span>
+          </div>
+          <div class="meta-item" *ngIf="extraWorkRequest.updatedAt">
+            <span class="meta-label">Updated At</span>
+            <span class="meta-value">{{ extraWorkRequest.updatedAt | date:'dd/MM/yyyy hh:mm a' }}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Material Lines Allocation Summary -->
+    <h3 class="section-title">Requested Supplies</h3>
+    <mat-card class="items-card">
+      <mat-card-content class="no-padding">
+        <mat-list>
+          <mat-list-item *ngFor="let line of extraWorkRequest.lines" class="supply-list-item">
+            <mat-icon matListItemIcon color="primary">inventory_2</mat-icon>
+            <div matListItemTitle class="item-name">{{ line.extraWorkItemName }}</div>
+            <div matListItemMeta class="item-qty">
+              <strong>{{ line.quantity }}</strong>
+            </div>
+          </mat-list-item>
+        </mat-list>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Contextual Note Attachment Block -->
+    <div class="notes-wrapper" *ngIf="extraWorkRequest.notes">
+      <h3 class="section-title">Housekeeper Notes</h3>
+      <div class="notes-bubble">
+        <mat-icon>chat_bubble_outline</mat-icon>
+        <p>{{ extraWorkRequest.notes }}</p>
+      </div>
+    </div>
+
+    <!-- 📱 MOBILE ONLY INLINE FOOTER (Moved inside scroll body) -->
+    <div class="mobile-action-container" *ngIf="isTeamLeader">
+      <button 
+        mat-flat-button 
+        color="accent" 
+        class="w-100 py-3 status-action-btn"
+        [disabled]="isLoading" 
+        [matMenuTriggerFor]="isLoading ? null : statusMenu">
+        <mat-spinner *ngIf="isLoading" diameter="20" class="button-spinner-inline me-2 d-inline-block"></mat-spinner>
+        <mat-icon *ngIf="!isLoading">edit</mat-icon> 
+        <span>{{ isLoading ? 'Updating...' : 'Change Status' }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Shared Menu Context Template -->
+  <mat-menu #statusMenu="matMenu">
+    <button 
+      mat-menu-item 
+      *ngFor="let option of statusMenuOptions" 
+      (click)="handleStatusUpdate(option.status)">
+      <mat-icon [style.color]="option.color">{{ option.icon }}</mat-icon>
+      <span>{{ option.label }}</span>
+    </button>
+  </mat-menu>
+</div>

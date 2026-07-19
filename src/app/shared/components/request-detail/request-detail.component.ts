@@ -25,7 +25,7 @@ export class RequestDetailComponent implements OnInit, OnDestroy {
   ];
 
   private subs: Subscription[] = [];
-requestItem: RequestHeader | null = null;
+  requestItem: RequestHeader | null = null;
 
   @Input() req!: any;
   @Output() closeDetail = new EventEmitter<void>();
@@ -34,7 +34,7 @@ requestItem: RequestHeader | null = null;
   requestId!: number;
   isLoading: boolean = false;
   session: any;
-loading: boolean = true; // Initial loading state
+  loading: boolean = true; // Initial loading state
 
   constructor(
     private requestService: RequestService,
@@ -91,9 +91,7 @@ loading: boolean = true; // Initial loading state
     this.subs.push(reqSub);
   }
 
-  emitStatusUpdate(status: string): void {
 
-  }
 
   handleStatusUpdate(status: string): void {
     this.isLoading = true; // Show loading indicator while processing
@@ -119,11 +117,9 @@ loading: boolean = true; // Initial loading state
 
   onBack(): void {
     this.closeDetail.emit();
-    if (this.isTeamLeader) {
+
       this.router.navigate(['/workspace/requests-list']);
-    } else {
-      this.router.navigate(['/workspace/housekeeper-dashboard']);
-    }
+   
   }
 
   ngOnDestroy(): void {

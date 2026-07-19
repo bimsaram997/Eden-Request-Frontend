@@ -1,0 +1,129 @@
+<div class="card shadow-sm border-0 mb-4 bg-white p-3 p-sm-4" [formGroup]="filterForm">
+  <div class="container-fluid p-0">
+    <div class="row g-2 g-sm-3 align-items-center">
+
+      <div class="col-12 col-sm-6 col-md-4 col-xl-2">
+        <mat-form-field appearance="outline" class="w-100 compact-field">
+          <mat-label>List Number</mat-label>
+          <mat-select formControlName="listNumber" (selectionChange)="onListChange()">
+            <mat-option *ngFor="let num of listNumbers" [value]="num">
+              List {{ num }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+        <mat-form-field appearance="outline" class="w-100 compact-field">
+          <mat-label>Room Number</mat-label>
+          <mat-select formControlName="roomId" [disabled]="availableRooms.length === 0">
+            <mat-option *ngFor="let room of availableRooms" [value]="room">
+              Room {{ room }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="col-12 col-sm-6 col-md-4 col-xl-2">
+        <mat-form-field appearance="outline" class="w-100 compact-field">
+          <mat-label>Status</mat-label>
+          <mat-select formControlName="status">
+            <mat-option *ngFor="let st of statusesList" [value]="st">{{ st }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+        <mat-form-field appearance="outline" class="w-100 compact-field">
+          <mat-label>Extra Work Items (Multi)</mat-label>
+          <mat-select formControlName="extraItemIds" multiple>
+            <mat-option *ngFor="let item of extraWorkItems" [value]="item.id">{{ item.name }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="col-12 col-sm-6 col-md-4 col-xl-3" *ngIf="isTeamLeader">
+        <mat-form-field appearance="outline" class="w-100 compact-field">
+          <mat-label>Assigned To</mat-label>
+          <mat-select formControlName="assignedToId">
+            <mat-option [value]="null">All Employees</mat-option>
+            <mat-option *ngFor="let hk of housekeepersList" [value]="hk.id">{{ hk.name }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+       <div class="col-12 col-sm-6 col-md-4 col-xl-3" >
+        <mat-form-field appearance="outline" class="w-100 compact-field">
+          <mat-label>Requested By</mat-label>
+          <mat-select formControlName="requestedById">
+            <mat-option [value]="null">All Employees</mat-option>
+            <mat-option *ngFor="let hk of teamLeaderList" [value]="hk.id">{{ hk.name }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+
+      <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+  <mat-form-field appearance="outline" class="w-100 compact-field">
+    <mat-label>Date Range</mat-label>
+    <!-- 🟢 Add [max]="maxDate" here to block future dates -->
+    <mat-date-range-input [rangePicker]="periodPicker" [max]="maxDate">
+      <input matStartDate placeholder="Start" formControlName="fromDate">
+      <input matEndDate placeholder="End" formControlName="toDate">
+    </mat-date-range-input>
+    <mat-datepicker-toggle matIconSuffix [for]="periodPicker"></mat-datepicker-toggle>
+    <mat-date-range-picker #periodPicker></mat-date-range-picker>
+  </mat-form-field>
+</div>
+
+      <div class="col-12 col-sm-6 col-md-4 col-xl-3">
+        <div class="row g-2">
+          <div class="col-6">
+            <mat-form-field appearance="outline" class="w-100 compact-field">
+              <mat-label>From Time</mat-label>
+              <input matInput type="time" formControlName="fromTime">
+            </mat-form-field>
+          </div>
+          <div class="col-6">
+            <mat-form-field appearance="outline" class="w-100 compact-field">
+              <mat-label>To Time</mat-label>
+              <input matInput type="time" formControlName="toTime">
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-md text-md-end mt-2 mt-md-0 d-flex gap-2 justify-content-md-end mt-1">
+  
+  <!-- 🛡️ SEARCH BUTTON WITH NETWORK LOCK -->
+  <button 
+    mat-flat-button 
+    color="primary" 
+    class="responsive-btn py-2 flex-grow-1 flex-md-grow-0" 
+    [disabled]="isSearching"
+    (click)="applyFilters()">
+    
+    <mat-spinner 
+      *ngIf="isSearching" 
+      diameter="18" 
+      class="button-spinner-inline me-2 d-inline-block">
+    </mat-spinner>
+    
+    <mat-icon *ngIf="!isSearching">search</mat-icon> 
+    <span>{{ isSearching ? 'Searching...' : 'Search' }}</span>
+  </button>
+
+  <button 
+    mat-stroked-button 
+    color="warn" 
+    class="responsive-btn py-2 flex-grow-1 flex-md-grow-0" 
+    [disabled]="isSearching"
+    (click)="resetFilters()">
+    <mat-icon>clear_all</mat-icon> Clear
+  </button>
+  
+</div>
+
+    </div>
+  </div>
+</div>

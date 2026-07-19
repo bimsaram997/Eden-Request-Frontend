@@ -15,7 +15,8 @@ export class SidenavbarComponent {
   imagePath: string = 'assets/main images/bread-food-meal-bun.jpg';
 // Updated menu array to hold the child routing targets
   menuArray: any[] = [
-    { name: 'Requests', routePath: 'requests-list', visible: true }
+    { name: 'Requests', routePath: 'requests-list', visible: true },
+    { name: 'Extra Work Requests', routePath: 'extra-work-requests', visible: true }
   ];
   isShow: boolean =  false;
   isTeamLeaderUser!: boolean;

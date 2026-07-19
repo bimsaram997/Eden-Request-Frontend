@@ -31,15 +31,33 @@ export const routes: Routes = [
         path: 'leader-dashboard',
         loadComponent: () => import('./modules/teamleader/team-leader-dash-board/team-leader-dash-board.component').then(m => m.TeamLeaderDashBoardComponent)
       },
-       {
+      {
         path: 'requests-list',
         loadComponent: () => import('./modules/housekeeping/housekeeping-dashbaord/components/request-list/request-list.component').then(m => m.RequestListComponent)
       },
       {
-      path: 'requests-component/:id',
-      loadComponent: () => import('./shared/components/request-detail/request-detail.component').then(m => m.RequestDetailComponent)
-      }
+        path: 'extra-work-requests',
+        loadComponent: () => import('./shared/components/Extra Requests/extra-work-request-list/extra-work-request-list.component').then(m => m.ExtraWorkRequestListComponent)
+      },
+      {
+        path: 'requests-component/:id',
+        loadComponent: () => import('./shared/components/request-detail/request-detail.component').then(m => m.RequestDetailComponent)
+      },
+      {
+        path: 'extra-work-request-form',
+        loadComponent: () => import('./modules/teamleader/components/extra-work-request-form/extra-work-request-form.component').then(m => m.ExtraWorkRequestFormComponent)
+      },
+
+     
+       {
+        path: 'extra-work-request-detail/:id',
+        loadComponent: () => import('./shared/components/Extra Requests/extra-request-detail/extra-request-detail.component').then(m => m.ExtraRequestDetailComponent)
+      },
       
+      
+
+    
+
     ]
   },
   { path: '', redirectTo: 'login', pathMatch: 'full' },

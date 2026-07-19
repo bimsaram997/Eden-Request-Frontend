@@ -49,7 +49,19 @@ this.notificationService.startConnection(email, role);
           complete: () => console.log('SignalR Stream Completed')
         }) as any;
 
-        this.activeSubscriptions.push(statusSub);
+        const extraWorkSub = this.notificationService.housekeeperNewExtraWork$.subscribe({
+          next: (extraWork) => {
+            this.snackBar.open(`⚡ You have a new extra work request for Room ${extraWork.roomNumber}!`, 'OK', {
+              duration: 6000
+            });
+            //this.refreshMyTasks();
+          },
+          // Add these two lines to satisfy the IStreamSubscriber interface requirements:
+          error: (err) => console.error('SignalR Stream Error:', err),
+          complete: () => console.log('SignalR Stream Completed')
+        }) as any;
+
+        this.activeSubscriptions.push(statusSub, extraWorkSub);
       }
     } else if (role === "TeamLeader") {
        const requestSub = this.notificationService.leaderNewRequests$.subscribe({
@@ -62,6 +74,18 @@ this.notificationService.startConnection(email, role);
       error: (err) => console.error('Leader stream error:', err),
       complete: () => { }
     }) as any;
+
+     const extraWorkSub = this.notificationService.leaderExtraWorkStatusUpdates$.subscribe({
+          next: (extraWork) => {
+            this.snackBar.open(`⚡ Your extra work request for Room ${extraWork.roomNumber} has been updated!`, 'OK', {
+              duration: 6000
+            });
+            //this.refreshMyTasks();
+          },
+          // Add these two lines to satisfy the IStreamSubscriber interface requirements:
+          error: (err) => console.error('SignalR Stream Error:', err),
+          complete: () => console.log('SignalR Stream Completed')
+        }) as any;
 
     this.activeSubscriptions.push(requestSub);
     }
