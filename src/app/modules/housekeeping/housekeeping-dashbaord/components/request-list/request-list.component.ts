@@ -1,6 +1,6 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MATERIAL_COMPONENTS } from '../../../../../shared/utils/material-imports';
-import { PageEvent } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { RequestService } from '../../../../../services/request.service';
 import { Subscription } from 'rxjs';
 
@@ -20,6 +20,8 @@ import { PagedResponse, RequestModel } from '../../../../../models/request.model
 })
 export class RequestListComponent implements OnInit, OnDestroy {
   // Pagination State Tracking Flags
+
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
   currentPage = 1;
   pageSize = 6;
   totalRecords = 0;
@@ -44,6 +46,8 @@ export class RequestListComponent implements OnInit, OnDestroy {
   };
   session: any;
   notificationSub: any;
+
+
 
 
 
@@ -79,16 +83,25 @@ export class RequestListComponent implements OnInit, OnDestroy {
     this.subs.push(statusSub);
   }
 
-  onFilterCriteriaChanged(payload: ExtendedFilterPayload): void {
+
+  onFilterCriteriaChanged(payload: any): void {
     this.activeFilters = payload;
-    this.currentPage = 1; //  Crucial: Reset back to page 1 whenever search criteria changes
+
+    //  1. Reset component state back to Page 1
+    this.currentPage = 1;
+
+    //  2. Reset the MatPaginator UI control back to first page index (0)
+    if (this.paginator) {
+      this.paginator.firstPage();
+    }
+
     this.isSearching = true;
     this.fetchHistoryPage();
   }
 
-
   onPageChange(event: PageEvent): void {
-    this.currentPage = event.pageIndex + 1; // Material uses 0-based indexing, C# API uses 1-based indexing
+    // Material Paginator uses 0-based index; C# API uses 1-based index
+    this.currentPage = event.pageIndex + 1; 
     this.fetchHistoryPage();
   }
 
@@ -116,9 +129,12 @@ fetchHistoryPage(): void {
   const requestPayload = {
     page: this.currentPage,
     pageSize: this.pageSize,
-    roomId: this.activeFilters.roomListId || null,
-    requestedById: this.isTeamLeaderUser ? null : employeeId,
-    assignedToId: this.activeFilters.targetEmployeeId || null,
+    roomListId: this.activeFilters.roomListId || null,
+    roomId: this.activeFilters.roomSearch || null,
+    categoryId: this.activeFilters.categoryId || null,
+    itemIds: this.activeFilters.itemIds || [],
+    requestedById: this.activeFilters.targetEmployeeId || null,
+    assignedToId:  null,
     status: this.activeFilters.status || 'All',
     fromDate: formatLocalDateText(this.activeFilters.fromDate),
     toDate: formatLocalDateText(this.activeFilters.toDate),

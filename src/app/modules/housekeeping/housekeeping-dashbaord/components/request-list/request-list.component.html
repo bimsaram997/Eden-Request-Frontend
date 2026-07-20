@@ -34,13 +34,14 @@
   </mat-accordion>
 
   <div class="paginator-wrapper mt-4 d-flex justify-content-center">
-    <mat-paginator 
-      [length]="totalRecords"
-      [pageSize]="pageSize"
-      [hidePageSize]="true"
-      aria-label="Select history page"
-      (page)="onPageChange($event)">
-    </mat-paginator>
-  </div>
+  <mat-paginator 
+    [length]="totalRecords"
+    [pageSize]="pageSize"
+    [pageIndex]="currentPage - 1"
+    [hidePageSize]="true"
+    aria-label="Select history page"
+    (page)="onPageChange($event)">
+  </mat-paginator>
+</div>
 
 </div>

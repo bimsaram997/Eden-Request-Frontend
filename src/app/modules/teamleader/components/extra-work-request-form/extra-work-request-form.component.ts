@@ -19,9 +19,7 @@ import { CreateExtraRequestLineDto, CreateExtraWorkRequestDto } from '../../../.
 })
 export class ExtraWorkRequestFormComponent {
 
-  backToDashboard() {
-    throw new Error('Method not implemented.');
-  }
+ 
   listRoomsMap: { [key: number]: string[] } = {
     10: ['101', '102', '103'],
     20: ['201', '202', '203']
@@ -238,6 +236,10 @@ export class ExtraWorkRequestFormComponent {
 
   removeItemFromList(index: number): void {
     this.requestedItems.removeAt(index);
+  }
+
+   backToDashboard() {
+    this.router.navigate(['/workspace/extra-work-requests']);
   }
 
 

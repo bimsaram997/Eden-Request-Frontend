@@ -3,7 +3,7 @@ import { ExtraWorkRequestSearchComponent } from '../extra-work-request-search/ex
 import { ExtendedFilterPayload, ExtraWorkRequestFilterPayload } from '../../../../models/DTO';
 import { ExtraWorkRequestService } from '../../../../services/extra-work-request.service';
 import { NotificationServiceService } from '../../../../services/notification-service.service';
-import { PageEvent } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { PagedResponse } from '../../../../models/request.model';
 import { ExtraWorkRequestDto, UpdateExtraWorkRequestDto } from '../../../../models/extra-work-request';
 import { ExtraWorkRequestCardComponent } from '../extra-work-request-card/extra-work-request-card.component';
@@ -18,8 +18,9 @@ import { Router } from '@angular/router';
   styleUrl: './extra-work-request-list.component.css'
 })
 export class ExtraWorkRequestListComponent implements OnInit, OnDestroy {
-  // 🟢 1. Bind a query reference to your search child component to extract form values directly on tab change
+  // 🟢 1. Bind query references for both the search child component and the MatPaginator
   @ViewChild(ExtraWorkRequestSearchComponent) searchComponent!: ExtraWorkRequestSearchComponent;
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   activeFilters: ExtraWorkRequestFilterPayload = {
     roomNumber: null,
@@ -133,6 +134,14 @@ export class ExtraWorkRequestListComponent implements OnInit, OnDestroy {
     this.subs.push(historySub);
   }
 
+  // 🟢 HELPER: Safely reset pagination back to Page 1 on both component state and UI control
+  private resetPaginationToFirstPage(): void {
+    this.currentPage = 1;
+    if (this.paginator) {
+      this.paginator.firstPage();
+    }
+  }
+
   onFilterCriteriaChanged(payload: ExtraWorkRequestFilterPayload): void {
     this.activeFilters = payload;
     
@@ -164,7 +173,8 @@ export class ExtraWorkRequestListComponent implements OnInit, OnDestroy {
       this.isToday = false;
     }
 
-    this.currentPage = 1; 
+    // 🟢 Reset both page counter and MatPaginator UI
+    this.resetPaginationToFirstPage();
     this.isSearching = true;
     this.fetchHistoryPage();
   }
@@ -174,10 +184,9 @@ export class ExtraWorkRequestListComponent implements OnInit, OnDestroy {
     this.fetchHistoryPage();
   }
 
-  // 🟢 2. HELPER: Read current form states directly from UI component context safely
+  // 🟢 HELPER: Read current form states directly from UI component context safely
   private syncCurrentSearchFilters(): void {
     if (this.searchComponent && this.searchComponent.filterForm) {
-      // Pull current visible selection values directly from your reactive input bindings
       const currentFormValue = this.searchComponent.filterForm.value;
       
       this.activeFilters = {
@@ -200,16 +209,16 @@ export class ExtraWorkRequestListComponent implements OnInit, OnDestroy {
     this.isSearching = true;
     this.isToday = true;
     
-    // Sync other parameters (List Number, Room, Status, etc.) so they are preserved
+    // Sync active parameters so filter inputs are preserved
     this.syncCurrentSearchFilters();
     
-    // Clear out date range properties exclusively since we are moving back to absolute today tab
+    // Clear date range properties since context is moving strictly to Today tab
     this.activeFilters.fromDate = null;
     this.activeFilters.toDate = null;
     this.fromStr = null;
     this.toStr = null;
 
-    // Reset date picker input boxes visually inside the child search control UI if reference exists
+    // Reset date picker input boxes visually inside search control UI if present
     if (this.searchComponent && this.searchComponent.filterForm) {
       this.searchComponent.filterForm.patchValue({
         fromDate: null,
@@ -217,7 +226,8 @@ export class ExtraWorkRequestListComponent implements OnInit, OnDestroy {
       }, { emitEvent: false });
     }
 
-    this.currentPage = 1;
+    // 🟢 Reset both page counter and MatPaginator UI
+    this.resetPaginationToFirstPage();
     this.fetchHistoryPage();
   }
 
@@ -225,10 +235,11 @@ export class ExtraWorkRequestListComponent implements OnInit, OnDestroy {
     this.isSearching = true;
     this.isToday = false;
 
-    // 🟢 3. Preserve selection states across tabs instantly
+    // Preserve selection states across tabs
     this.syncCurrentSearchFilters();
 
-    this.currentPage = 1;
+    // 🟢 Reset both page counter and MatPaginator UI
+    this.resetPaginationToFirstPage();
     this.fetchHistoryPage();
   }
 
