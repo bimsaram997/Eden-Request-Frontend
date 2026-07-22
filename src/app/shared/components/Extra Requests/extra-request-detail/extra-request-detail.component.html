@@ -17,7 +17,7 @@
         color="accent" 
         class="desktop-action-btn"
         *ngIf="!isTeamLeader"
-        [disabled]="isLoading" 
+        [disabled]="isLoading || extraWorkRequest.status === 'Done'" 
         [matMenuTriggerFor]="isLoading ? null : statusMenu">
         <mat-spinner *ngIf="isLoading" diameter="18" class="button-spinner-inline me-2 d-inline-block"></mat-spinner>
         <mat-icon *ngIf="!isLoading">edit</mat-icon> 
@@ -47,9 +47,11 @@
             <span class="meta-label">Updated By</span>
             <span class="meta-value text-truncate">{{ extraWorkRequest.updatedByEmployee }} {{isTeamLeader ? "": "(Me)"}}</span>
           </div>
-          <div class="meta-item" *ngIf="extraWorkRequest.updatedAt">
-            <span class="meta-label">Updated At</span>
-            <span class="meta-value">{{ extraWorkRequest.updatedAt | date:'dd/MM/yyyy hh:mm a' }}</span>
+          <div class="meta-item" *ngIf="extraWorkRequest.status === 'Acknowledge' || extraWorkRequest.status === 'Done'">
+            <span class="meta-label">{{ extraWorkRequest.status === 'Acknowledge' ? 'Acknowledged On' : 'Completed On' }}</span>
+            <span class="meta-value">{{ (extraWorkRequest.status === 'Acknowledge'
+    ? extraWorkRequest.acknowledgedDate
+    : extraWorkRequest.doneDate) | date:'dd/MM/yyyy hh:mm a' }}</span>
           </div>
         </div>
       </mat-card-content>

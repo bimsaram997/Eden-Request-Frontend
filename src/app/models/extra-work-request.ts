@@ -10,9 +10,11 @@ export interface ExtraWorkRequestDto {
     updatedById: number | null;
     updatedByEmployee: string;
     addedDate: string;
-    updatedAt: string | null;
     notes: string | null;
     lines: ExtraRequestLineDto[];
+   acknowledgedDate: string | null;
+   doneDate: string | null; 
+  
 }
 
 export interface ExtraRequestLineDto {

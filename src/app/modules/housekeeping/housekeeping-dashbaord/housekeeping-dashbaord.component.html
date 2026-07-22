@@ -1,7 +1,172 @@
-<div class="container py-3">
-    <div class="row">
-        <div class="col-12">
-            <!-- <app-request-list></app-request-list> -->
+<div class="container-fluid p-2 p-md-4 housekeeper-dashboard">
+  
+  <!-- 👤 EMPLOYEE PROFILE BANNER (NO INITIALS) -->
+  <mat-card class="employee-banner mb-4 border-0 shadow-sm">
+    <mat-card-content class="p-3 p-md-4">
+      <div class="row align-items-center g-3">
+        <div class="col-auto">
+          <!-- Housekeeper Icon Badge -->
+          <div class="icon-avatar bg-primary-subtle text-primary d-flex align-items-center justify-content-center rounded-circle">
+            <mat-icon class="fs-3">cleaning_services</mat-icon>
+          </div>
         </div>
+        <div class="col">
+          <div class="d-flex flex-wrap align-items-center gap-2">
+            <h3 class="m-0 fw-bold text-dark">{{ employeeDetails.name }}</h3>
+            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+              Active Shift
+            </span>
+          </div>
+          <div class="text-secondary small mt-1 d-flex flex-wrap gap-3">
+            <span><mat-icon class="align-middle fs-6">badge</mat-icon> ID: #{{ employeeDetails.id }}</span>
+            <span><mat-icon class="align-middle fs-6">work</mat-icon> {{ employeeDetails.role }}</span>
+            <span><mat-icon class="align-middle fs-6">meeting_room</mat-icon> Assigned List: {{ "L-101" }}</span>
+          </div>
+        </div>
+        <div class="col-12 col-md-auto text-end">
+          <button mat-stroked-button color="primary" class="w-100 w-md-auto" (click)="fetchReportData()" [disabled]="isLoading">
+            <mat-icon>refresh</mat-icon> Refresh Data
+          </button>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- ⌛ LOADING STATE -->
+  <div *ngIf="isLoading" class="text-center my-5 py-5">
+    <mat-spinner diameter="48" class="mx-auto"></mat-spinner>
+    <p class="mt-3 text-muted">Loading performance data...</p>
+  </div>
+
+  <div *ngIf="!isLoading && reportData">
+    
+    <!-- 📊 KPI CARDS GRID -->
+    <div class="row g-3 mb-4">
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm h-100 kpi-card">
+          <div class="card-body d-flex justify-content-between align-items-center">
+            <div>
+              <span class="text-uppercase fw-semibold text-muted small">Extra Work Done</span>
+              <h2 class="fw-bold my-1 text-success">{{ reportData.kpis.extraWorkCompletedToday }}</h2>
+              <span class="small text-muted">Extra beds set up today</span>
+            </div>
+            <div class="kpi-icon-wrapper bg-success-subtle text-success">
+              <mat-icon>king_bed</mat-icon>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm h-100 kpi-card">
+          <div class="card-body d-flex justify-content-between align-items-center">
+            <div>
+              <span class="text-uppercase fw-semibold text-muted small">Supplies Requested</span>
+              <h2 class="fw-bold my-1 text-info">{{ reportData.kpis.suppliesRequestedToday }}</h2>
+              <span class="small text-muted">Forms sent to Leader</span>
+            </div>
+            <div class="kpi-icon-wrapper bg-info-subtle text-info">
+              <mat-icon>cleaning_services</mat-icon>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm h-100 kpi-card">
+          <div class="card-body d-flex justify-content-between align-items-center">
+            <div>
+              <span class="text-uppercase fw-semibold text-muted small">Avg Setup Speed</span>
+              <h2 class="fw-bold my-1 text-primary">{{ reportData.kpis.avgSetupSpeedMinutes }} <small class="fs-6 text-muted">min</small></h2>
+              <span class="small text-muted">Assignment to Done</span>
+            </div>
+            <div class="kpi-icon-wrapper bg-primary-subtle text-primary">
+              <mat-icon>speed</mat-icon>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-sm-6 col-xl-3">
+        <div class="card border-0 shadow-sm h-100 kpi-card">
+          <div class="card-body d-flex justify-content-between align-items-center">
+            <div>
+              <span class="text-uppercase fw-semibold text-muted small">Open Queue</span>
+              <h2 class="fw-bold my-1 text-warning">{{ reportData.kpis.pendingAssignedTasks }}</h2>
+              <span class="small text-muted">Tasks awaiting completion</span>
+            </div>
+            <div class="kpi-icon-wrapper bg-warning-subtle text-warning">
+              <mat-icon>pending_actions</mat-icon>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <!-- 📈 CHART.JS WEEKLY TREND CARD -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-white border-0 pt-3 px-3 px-md-4">
+            <h5 class="fw-bold m-0 text-dark">7-Day Performance Trend</h5>
+            <small class="text-muted">Compare requested supplies vs completed extra bed tasks over time</small>
+          </div>
+          <div class="card-body px-3 px-md-4">
+            <div class="chart-container" style="position: relative; height: 300px; width: 100%;">
+              <canvas id="weeklyTrendChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 📋 TODAY'S TASK LOG TABLE -->
+    <div class="row">
+      <div class="col-12">
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-white border-0 pt-3 px-3 px-md-4">
+            <h5 class="fw-bold m-0 text-dark">Today's Shift Activity Log</h5>
+            <small class="text-muted">Detailed log of all requests handled during this shift</small>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th class="ps-3 ps-md-4">Room</th>
+                    <th>Category</th>
+                    <th>Details / Items</th>
+                    <th class="text-end pe-3 pe-md-4">Time</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let log of reportData.todayTaskLog">
+                    <td class="ps-3 ps-md-4">
+                      <span class="fw-bold text-dark">Room {{ log.roomNumber }}</span>
+                    </td>
+                    <td>
+                      <span class="badge rounded-pill px-2 py-1"
+                            [ngClass]="log.category === 'Extra Work' ? 'bg-primary-subtle text-primary border border-primary-subtle' : 'bg-info-subtle text-info border border-info-subtle'">
+                        {{ log.category }}
+                      </span>
+                    </td>
+                    <td class="text-secondary">{{ log.description }}</td>
+                    <td class="text-end pe-3 pe-md-4 text-muted small">
+                      {{ log.completedAt | date:'hh:mm a' }}
+                    </td>
+                  </tr>
+                  <tr *ngIf="reportData.todayTaskLog.length === 0">
+                    <td colspan="4" class="text-center py-4 text-muted">
+                      No activities logged for today's shift yet.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </div>

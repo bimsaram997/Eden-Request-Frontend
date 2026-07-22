@@ -20,4 +20,8 @@ baseUrl = environment.baseUrl;
    public loadAllEmployees(): Observable<any> {
     return this.http.get(`${this.baseUrl}/Employee/getAllEmployee`);
   }
+
+   public getEmployeeGenericDataById(id: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/Employee/${id}`);
+  }
 }
