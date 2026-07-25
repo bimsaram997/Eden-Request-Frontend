@@ -41,7 +41,7 @@
 
         <div class="tl-action-footer" *ngIf="!isTeamLeader">
             <!-- Disable the button and change behavior dynamically when isLoading is true -->
-            <button mat-flat-button color="accent" [disabled]="isLoading"
+            <button mat-flat-button color="accent" [disabled]="isLoading || req.status === 'Done'"
                 [matMenuTriggerFor]="isLoading ? null : statusMenu">
 
                 <!-- Show spinner when loading, otherwise show the edit icon -->

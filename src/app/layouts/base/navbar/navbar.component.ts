@@ -10,15 +10,31 @@ import { NotificationServiceService } from '../../../services/notification-servi
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css'
 })
-export class NavbarComponent implements OnInit{
-@Output() public sidenavToggle = new EventEmitter();
+export class NavbarComponent implements OnInit {
 
-constructor(private router: Router, private notificationService: NotificationServiceService ) { }
+  @Output() public sidenavToggle = new EventEmitter();
+  session: any;
+  isTeamLeaderUser!: boolean;
 
-ngOnInit(): void {
+  constructor(private router: Router, private notificationService: NotificationServiceService) { }
+
+  ngOnInit(): void {
+    this.session = JSON.parse(localStorage.getItem('scandic_eden_session') || '{}');
+    this.isTeamLeaderUser = (this.session.role || this.session.userRole) === 'TeamLeader';
+
   }
+
+
   onToogleSlidenav() {
     this.sidenavToggle.emit();
+  }
+
+  navigateToHome() {
+    if (this.isTeamLeaderUser) {
+      this.router.navigate(['/workspace/leader-dashboard']);
+    } else {
+      this.router.navigate(['/workspace/housekeeper-dashboard']);
+    }
   }
 
   public logOut(): void {

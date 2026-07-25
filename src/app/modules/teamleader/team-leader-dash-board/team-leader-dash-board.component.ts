@@ -3,63 +3,126 @@ import { Subscription } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationServiceService } from '../../../services/notification-service.service';
 import { PushNotificationService } from '../../../services/push-notification.service';
+import { HttpClient } from '@angular/common/http';
+import { ReportsService } from '../../../services/reports.service';
+import Chart from 'chart.js/auto';
+import { MATERIAL_COMPONENTS } from '../../../shared/utils/material-imports';
 
 @Component({
   selector: 'app-team-leader-dash-board',
   standalone: true,
-  imports: [],
+  imports: [MATERIAL_COMPONENTS],
   templateUrl: './team-leader-dash-board.component.html',
   styleUrl: './team-leader-dash-board.component.css'
 })
 export class TeamLeaderDashBoardComponent implements OnInit, OnDestroy {
   private activeSubscriptions: any[] = [];
   session: any;
+  isLoading = true;
+  reportData: any = null;
+  staffChart: any;
+  itemsChart: any;
 
-  constructor(
-    private notificationService: NotificationServiceService,
-    private pushService: PushNotificationService,
-    
-    private snackBar: MatSnackBar
+  constructor(private http: HttpClient,
+    private reportsService: ReportsService,
   ) { }
 
   ngOnInit(): void {
-  //   setTimeout(() => {
-  //   this.session = JSON.parse(localStorage.getItem('scandic_eden_session') || '{}');
-    
-  //   console.log("📦 Loaded session object post-login:", this.session);
-
-  //   const email = this.session.email || '';
-  //   const role = this.session.role || this.session.userRole || 'Housekeeper';
-    
-  //   // Explicitly fallback across all common property names to protect identity
-  //   const currentEmployeeId = this.session.id || this.session.employeeId || this.session.userId || null;
-
-  //   console.log(`👤 Current Employee ID located: ${currentEmployeeId}`);
-
-  //   if (currentEmployeeId) {
-  //     this.pushService.subscribeUserDevice(currentEmployeeId);
-  //   } else {
-  //     console.warn("⚠️ Could not register push notifications: currentEmployeeId missing from localStorage.");
-  //   }
-  // }, 300);
+    this.session = JSON.parse(localStorage.getItem('scandic_eden_session') || '{}');
+    this.fetchReportData();
   }
 
-  refreshRequestGrid(): void {
-    console.log('Refreshing main leader dashboard layout grid...');
-    // Add your API endpoint calling logic here
+  fetchReportData(): void {
+    this.isLoading = true;
+    this.reportsService.getReportsByTeamLeader().subscribe({
+      next: (data) => {
+        this.reportData = data;
+        this.isLoading = false;
+        
+        setTimeout(() => this.renderCharts(), 50);
+      },
+      error: (err) => {
+        console.error('Error fetching team leader report:', err);
+        this.isLoading = false;
+      }
+    });
   }
 
-  triggerPushManually() {
-  console.log("Button clicked. Invoking push prompt...");
-  this.pushService.subscribeUserDevice(Number(localStorage.getItem('userEmployeeId')));
-}
-ngOnDestroy(): void {
-    // 🟢 4. FIX: Safely loop and unsubscribe individually without throwing errors
+  renderCharts(): void {
+    this.renderStaffChart();
+    this.renderItemsChart();
+  }
+
+  private renderStaffChart(): void {
+    const canvas = document.getElementById('staffChart') as HTMLCanvasElement;
+    if (!canvas || !this.reportData?.staffPerformance) return;
+
+    if (this.staffChart) this.staffChart.destroy();
+
+    const labels = this.reportData.staffPerformance.map((s: any) => s.housekeeperName);
+    const data = this.reportData.staffPerformance.map((s: any) => s.completedExtraWork);
+
+    this.staffChart = new Chart(canvas, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Completed Extra works',
+          data: data,
+          backgroundColor: '#0d6efd',
+          borderRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { display: false } },
+          y: { beginAtZero: true, ticks: { stepSize: 1 } }
+        }
+      }
+    });
+  }
+
+  private renderItemsChart(): void {
+    const canvas = document.getElementById('itemsChart') as HTMLCanvasElement;
+    if (!canvas || !this.reportData?.topItems) return;
+
+    if (this.itemsChart) this.itemsChart.destroy();
+
+    const labels = this.reportData.topItems.map((i: any) => i.itemName);
+    const data = this.reportData.topItems.map((i: any) => i.totalQuantity);
+
+    this.itemsChart = new Chart(canvas, {
+      type: 'doughnut',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: data,
+          backgroundColor: ['#0d6efd', '#0dcaf0', '#198754', '#ffc107', '#dc3545']
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom' }
+        }
+      }
+    });
+  }
+
+
+  ngOnDestroy(): void {
+    if (this.staffChart) this.staffChart.destroy();
+    if (this.itemsChart) this.itemsChart.destroy();
+    //  4. FIX: Safely loop and unsubscribe individually without throwing errors
     this.activeSubscriptions.forEach(sub => {
       if (sub && typeof sub.unsubscribe === 'function') {
         sub.unsubscribe();
       }
     });
-  
+
   }
 }

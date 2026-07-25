@@ -13,5 +13,9 @@ export class ReportsService {
 public getReportsByHouseKeeperId(housekeeperId: number): Observable<any> {
    return this.http.get(`${this.myUrl}/Reports/housekeeper/${housekeeperId}`);
   }
+
+  public getReportsByTeamLeader(): Observable<any> {
+   return this.http.get(`${this.myUrl}/Reports/teamleader`);
+  }
 }
 
