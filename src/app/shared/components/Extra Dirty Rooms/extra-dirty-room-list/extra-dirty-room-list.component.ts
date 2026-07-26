@@ -11,20 +11,24 @@ import { Router } from '@angular/router';
 })
 export class ExtraDirtyRoomListComponent implements OnInit, OnDestroy {
   private subs: any[] = [];
+  session: any;
+  isTeamLeaderUser!: boolean;
+
   constructor(
     private router: Router
   ) { }
 
   ngOnInit(): void {
-   
-   
+    this.session = JSON.parse(localStorage.getItem('scandic_eden_session') || '{}');
+    this.isTeamLeaderUser = (this.session.role || this.session.userRole) === 'TeamLeader';
+
   }
 
 
 
-routeToExtraDirtyRoom() {
-throw new Error('Method not implemented.');
-}
+  routeToExtraDirtyRoom() {
+    this.router.navigate(['/workspace/extra-dirty-room-form']);
+  }
 
   ngOnDestroy(): void {
     this.subs.forEach(sub => {

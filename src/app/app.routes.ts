@@ -54,7 +54,11 @@ export const routes: Routes = [
       {
         path: 'extra-dirty-rooms',
         loadComponent: () => import('./shared/components/Extra Dirty Rooms/extra-dirty-room-list/extra-dirty-room-list.component').then(m => m.ExtraDirtyRoomListComponent)
-      }
+      },
+       {
+        path: 'extra-dirty-room-form',
+        loadComponent: () => import('./modules/housekeeping/housekeeping-dashbaord/components/extra-dirty-room-form/extra-dirty-room-form.component').then(m => m.ExtraDirtyRoomFormComponent )
+      },
       
 
     
