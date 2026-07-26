@@ -47,13 +47,14 @@ export const routes: Routes = [
         path: 'extra-work-request-form',
         loadComponent: () => import('./modules/teamleader/components/extra-work-request-form/extra-work-request-form.component').then(m => m.ExtraWorkRequestFormComponent)
       },
-
-     
        {
         path: 'extra-work-request-detail/:id',
         loadComponent: () => import('./shared/components/Extra Requests/extra-request-detail/extra-request-detail.component').then(m => m.ExtraRequestDetailComponent)
       },
-      
+      {
+        path: 'extra-dirty-rooms',
+        loadComponent: () => import('./shared/components/Extra Dirty Rooms/extra-dirty-room-list/extra-dirty-room-list.component').then(m => m.ExtraDirtyRoomListComponent)
+      }
       
 
     

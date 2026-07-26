@@ -16,7 +16,8 @@ export class SidenavbarComponent {
 // Updated menu array to hold the child routing targets
   menuArray: any[] = [
     { name: 'Requests', routePath: 'requests-list', visible: true },
-    { name: 'Extra Work Requests', routePath: 'extra-work-requests', visible: true }
+    { name: 'Extra Work Requests', routePath: 'extra-work-requests', visible: true },
+    { name: 'Extra Dirty Rooms', routePath: 'extra-dirty-rooms', visible: true },
   ];
   isShow: boolean =  false;
   isTeamLeaderUser!: boolean;
