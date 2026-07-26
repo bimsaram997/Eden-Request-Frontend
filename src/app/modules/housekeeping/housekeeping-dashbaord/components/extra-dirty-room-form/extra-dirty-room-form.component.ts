@@ -82,7 +82,7 @@ requestForm!: FormGroup;
   }
 
   backToDashboard(): void {
-    this.router.navigate(['/dashboard']);
+    this.router.navigate(['/workspace/extra-dirty-rooms']);
   }
 
   onSubmit(): void {
