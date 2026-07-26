@@ -2,9 +2,11 @@
    1. GLOBAL WRAPPER & CONTAINER
    ========================================== */
 .mobile-form-container {
-  max-width: 900px;
+  /* Fluid width uses up to 1200px on laptops without oversized margins */
+  width: min(96%, 1200px);
   margin: 0 auto;
-  padding: 16px 16px 120px 16px; /* Added heavy bottom padding to clear the sticky action footer */
+  padding: clamp(12px, 2vw, 24px) clamp(12px, 2vw, 24px) 120px clamp(12px, 2vw, 24px);
+  box-sizing: border-box;
 }
 
 .form-header {
@@ -15,7 +17,7 @@
 }
 
 .form-header h2 {
-  font-size: 1.25rem;
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
   font-weight: 700;
   margin: 0;
 }
@@ -25,6 +27,13 @@
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
   overflow: hidden;
+}
+
+/* Fluid Form Field Layout */
+.form-fields-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 16px;
 }
 
 /* ==========================================
@@ -37,17 +46,10 @@
   padding: 16px !important;
 }
 
-/* Stacks on mobile, splits 50/50 on larger devices */
 .picker-fields-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
   gap: 12px;
-}
-
-@media (min-width: 600px) {
-  .picker-fields-grid {
-    grid-template-columns: 2fr 1fr; /* More space for search selection than quantity */
-  }
 }
 
 .add-btn {
@@ -69,21 +71,9 @@
 
 .summary-card-grid {
   display: grid;
-  grid-template-columns: 1fr; /* Single column default */
+  /* Automatically shifts from 1 to 2 to 3 columns depending on device width */
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
   gap: 12px;
-}
-
-/* Grid shifts dynamically based on screens */
-@media (min-width: 600px) {
-  .summary-card-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (min-width: 960px) {
-  .summary-card-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
 }
 
 .mobile-item-card {
@@ -105,6 +95,7 @@
   font-size: 15px;
   font-weight: 600;
   color: #212529;
+  word-break: break-word;
 }
 
 .category-badge {
@@ -145,8 +136,7 @@
 }
 
 .submit-btn {
-  width: 100%;
-  max-width: 500px;
+  width: min(100%, 500px);
   padding: 24px 0 !important;
   font-size: 16px !important;
   font-weight: bold;

@@ -12,73 +12,59 @@
         <mat-card class="input-card">
             <mat-card-content class="p-3">
 
-                <!-- Lists and Rooms -->
-                <div class="row g-3 mb-2">
-                    <div class="col-12 col-md-6">
-                        <mat-form-field appearance="outline" class="w-100">
-                            <mat-label>List Number</mat-label>
-                            <mat-select formControlName="listNumber" (selectionChange)="onListChange()">
-                                <mat-option *ngFor="let num of listNumbers" [value]="num">
-                                    List {{ num }}
-                                </mat-option>
-                            </mat-select>
-                            <mat-error *ngIf="requestForm.get('listNumber')?.hasError('required')">Required</mat-error>
-                        </mat-form-field>
-                    </div>
+                <!-- Lists and Rooms Grid -->
+                <div class="form-fields-grid mb-2">
+                    <mat-form-field appearance="outline" class="w-100">
+                        <mat-label>List Number</mat-label>
+                        <mat-select formControlName="listNumber" (selectionChange)="onListChange()">
+                            <mat-option *ngFor="let num of listNumbers" [value]="num">
+                                List {{ num }}
+                            </mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="requestForm.get('listNumber')?.hasError('required')">Required</mat-error>
+                    </mat-form-field>
 
-                    <div class="col-12 col-md-6">
-                        <mat-form-field appearance="outline" class="w-100">
-                            <mat-label>Room Number</mat-label>
-                            <mat-select formControlName="roomNumber" [disabled]="availableRooms.length === 0">
-                                <mat-option *ngFor="let room of availableRooms" [value]="room">
-                                    Room {{ room }}
-                                </mat-option>
-                            </mat-select>
-                            <mat-error *ngIf="requestForm.get('roomNumber')?.hasError('required')">Required</mat-error>
-                        </mat-form-field>
-                    </div>
+                    <mat-form-field appearance="outline" class="w-100">
+                        <mat-label>Room Number</mat-label>
+                        <mat-select formControlName="roomNumber" [disabled]="availableRooms.length === 0">
+                            <mat-option *ngFor="let room of availableRooms" [value]="room">
+                                Room {{ room }}
+                            </mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="requestForm.get('roomNumber')?.hasError('required')">Required</mat-error>
+                    </mat-form-field>
                 </div>
 
-                <!-- Assignment and Notes -->
-                <div class="row g-3">
-                    <div class="col-12 col-md-6">
-                        <mat-form-field appearance="outline" class="w-100">
-                            <mat-label>Assigned To</mat-label>
-                            <mat-select formControlName="assignedToId">
-                                <div class="dropdown-search-box">
-                                    <mat-icon>search</mat-icon>
-                                    <input placeholder="Type to filter items..." (keyup)="$event.stopPropagation()"
-                                        [(ngModel)]="nameSearchQuery" [ngModelOptions]="{standalone: true}"
-                                        class="search-input-element">
-                                    <button *ngIf="nameSearchQuery" mat-icon-button type="button"
-                                        class="clear-search-btn"
-                                        (click)="$event.stopPropagation(); nameSearchQuery = ''">
-                                        <mat-icon>close</mat-icon>
-                                    </button>
-                                </div>
-                                <mat-option *ngFor="let prod of getFilteredAvailableHousekeepers()" [value]="prod">
-                                    {{ prod.name }}
-                                </mat-option>
-                                <mat-option *ngIf="getFilteredAvailableHousekeepers().length === 0" disabled>
-                                    No housekeepers match "{{ nameSearchQuery }}"
-                                </mat-option>
+                <!-- Assignment and Notes Grid -->
+                <div class="form-fields-grid">
+                    <mat-form-field appearance="outline" class="w-100">
+                        <mat-label>Assigned To</mat-label>
+                        <mat-select formControlName="assignedToId">
+                            <div class="dropdown-search-box">
+                                <mat-icon>search</mat-icon>
+                                <input placeholder="Type to filter items..." (keyup)="$event.stopPropagation()"
+                                    [(ngModel)]="nameSearchQuery" [ngModelOptions]="{standalone: true}"
+                                    class="search-input-element">
+                                <button *ngIf="nameSearchQuery" mat-icon-button type="button"
+                                    class="clear-search-btn"
+                                    (click)="$event.stopPropagation(); nameSearchQuery = ''">
+                                    <mat-icon>close</mat-icon>
+                                </button>
+                            </div>
+                            <mat-option *ngFor="let prod of getFilteredAvailableHousekeepers()" [value]="prod">
+                                {{ prod.name }}
+                            </mat-option>
+                            <mat-option *ngIf="getFilteredAvailableHousekeepers().length === 0" disabled>
+                                No housekeepers match "{{ nameSearchQuery }}"
+                            </mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="requestForm.get('assignedToId')?.hasError('required')">Required</mat-error>
+                    </mat-form-field>
 
-
-                              
-                            </mat-select>
-
-
-                            <mat-error
-                                *ngIf="requestForm.get('assignedToId')?.hasError('required')">Required</mat-error>
-                        </mat-form-field>
-                    </div>
-
-                    <div class="col-12 col-md-6">
-                        <mat-form-field appearance="outline" class="w-100">
-                            <mat-label>Notes / Special Instructions</mat-label>
-                            <textarea matInput rows="2" formControlName="notes"></textarea>
-                        </mat-form-field>
-                    </div>
+                    <mat-form-field appearance="outline" class="w-100">
+                        <mat-label>Notes / Special Instructions</mat-label>
+                        <textarea matInput rows="2" formControlName="notes"></textarea>
+                    </mat-form-field>
                 </div>
 
             </mat-card-content>
@@ -139,7 +125,6 @@
             <mat-card *ngFor="let control of requestedItems.controls; let i = index" class="mobile-item-card">
                 <mat-card-content class="card-layout-split">
                     <div class="item-details">
-
                         <h4>{{ control.get('itemName')?.value }}</h4>
                         <p class="amount-label">Amount: <strong>{{ control.get('quantity')?.value }} {{
                                 control.get('unitType')?.value }}</strong></p>
