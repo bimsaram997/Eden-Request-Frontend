@@ -2,9 +2,11 @@
    1. GLOBAL WRAPPER & CONTAINER
    ========================================== */
 .mobile-form-container {
-  max-width: 1000px; /* Expands nicely on larger screens */
+  /* Fluid width scales up to 1200px comfortably without wide layout margin gaps */
+  width: min(96%, 1200px);
   margin: 0 auto;
-  padding: 16px 16px 100px 16px;
+  padding: clamp(12px, 2vw, 24px) clamp(12px, 2vw, 24px) 120px clamp(12px, 2vw, 24px);
+  box-sizing: border-box;
 }
 
 .form-header {
@@ -14,50 +16,81 @@
   margin-bottom: 20px;
 }
 
+.form-header h2 {
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  font-weight: 700;
+  margin: 0;
+}
+
 .input-card {
   margin-bottom: 20px;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+  overflow: hidden;
 }
 
-.vertical-stack {
+/* Fluid Main Form Grid Layout */
+.form-fields-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 16px;
+}
+
+/* ==========================================
+   2. ITEM PICKER & FLUID FIELDS
+   ========================================== */
+.item-picker-content {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding-top: 8px;
-}
-
-.full-width {
-  width: 100%;
-}
-
-/* Base side-by-side rows for controls */
-.side-by-side-row {
-  display: flex;
   gap: 16px;
+  padding: 16px !important;
+}
+
+.picker-fields-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+.quantity-unit-group {
+  display: flex;
+  gap: 12px;
   width: 100%;
 }
 
-.flex-1 { flex: 1; }
-.flex-2 { flex: 2; }
+.qty-field {
+  flex: 2;
+}
+
+.unit-field {
+  flex: 1;
+}
 
 .add-btn {
-  padding: 24px 0;
-  font-size: 15px;
+  padding: 24px 0 !important;
+  font-size: 15px !important;
   font-weight: 600;
   border-radius: 8px;
 }
 
+/* ==========================================
+   3. REUSABLE ITEM SUMMARY CARDS
+   ========================================== */
 .added-summary-section h3 {
-  margin: 32px 0 16px 4px;
+  margin: 28px 0 16px 4px;
   font-size: 18px;
   font-weight: 600;
   color: #495057;
 }
 
-/* ==========================================
-   2. REUSABLE ITEM SUMMARY CARDS
-   ========================================== */
+.summary-card-grid {
+  display: grid;
+  /* Automatically adjusts from 1 column up to 3 columns depending on space */
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  gap: 16px;
+}
+
 .mobile-item-card {
   border-left: 5px solid #3f51b5;
   border-radius: 8px;
@@ -73,16 +106,17 @@
 }
 
 .item-details h4 {
-  margin: 6px 0;
-  font-size: 16px;
+  margin: 6px 0 2px 0;
+  font-size: 15px;
   font-weight: 600;
   color: #212529;
+  word-break: break-word;
 }
 
 .category-badge {
-  font-size: 10px;
+  font-size: 9px;
   background: #e9ecef;
-  padding: 3px 10px;
+  padding: 2px 8px;
   border-radius: 12px;
   color: #495057;
   text-transform: uppercase;
@@ -91,7 +125,7 @@
 
 .amount-label {
   margin: 0;
-  font-size: 14px;
+  font-size: 13px;
   color: #6c757d;
 }
 
@@ -100,79 +134,37 @@
 }
 
 /* ==========================================
-   3. RESPONSIVE GRID MEDIA QUERIES (The Magic)
-   ========================================== */
-
-/* 📱 MOBILE VIEW (Default) */
-.summary-card-grid {
-  display: grid;
-  grid-template-columns: 1fr; /* 1 card per row */
-  gap: 12px;
-}
-
-/* 📋 TABLET VIEW (Screens broader than 600px) */
-@media (min-width: 600px) {
-  .vertical-stack {
-    flex-direction: row; /* Rows inputs side-by-side */
-    flex-wrap: wrap;
-    align-items: center;
-  }
-  
-  .vertical-stack .full-width {
-    flex: 1;
-    min-width: 200px; /* Wrap smoothly if screen shrinks */
-  }
-
-  .add-btn {
-    width: auto;
-    padding: 24px 24px;
-    margin-top: -16px; /* Balance field alignments */
-  }
-
-  .summary-card-grid {
-    grid-template-columns: repeat(2, 1fr); /* 2 cards side-by-side */
-    gap: 16px;
-  }
-}
-
-/* 💻 DESKTOP VIEW (Screens broader than 960px) */
-@media (min-width: 960px) {
-  .summary-card-grid {
-    grid-template-columns: repeat(3, 1fr); /* 3 cards side-by-side */
-  }
-}
-
-/* ==========================================
-   4. STICKY BOTTOM BUTTON RESPONSIVENESS
+   4. STICKY ACTION FOOTER
    ========================================== */
 .sticky-action-footer {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 16px;
+  padding: 12px 16px;
   background: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
-  backdrop-filter: blur(8px);
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(10px);
   z-index: 99;
   display: flex;
   justify-content: center;
 }
 
 .submit-btn {
-  width: 100%;
-  max-width: 500px; /* Keeps button from becoming awkwardly wide on huge screens */
-  padding: 24px 0;
-  font-size: 16px;
+  width: min(100%, 500px);
+  padding: 24px 0 !important;
+  font-size: 16px !important;
   font-weight: bold;
   border-radius: 8px;
 }
 
-/* 🔍 Dropdown Search Header Bar Container Box */
+/* ==========================================
+   5. DROPDOWN SEARCH ELEMENT
+   ========================================== */
 .dropdown-search-box {
   display: flex;
   align-items: center;
-  padding: 8px 12px;
+  padding: 10px 14px;
   position: sticky;
   top: 0;
   background: #ffffff;
@@ -185,7 +177,6 @@
   color: #757575;
 }
 
-/* The underlying text element */
 .search-input-element {
   width: 100%;
   border: none;
@@ -197,6 +188,6 @@
 }
 
 .clear-search-btn {
-  transform: scale(0.8);
+  transform: scale(0.85);
   margin-right: -8px;
 }

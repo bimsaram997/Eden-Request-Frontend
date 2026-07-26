@@ -1,47 +1,57 @@
 <div class="history-container py-3">
-  <div class="row mb-4 align-items-center">
-        <div class="col col-sm-8">
-            <h2 class="m-0 fs-4 fw-bold text-secondary">Material Requests</h2>
-        </div>
-        
-        <div class="col-auto text-end " *ngIf="!isTeamLeaderUser">
-            <button 
-                mat-raised-button 
-                color="primary" 
-                class="py-2 px-4 fs-6 rounded-1" 
-                (click)="routeToRequest()">
-                ➕ Add New Request
-            </button>
-        </div>
+  
+  <!-- Header Row: Title & Action Button -->
+  <div class="history-top-bar mb-4">
+    <h2 class="m-0 fs-4 fw-bold text-secondary">Supply Requests</h2>
+    <div *ngIf="!isTeamLeaderUser">
+      <button 
+        mat-raised-button 
+        color="primary" 
+        class="py-2 px-4 fs-6 rounded-1 add-request-btn" 
+        (click)="routeToRequest()">
+        ➕ Add New Request
+      </button>
     </div>
-  <div class="mb-4">
-    <app-requests-search (filtersChanged)="onFilterCriteriaChanged($event)" [isSearching]="isSearching"></app-requests-search>
   </div>
 
-  <div class="history-header d-flex justify-content-between align-items-center mb-3">
-    <h3 class="m-0">📋 Past Requests</h3>
-    <span class="badge bg-secondary total-count p-2 fs-6">
+  <!-- Search Filter Component -->
+  <div class="mb-4">
+    <app-requests-search 
+      (filtersChanged)="onFilterCriteriaChanged($event)" 
+      [isSearching]="isSearching">
+    </app-requests-search>
+  </div>
+
+  <!-- Section Control Bar -->
+  <div class="controls-bar-wrapper mb-3">
+    <h3 class="m-0 page-section-title">📋 Past Requests</h3>
+    <span class="badge total-count-badge p-2 fs-6">
       Total Requests Found: {{ totalRecords }}
     </span>
   </div>
 
-  <mat-accordion class="request-accordion" multi="true">
-    <app-request-history-card
-      *ngFor="let requestItem of userRequests" 
-      [isLoading]="updatingRequestIds.has(requestItem.id)"
-      [req]="requestItem" (statusChanged)="handleStatusUpdate($event)">
-    </app-request-history-card>
-  </mat-accordion>
+  <!-- Cards Accordion Grid -->
+  <div class="cards-grid-wrapper">
+    <mat-accordion class="request-accordion w-100" multi="true">
+      <app-request-history-card
+        *ngFor="let requestItem of userRequests" 
+        [isLoading]="updatingRequestIds.has(requestItem.id)"
+        [req]="requestItem" 
+        (statusChanged)="handleStatusUpdate($event)">
+      </app-request-history-card>
+    </mat-accordion>
+  </div>
 
+  <!-- Paginator Footer -->
   <div class="paginator-wrapper mt-4 d-flex justify-content-center">
-  <mat-paginator 
-    [length]="totalRecords"
-    [pageSize]="pageSize"
-    [pageIndex]="currentPage - 1"
-    [hidePageSize]="true"
-    aria-label="Select history page"
-    (page)="onPageChange($event)">
-  </mat-paginator>
-</div>
+    <mat-paginator 
+      [length]="totalRecords"
+      [pageSize]="pageSize"
+      [pageIndex]="currentPage - 1"
+      [hidePageSize]="true"
+      aria-label="Select history page"
+      (page)="onPageChange($event)">
+    </mat-paginator>
+  </div>
 
 </div>
