@@ -8,6 +8,7 @@ import { MATERIAL_COMPONENTS } from '../../utils/material-imports';
 import { ExtendedFilterPayload } from '../../../models/DTO';
 import { AuthService } from '../../../services/auth.service';
 import { EmployeeDto } from '../../../models/class';
+import { setupDateTimeSync } from '../../utils/date-time-filter.utils';
 
 @Component({
   selector: 'app-requests-search',
@@ -16,7 +17,7 @@ import { EmployeeDto } from '../../../models/class';
   templateUrl: './requests-search.component.html',
   styleUrl: './requests-search.component.css'
 })
-export class RequestsSearchComponent implements OnInit {
+export class RequestsSearchComponent implements OnInit, OnDestroy {
   @Input() isSearching: boolean = false;
   @Output() filtersChanged = new EventEmitter<ExtendedFilterPayload>();
 
@@ -38,7 +39,7 @@ export class RequestsSearchComponent implements OnInit {
 
   filterForm!: FormGroup;
 
-  private subs = new Subscription();
+  private subs: any[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -54,6 +55,7 @@ export class RequestsSearchComponent implements OnInit {
     const session = JSON.parse(localStorage.getItem('scandic_eden_session') || '{}');
     this.isTeamLeader = (session.role || session.userRole) === 'TeamLeader';
     this.createRequestSearchForm();
+     setupDateTimeSync(this.filterForm, this.subs); 
     this.loadCategories();
     this.loadEmployee();
 
@@ -75,8 +77,8 @@ export class RequestsSearchComponent implements OnInit {
       targetEmployeeId: [],
       fromDate: [null],
       toDate: [null],
-      fromTime: [null],
-      toTime: [null]
+      fromTime: [{ value: '', disabled: true }],
+      toTime: [{ value: '', disabled: true }]
     });
   }
 
@@ -92,7 +94,7 @@ export class RequestsSearchComponent implements OnInit {
     error: (err) => console.error('Error fetching employees:', err)
   });
   
-  this.subs.add(emSub);
+  this.subs.push(emSub);
 }
 
     
@@ -111,7 +113,7 @@ export class RequestsSearchComponent implements OnInit {
       next: (data) => this.categoriesList = data,
       error: (err) => console.error('Error fetching categories:', err)
     });
-    this.subs.add(catSub);
+    this.subs.push(catSub);
   }
 
   onCategoryChange(): void {
@@ -171,11 +173,13 @@ export class RequestsSearchComponent implements OnInit {
     this.applyFilters();
   }
 
-
-
-
-
-
+ngOnDestroy(): void {
+    this.subs.forEach((sub: any) => {
+      if (sub && typeof sub.unsubscribe === 'function') {
+        sub.unsubscribe();
+      }
+    });
+  }
 
 
 }

@@ -1,0 +1,85 @@
+<div class="table-responsive mat-elevation-z2 rounded overflow-hidden">
+  <table mat-table [dataSource]="reports" class="w-100">
+
+    <!-- ID -->
+    <ng-container matColumnDef="id">
+      <th mat-header-cell *matHeaderCellDef> # </th>
+      <td mat-cell *matCellDef="let report"> {{ report.id }} </td>
+    </ng-container>
+
+    <!-- Room Number -->
+    <ng-container matColumnDef="roomNumber">
+      <th mat-header-cell *matHeaderCellDef> Room </th>
+      <td mat-cell *matCellDef="let report"> 
+        <strong class="text-primary">{{ report.roomNumber || 'N/A' }}</strong> 
+      </td>
+    </ng-container>
+
+    <!-- Reported By -->
+    <ng-container matColumnDef="reportedBy">
+      <th mat-header-cell *matHeaderCellDef> Reported By </th>
+      <td mat-cell *matCellDef="let report"> {{ report.reportedByEmployee || 'Unknown' }} </td>
+    </ng-container>
+
+    <!-- Created At -->
+    <ng-container matColumnDef="createdAt">
+      <th mat-header-cell *matHeaderCellDef> Date & Time </th>
+      <td mat-cell *matCellDef="let report"> {{ report.createdAt | date:'medium' }} </td>
+    </ng-container>
+
+    <!-- Notes -->
+    <ng-container matColumnDef="notes">
+      <th mat-header-cell *matHeaderCellDef> Notes </th>
+      <td mat-cell *matCellDef="let report" class="text-truncate" style="max-width: 250px;"> 
+        {{ report.notes || '-' }} 
+      </td>
+    </ng-container>
+
+    <!-- Actions -->
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef class="text-end"> Actions </th>
+      <td mat-cell *matCellDef="let report" class="text-end">
+        <div class="d-flex align-items-center justify-content-end gap-1">
+          
+          <!-- Media Attachment Trigger -->
+          <button 
+            mat-icon-button 
+            color="accent"
+            [disabled]="!report.mediaFiles || report.mediaFiles.length === 0"
+            (click)="onOpenMedia(report)"
+            matTooltip="View Media Attachments">
+            <mat-icon 
+              [matBadge]="report.mediaFiles?.length" 
+              [matBadgeHidden]="!report.mediaFiles?.length" 
+              matBadgeColor="primary" 
+              matBadgeSize="small">
+              perm_media
+            </mat-icon>
+          </button>
+
+          <!-- View Details Trigger -->
+          <button 
+            mat-icon-button 
+            color="primary" 
+            [disabled]="updatingReportIds.has(report.id)"
+            (click)="onView(report)"
+            matTooltip="View Details">
+            <mat-icon>visibility</mat-icon>
+          </button>
+
+        </div>
+      </td>
+    </ng-container>
+
+    <!-- Table Header & Rows -->
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+    <!-- Empty State -->
+    <tr class="mat-row" *matNoDataRow>
+      <td class="mat-cell text-center py-4" [attr.colspan]="displayedColumns.length">
+        No dirty room reports found.
+      </td>
+    </tr>
+  </table>
+</div>

@@ -16,22 +16,60 @@
 
   <!-- Search Filter Component -->
   <div class="mb-4">
-   
+   <app-extra-dirt-romm-search 
+      (filtersChanged)="onFilterCriteriaChanged($event)" 
+      [isSearching]="isSearching">
+    </app-extra-dirt-romm-search>
   </div>
 
   <!-- Section Control Bar (Title, Today/Past Toggle, Total Count) -->
-  <div class="controls-bar-wrapper mb-4">
+     <div class="controls-bar-wrapper mb-4">
+    <h3 class="m-0 page-section-title">
+      📋 {{ isToday ? "Today's Requests" : "Past Requests" }}
+    </h3>
     
-  </div>
+    <div class="controls-group">
+      <!-- Toggle Buttons -->
+      <div class="btn-group filter-toggle-group" role="group" aria-label="Request Time Period">
+        <button 
+          type="button" 
+          class="btn btn-outline-primary py-2 px-3 fs-7"
+          [class.active]="isToday === true"
+          (click)="selectTodayTab()">
+          Today
+        </button>
+        <button 
+          type="button" 
+          class="btn btn-outline-primary py-2 px-3 fs-7"
+          [class.active]="isToday === false"
+          (click)="selectPastTab()">
+          Past
+        </button>
+      </div>
 
-  <!-- Cards Grid Layout -->
-  <div class="cards-grid-wrapper">
-    
+      <!-- Total Count Badge -->
+      <span class="badge total-count-badge p-2 fs-6">
+        Total: {{ totalRecords }}
+      </span>
+    </div>
+  </div>
+  <div class="table-grid-wrapper">
+    <app-extra-dirty-room-table
+      [reports]="extraDirtyReports"
+      [updatingReportIds]="updatingReportIds"
+      (viewDetails)="handleViewDetails($event)"
+      (openMediaModal)="handleOpenMediaModal($event)">
+    </app-extra-dirty-room-table>
   </div>
 
   <!-- Paginator -->
   <div class="paginator-wrapper mt-4 d-flex justify-content-center">
-   
+    <mat-paginator 
+      [length]="totalRecords"
+      [pageSize]="pageSize"
+      [hidePageSize]="true"
+      aria-label="Select report page"
+      (page)="onPageChange($event)">
+  </mat-paginator>
   </div>
-
 </div>

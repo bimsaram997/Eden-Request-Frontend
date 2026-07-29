@@ -71,5 +71,7 @@ export const MATERIAL_COMPONENTS = [
   MatTableModule,
   MatTabsModule,
   MatToolbarModule,
-  MatTooltipModule
+  MatTooltipModule,
+  MatIconModule,
+    MatCardModule
 ];

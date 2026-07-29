@@ -3,6 +3,8 @@ import { MATERIAL_COMPONENTS } from '../../../../../shared/utils/material-import
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { ExtraDirtyReportResponse } from '../../../../../models/extra-dirty-rooms';
+import { ExtraDirtyRoomService } from '../../../../../services/extra-dirty-room.service';
 
 export interface MediaPreview {
   file: File;
@@ -30,7 +32,8 @@ requestForm!: FormGroup;
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private extraDirtyRoomService: ExtraDirtyRoomService
   ) {}
 
   ngOnInit(): void {
@@ -85,13 +88,18 @@ requestForm!: FormGroup;
     this.router.navigate(['/workspace/extra-dirty-rooms']);
   }
 
-  onSubmit(): void {
+ onSubmit(): void {
     if (this.requestForm.invalid) return;
+
+    if (!this.mediaItems || this.mediaItems.length === 0) {
+      alert('Please attach at least one photo or video before submitting.');
+      return;
+    }
 
     this.isSubmitting = true;
 
     // Retrieve logged-in housekeeper ID from stored session/token
-    const session = JSON.parse(localStorage.getItem('user_session') || '{}');
+   const session = JSON.parse(localStorage.getItem('scandic_eden_session') || '{}');
     const loggedInHousekeeperId = session.id || session.employeeId || 1;
 
     const formData = new FormData();
@@ -103,18 +111,19 @@ requestForm!: FormGroup;
       formData.append('files', item.file, item.file.name);
     });
 
-    // this.http.post(this.apiUrl, formData).subscribe({
-    //   next: () => {
-    //     this.isSubmitting = false;
-    //     alert('Extra dirty report submitted successfully!');
-    //     this.backToDashboard();
-    //   },
-    //   error: (err) => {
-    //     console.error('Submission failed:', err);
-    //     this.isSubmitting = false;
-    //     alert('Failed to submit report. Please try again.');
-    //   }
-    // });
+    // Call service using your exact method signature style
+    this.extraDirtyRoomService.placeExtraDiryRoom(formData).subscribe({
+      next: (response: ExtraDirtyReportResponse) => {
+        this.isSubmitting = false;
+        alert(response.message || 'Extra dirty report submitted successfully!');
+        this.backToDashboard();
+      },
+      error: (err) => {
+        console.error('Submission failed:', err);
+        this.isSubmitting = false;
+        alert(err.error?.message || 'Failed to submit report. Please try again.');
+      }
+    });
   }
 
     ngOnDestroy(): void {

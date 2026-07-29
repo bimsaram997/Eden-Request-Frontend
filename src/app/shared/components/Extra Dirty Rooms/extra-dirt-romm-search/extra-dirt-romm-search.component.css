@@ -1,0 +1,32 @@
+/* 1. Eliminate underlying helper whitespace below Material fields to keep Bootstrap rows tight */
+::ng-deep .compact-field .mat-mdc-form-field-subscript-wrapper {
+  display: none !important;
+}
+
+/* 2. Soft subtle background style tint for high visibility form elements */
+::ng-deep .compact-field .mat-mdc-text-field-wrapper {
+  padding-top: 4px;
+  padding-bottom: 4px;
+  background-color: #fdfdfd !important;
+}
+
+/* 3. Touch Target Optimization (Ensures 48px standard touch box sizing rules for easy mobile tapping) */
+.responsive-btn {
+  height: 48px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  border-radius: 8px !important;
+}
+
+/* 📱 Smartphone Specific Cleanups */
+@media (max-width: 576px) {
+  ::ng-deep .compact-field .mat-mdc-text-field-wrapper {
+    height: 50px; /* Marginally deeper input fields to match thumb clicks on touch panels */
+  }
+}
+
+@media (min-width: 768px) {
+  .mt-md-0 {
+    margin-top: 10px !important;
+  }
+}

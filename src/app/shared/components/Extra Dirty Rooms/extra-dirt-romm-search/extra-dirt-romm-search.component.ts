@@ -1,40 +1,29 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { ExtendedFilterPayload, ExtraWorkRequestFilterPayload } from '../../../../models/DTO';
-import { Employee, EmployeeDto } from '../../../../models/class';
-import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
-import { ExtraWorkItems } from '../../../../models/extra-work-items';
-import { Subscription } from 'rxjs';
+import { MATERIAL_COMPONENTS } from '../../../utils/material-imports';
+import { ExtraWorkRequestFilterPayload } from '../../../../models/DTO';
+import { ExtraDirtyFilterPayload } from '../../../../models/extra-dirty-rooms';
+import { Employee, EmployeeDto } from '../../../../models/employee';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ExtraWorkItemService } from '../../../../services/extra-work-item.service';
-import { ExtraWorkRequestService } from '../../../../services/extra-work-request.service';
 import { AuthService } from '../../../../services/auth.service';
-import { MATERIAL_COMPONENTS } from '../../../utils/material-imports';
 import { setupDateTimeSync } from '../../../utils/date-time-filter.utils';
 
 @Component({
-  selector: 'app-extra-work-request-search',
+  selector: 'app-extra-dirt-romm-search',
   standalone: true,
   imports: [MATERIAL_COMPONENTS],
-  templateUrl: './extra-work-request-search.component.html',
-  styleUrl: './extra-work-request-search.component.css'
+  templateUrl: './extra-dirt-romm-search.component.html',
+  styleUrl: './extra-dirt-romm-search.component.css'
 })
-export class ExtraWorkRequestSearchComponent implements OnInit, OnDestroy {
+export class ExtraDirtRommSearchComponent implements OnInit, OnDestroy {
   @Input() isSearching: boolean = false;
-  @Output() filtersChanged = new EventEmitter<ExtraWorkRequestFilterPayload>();
-maxDate: Date = new Date();
-  listRoomsMap: { [key: number]: string[] } = {
-    10: ['101', '102', '103'],
-    20: ['201', '202', '203']
-  };
-
+  @Output() filtersChanged = new EventEmitter<ExtraDirtyFilterPayload>();
+  maxDate: Date = new Date();
+  availableRooms: string[] = ['101', '102', '103', '201', '202', '304', '305', '401'];
   housekeepersList: Employee[] = [];
   teamLeaderList: Employee[] = [];
-  statusesList = ['All', 'Pending', 'Acknowledge', 'Done',];
 
-  listNumbers: number[] = [10, 20];
-  availableRooms: string[] = [];
-  extraWorkItems: ExtraWorkItems[] = [];
-  itemSearchQuery: string = '';
   isTeamLeader: boolean = false; // Placeholder for team leader status, adjust as needed
 
   filterForm!: FormGroup;
@@ -44,8 +33,8 @@ maxDate: Date = new Date();
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private extraWorkItemService: ExtraWorkItemService,
-    private extraWorkRequestService: ExtraWorkRequestService,
+
+
     private authService: AuthService
   ) { }
 
@@ -57,7 +46,6 @@ maxDate: Date = new Date();
     this.createRequestSearchForm();
     setupDateTimeSync(this.filterForm, this.subs);
     this.loadEmployee();
-    this.loadExtraWorkItems();
 
   }
 
@@ -65,12 +53,8 @@ maxDate: Date = new Date();
 
   createRequestSearchForm() {
     this.filterForm = this.fb.group({
-      listNumber: [''],
-      roomId: [''],
-      extraItemIds: [[]],
-      status: [],
-      requestedById: [null],
-      assignedToId: [],
+      reportedById: [''],
+      roomNumber: [''],
       fromDate: [null],
       toDate: [null],
       fromTime: [{ value: '', disabled: true }],
@@ -95,40 +79,16 @@ maxDate: Date = new Date();
     this.subs.push(emSub);
   }
 
-  loadExtraWorkItems(): void {
-    const itemSub = this.extraWorkItemService.getAllExtraWorkItems().subscribe({
-      next: (data) => {
-        this.extraWorkItems = data;
-      },
-      error: (err) => console.error('Error fetching extra work items:', err)
-    });
-
-    this.subs.push(itemSub);
-  }
-
-  onListChange(): void {
-    const selectedList = this.filterForm.get('listNumber')?.value;
-    this.filterForm.get('roomNumber')?.setValue('');
-    if (selectedList && this.listRoomsMap[selectedList]) {
-      this.availableRooms = this.listRoomsMap[selectedList];
-    } else {
-      this.availableRooms = [];
-    }
-  }
-
   applyFilters(): void {
     const values = this.filterForm.value;
 
     // 2. Map properties strictly to match the ExtendedFilterPayload layout rules
-    const payload: ExtraWorkRequestFilterPayload = {
-      roomNumber: values.roomId || null,
-      listNumber: values.listNumber ? parseInt(values.listNumber, 10) : null,
-      status: values.status || 'All',
-      requestedById: values.requestedById || null,
-      assignedToId: values.assignedToId || null,
+    const payload: ExtraDirtyFilterPayload = {
+      roomNumber: values.roomNumber || null,
+      reportedById: values.reportedById || null,
+
       fromDate: values.fromDate || null,
       toDate: values.toDate || null,
-      extraWorkItemIds: values.extraItemIds && values.extraItemIds.length ? values.extraItemIds : [],
       fromTime: values.fromTime || null,
       toTime: values.toTime || null,
       isToday: null // This can be set based on your specific logic or UI input 
@@ -139,16 +99,39 @@ maxDate: Date = new Date();
 
   resetFilters(): void {
     this.filterForm.reset({
-      listNumber: '',
       roomNumber: '',
-      statuses: [],
-      itemIds: [],
-      rquestedById: [],
-      AssignedToId: [],
-      fromDate: null,
-      toDate: null
+      reportedById: null,
+      fromTime: [{ value: '', disabled: true }],
+      toTime: [{ value: '', disabled: true }]
     });
     this.applyFilters();
+  }
+
+  private setupDateRangeListener(): void {
+    // Watch for changes on both fromDate and toDate
+    this.filterForm.valueChanges.subscribe(() => {
+      const { fromDate, toDate } = this.filterForm.value;
+      const hasDateSelected = !!fromDate || !!toDate;
+
+      const fromTimeCtrl = this.filterForm.get('fromTime');
+      const toTimeCtrl = this.filterForm.get('toTime');
+
+      if (hasDateSelected) {
+        // Enable time inputs if a date is selected
+        if (fromTimeCtrl?.disabled) fromTimeCtrl.enable({ emitEvent: false });
+        if (toTimeCtrl?.disabled) toTimeCtrl.enable({ emitEvent: false });
+      } else {
+        // Disable and reset time inputs if dates are cleared
+        if (fromTimeCtrl?.enabled) {
+          fromTimeCtrl.reset('', { emitEvent: false });
+          fromTimeCtrl.disable({ emitEvent: false });
+        }
+        if (toTimeCtrl?.enabled) {
+          toTimeCtrl.reset('', { emitEvent: false });
+          toTimeCtrl.disable({ emitEvent: false });
+        }
+      }
+    });
   }
 
 
