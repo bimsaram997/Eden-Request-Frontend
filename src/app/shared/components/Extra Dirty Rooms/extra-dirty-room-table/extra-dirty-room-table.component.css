@@ -1,0 +1,28 @@
+/* 1. Ensure the parent wrapper handles overflow properly without cutting off shadow/borders */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto !important; /* Force horizontal scrolling */
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  display: block;
+}
+
+/* 2. Set a min-width on the table so columns never compress past readability */
+.table-responsive table.mat-table {
+  min-width: 600px; /* Forces table width on mobile screens */
+  width: 100%;
+}
+
+/* 3. Prevent header text and cell text from wrapping onto multiple lines */
+.mat-header-cell, 
+.mat-cell {
+  white-space: nowrap; /* Prevents text like "Date & Time" from wrapping */
+  padding: 12px 16px;
+}
+
+/* 4. Ensure notes column truncates nicely if it's too long */
+.mat-column-notes {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
