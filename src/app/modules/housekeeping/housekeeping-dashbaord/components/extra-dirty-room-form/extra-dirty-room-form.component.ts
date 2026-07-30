@@ -132,50 +132,73 @@ export class ExtraDirtyRoomFormComponent implements OnInit, OnDestroy {
     return;
   }
 
-  // 💡 GET LOGGED IN USER ID FROM SESSION
+  // 1. EXTRACT SESSION ID
   const sessionStr = localStorage.getItem('scandic_eden_session');
   let loggedInHousekeeperId: number | null = null;
 
   if (sessionStr) {
     try {
       const session = JSON.parse(sessionStr);
-      // Check all possible property names for the employee ID
-      loggedInHousekeeperId = session.employeeId || session.id || session.userId || null;
+      loggedInHousekeeperId = session.employeeId || session.id || session.userId || session.user?.id || session.user?.employeeId || null;
     } catch {
       loggedInHousekeeperId = null;
     }
   }
-alert(`Submitting with ReportedById: ${loggedInHousekeeperId}`);
-  // 🛑 BLOCK SUBMISSION IF NOT LOGGED IN
+
   if (!loggedInHousekeeperId) {
-    alert('Your session has expired on this iPhone. Please log in again to submit reports.');
+    alert('Your session has expired on this device. Please log in again.');
     this.router.navigate(['/login']);
+    return;
+  }
+
+  // 2. EXTRACT ROOM NUMBER SAFELY
+  const roomValue = this.requestForm.get('roomNumber')?.value;
+  const rawRoomNumber = typeof roomValue === 'object' && roomValue !== null
+    ? (roomValue.roomNumber || roomValue.name || roomValue.id || '')
+    : String(roomValue || '');
+
+  if (!rawRoomNumber.trim()) {
+    alert('Please select a valid room number.');
     return;
   }
 
   this.isSubmitting = true;
 
+  // 3. BUILD FORMDATA WITH BOTH CASING COMBINATIONS (Fixes iOS WebKit Model Binding)
   const formData = new FormData();
-  formData.append('roomNumber', this.requestForm.value.roomNumber);
-  formData.append('notes', this.requestForm.value.notes || '');
-  formData.append('reportedById', loggedInHousekeeperId.toString());
+  
+  const cleanRoom = rawRoomNumber.trim();
+  const cleanNotes = (this.requestForm.value.notes || '').toString().trim();
+  const cleanReportedBy = loggedInHousekeeperId.toString();
 
+  // Append camelCase
+  formData.append('roomNumber', cleanRoom);
+  formData.append('notes', cleanNotes);
+  formData.append('reportedById', cleanReportedBy);
+
+  // Append PascalCase (Required by some ASP.NET Core FromForm configurations)
+  formData.append('RoomNumber', cleanRoom);
+  formData.append('Notes', cleanNotes);
+  formData.append('ReportedById', cleanReportedBy);
+
+  // 4. APPEND FILES
   this.mediaItems.forEach((item, index) => {
     const rawFile = item.file;
     const isVideo = item.type === 'video';
-    
+
     const fallbackExt = isVideo ? 'mp4' : 'jpg';
     const fallbackMime = isVideo ? 'video/mp4' : 'image/jpeg';
-    
-    const cleanFileName = rawFile.name && rawFile.name.includes('.') 
-      ? rawFile.name 
-      : `mobile_upload_${index + 1}.${fallbackExt}`;
+
+    const cleanFileName = rawFile.name && rawFile.name.includes('.')
+      ? rawFile.name
+      : `ios_upload_${index + 1}.${fallbackExt}`;
 
     const cleanBlob = new File([rawFile], cleanFileName, {
       type: rawFile.type || fallbackMime
     });
 
     formData.append('files', cleanBlob, cleanFileName);
+    formData.append('Files', cleanBlob, cleanFileName);
   });
 
   this.extraDirtyRoomService.placeExtraDiryRoom(formData).subscribe({
