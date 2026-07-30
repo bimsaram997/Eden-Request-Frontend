@@ -121,7 +121,7 @@ export class ExtraDirtyRoomFormComponent implements OnInit, OnDestroy {
     this.router.navigate(['/workspace/extra-dirty-rooms']);
   }
 
-  onSubmit(): void {
+onSubmit(): void {
   if (this.requestForm.invalid) {
     this.requestForm.markAllAsTouched();
     return;
@@ -132,7 +132,7 @@ export class ExtraDirtyRoomFormComponent implements OnInit, OnDestroy {
     return;
   }
 
-  // 1. EXTRACT SESSION ID
+  // 1. EXTRACT SESSION & ROOM NUMBER
   const sessionStr = localStorage.getItem('scandic_eden_session');
   let loggedInHousekeeperId: number | null = null;
 
@@ -146,42 +146,32 @@ export class ExtraDirtyRoomFormComponent implements OnInit, OnDestroy {
   }
 
   if (!loggedInHousekeeperId) {
-    alert('Your session has expired on this device. Please log in again.');
+    alert('Your session has expired. Please log in again.');
     this.router.navigate(['/login']);
     return;
   }
 
-  // 2. EXTRACT ROOM NUMBER SAFELY
   const roomValue = this.requestForm.get('roomNumber')?.value;
   const rawRoomNumber = typeof roomValue === 'object' && roomValue !== null
     ? (roomValue.roomNumber || roomValue.name || roomValue.id || '')
     : String(roomValue || '');
 
-  if (!rawRoomNumber.trim()) {
-    alert('Please select a valid room number.');
-    return;
-  }
-
   this.isSubmitting = true;
 
-  // 3. BUILD FORMDATA WITH BOTH CASING COMBINATIONS (Fixes iOS WebKit Model Binding)
+  // 2. INITIALIZE FORMDATA
   const formData = new FormData();
+
+  // 🚨 CRITICAL FOR IOS SAFARI: Append ALL string fields FIRST!
+  formData.append('roomNumber', rawRoomNumber.trim());
+  formData.append('RoomNumber', rawRoomNumber.trim());
   
-  const cleanRoom = rawRoomNumber.trim();
-  const cleanNotes = (this.requestForm.value.notes || '').toString().trim();
-  const cleanReportedBy = loggedInHousekeeperId.toString();
+  formData.append('reportedById', loggedInHousekeeperId.toString());
+  formData.append('ReportedById', loggedInHousekeeperId.toString());
+  
+  formData.append('notes', (this.requestForm.value.notes || '').toString().trim());
+  formData.append('Notes', (this.requestForm.value.notes || '').toString().trim());
 
-  // Append camelCase
-  formData.append('roomNumber', cleanRoom);
-  formData.append('notes', cleanNotes);
-  formData.append('reportedById', cleanReportedBy);
-
-  // Append PascalCase (Required by some ASP.NET Core FromForm configurations)
-  formData.append('RoomNumber', cleanRoom);
-  formData.append('Notes', cleanNotes);
-  formData.append('ReportedById', cleanReportedBy);
-
-  // 4. APPEND FILES
+  // 3. APPEND BINARY FILES LAST
   this.mediaItems.forEach((item, index) => {
     const rawFile = item.file;
     const isVideo = item.type === 'video';
@@ -198,7 +188,6 @@ export class ExtraDirtyRoomFormComponent implements OnInit, OnDestroy {
     });
 
     formData.append('files', cleanBlob, cleanFileName);
-    formData.append('Files', cleanBlob, cleanFileName);
   });
 
   this.extraDirtyRoomService.placeExtraDiryRoom(formData).subscribe({
