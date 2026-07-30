@@ -19,15 +19,18 @@ export interface MediaPreview {
   templateUrl: './extra-dirty-room-form.component.html',
   styleUrl: './extra-dirty-room-form.component.css'
 })
-export class ExtraDirtyRoomFormComponent implements OnInit, OnDestroy{
-requestForm!: FormGroup;
+export class ExtraDirtyRoomFormComponent implements OnInit, OnDestroy {
+  requestForm!: FormGroup;
   mediaItems: MediaPreview[] = [];
   isSubmitting = false;
 
   roomSearchQuery = '';
   availableRooms: string[] = ['101', '102', '103', '201', '202', '304', '305', '401'];
   isDesktop = false;
-  private readonly apiUrl = 'http://localhost:5000/api/ExtraDirtyReports';
+
+  // Supported extensions for iOS/Android fallback when file.type is empty
+  private readonly imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'heic', 'heif', 'bmp', 'tiff'];
+  private readonly videoExtensions = ['mp4', 'mov', 'm4v', 'webm', 'mkv', 'avi', '3gp', 'qt'];
 
   constructor(
     private fb: FormBuilder,
@@ -44,7 +47,6 @@ requestForm!: FormGroup;
     });
   }
 
-
   getFilteredRooms(): string[] {
     if (!this.roomSearchQuery.trim()) return this.availableRooms;
     return this.availableRooms.filter(room =>
@@ -52,55 +54,98 @@ requestForm!: FormGroup;
     );
   }
 
-  triggerMediaAccess(cameraInput: HTMLInputElement, storageInput: HTMLInputElement): void {
-    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    if (isMobile) {
-      cameraInput.click();
-    } else {
-      storageInput.click();
+  /**
+   * Helper method to reliably identify media type across Mobile (iOS HEIC/MOV) & Desktop
+   */
+  private determineMediaType(file: File): 'image' | 'video' {
+    // 1. Check standard MIME type if browser populated it
+    if (file.type) {
+      if (file.type.startsWith('video/')) return 'video';
+      if (file.type.startsWith('image/')) return 'image';
+    }
+
+    // 2. Fallback check by file extension (Crucial for iOS Camera/Gallery files where file.type === "")
+    const fileName = file.name || '';
+    const extension = fileName.split('.').pop()?.toLowerCase() || '';
+
+    if (this.videoExtensions.includes(extension)) {
+      return 'video';
+    }
+
+    // Default to image for HEIC / photos with missing MIME type
+    return 'image';
+  }
+
+  /**
+   * Safe URL Object generator with cleanup tracking
+   */
+  private createSafePreviewUrl(file: File): SafeUrl {
+    try {
+      const rawObjectUrl = URL.createObjectURL(file);
+      return this.sanitizer.bypassSecurityTrustUrl(rawObjectUrl);
+    } catch {
+      // Fallback placeholder if object URL creation fails
+      return '';
     }
   }
 
   onFilesSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
-    if (input.files && this.mediaItems.length < 5) {
-      Array.from(input.files).forEach((file: File) => {
-        if (this.mediaItems.length >= 5) return;
+    if (!input.files || input.files.length === 0) return;
 
-        const isVideo = file.type.startsWith('video/');
-        const rawObjectUrl = URL.createObjectURL(file);
+    const selectedFiles = Array.from(input.files);
 
-        this.mediaItems.push({
-          file: file,
-          type: isVideo ? 'video' : 'image',
-          previewUrl: this.sanitizer.bypassSecurityTrustUrl(rawObjectUrl)
-        });
+    for (const file of selectedFiles) {
+      if (this.mediaItems.length >= 5) break;
+
+      const mediaType = this.determineMediaType(file);
+      const previewUrl = this.createSafePreviewUrl(file);
+
+      this.mediaItems.push({
+        file: file,
+        type: mediaType,
+        previewUrl: previewUrl
       });
     }
+
+    // Reset input value so user can select the same file again if removed
     input.value = '';
   }
 
   removeMedia(index: number): void {
-    this.mediaItems.splice(index, 1);
+    if (index >= 0 && index < this.mediaItems.length) {
+      this.mediaItems.splice(index, 1);
+    }
   }
 
   backToDashboard(): void {
     this.router.navigate(['/workspace/extra-dirty-rooms']);
   }
 
- onSubmit(): void {
-    if (this.requestForm.invalid) return;
+  onSubmit(): void {
+    if (this.requestForm.invalid) {
+      this.requestForm.markAllAsTouched();
+      return;
+    }
 
     if (!this.mediaItems || this.mediaItems.length === 0) {
-      alert('Please attach at least one photo or video before submitting.');
+      alert('At least one photo or video evidence is required.');
       return;
     }
 
     this.isSubmitting = true;
 
-    // Retrieve logged-in housekeeper ID from stored session/token
-   const session = JSON.parse(localStorage.getItem('scandic_eden_session') || '{}');
-    const loggedInHousekeeperId = session.id || session.employeeId || 1;
+    // Retrieve logged-in housekeeper ID safely
+    const sessionStr = localStorage.getItem('scandic_eden_session');
+    let loggedInHousekeeperId = 1;
+    if (sessionStr) {
+      try {
+        const session = JSON.parse(sessionStr);
+        loggedInHousekeeperId = session.id || session.employeeId || 1;
+      } catch {
+        loggedInHousekeeperId = 1;
+      }
+    }
 
     const formData = new FormData();
     formData.append('roomNumber', this.requestForm.value.roomNumber);
@@ -111,7 +156,6 @@ requestForm!: FormGroup;
       formData.append('files', item.file, item.file.name);
     });
 
-    // Call service using your exact method signature style
     this.extraDirtyRoomService.placeExtraDiryRoom(formData).subscribe({
       next: (response: ExtraDirtyReportResponse) => {
         this.isSubmitting = false;
@@ -126,8 +170,7 @@ requestForm!: FormGroup;
     });
   }
 
-    ngOnDestroy(): void {
+  ngOnDestroy(): void {
     this.mediaItems = [];
   }
-
 }

@@ -53,37 +53,37 @@
         </mat-card>
     </form>
 
-<!-- Native Hidden Inputs for Mobile Camera & Local Files -->
-<input #photoCameraInput type="file" accept="image/*" capture="environment" (change)="onFilesSelected($event)" class="d-none" />
-<input #videoCameraInput type="file" accept="video/*" capture="environment" (change)="onFilesSelected($event)" class="d-none" />
-<input #fileStorageInput type="file" accept="image/*,video/*" multiple (change)="onFilesSelected($event)" class="d-none" />
+    <!-- Native Hidden Inputs cross-compatible with Desktop, iOS (HEIC/MOV), and Android -->
+    <input #photoCameraInput type="file" accept="image/*,.heic,.heif" capture="environment" (change)="onFilesSelected($event)" class="d-none" />
+    <input #videoCameraInput type="file" accept="video/*,.mov,.mp4" capture="environment" (change)="onFilesSelected($event)" class="d-none" />
+    <input #fileStorageInput type="file" accept="image/*,video/*,.heic,.heif,.mov,.mp4" multiple (change)="onFilesSelected($event)" class="d-none" />
 
-<!-- Media Capture Box -->
-<mat-card class="input-card item-picker-box">
-    <mat-card-header>
-        <mat-card-title style="font-size: 16px;">Attach Photos & Videos</mat-card-title>
-    </mat-card-header>
+    <!-- Media Capture Box -->
+    <mat-card class="input-card item-picker-box">
+        <mat-card-header>
+            <mat-card-title style="font-size: 16px;">Attach Photos & Videos</mat-card-title>
+        </mat-card-header>
 
-    <mat-card-content class="item-picker-content">
-        
-        <!-- HIDE THESE TWO BUTTONS ON DESKTOP / LAPTOP -->
-        <div class="picker-fields-grid" *ngIf="!isDesktop">
-            <button type="button" mat-flat-button color="primary" class="w-100 add-btn" (click)="photoCameraInput.click()">
-                <mat-icon>photo_camera</mat-icon> Take Photo
+        <mat-card-content class="item-picker-content">
+            
+            <!-- Direct Camera Triggers (Mobile Devices) -->
+            <div class="picker-fields-grid" *ngIf="!isDesktop">
+                <button type="button" mat-flat-button color="primary" class="w-100 add-btn" (click)="photoCameraInput.click()">
+                    <mat-icon>photo_camera</mat-icon> Take Photo
+                </button>
+
+                <button type="button" mat-flat-button color="accent" class="w-100 add-btn" (click)="videoCameraInput.click()">
+                    <mat-icon>videocam</mat-icon> Record Video
+                </button>
+            </div>
+
+            <!-- Gallery/File Picker (Desktop and Mobile) -->
+            <button type="button" mat-stroked-button class="w-100 py-2 mt-1" (click)="fileStorageInput.click()">
+                <mat-icon>folder_open</mat-icon> Choose from {{ isDesktop ? 'Computer Files' : 'Gallery / Files' }}
             </button>
 
-            <button type="button" mat-flat-button color="accent" class="w-100 add-btn" (click)="videoCameraInput.click()">
-                <mat-icon>videocam</mat-icon> Record Video
-            </button>
-        </div>
-
-        <!-- ALWAYS VISIBLE ON BOTH DESKTOP AND MOBILE -->
-        <button type="button" mat-stroked-button class="w-100 py-2 mt-1" (click)="fileStorageInput.click()">
-            <mat-icon>folder_open</mat-icon> Choose from {{ isDesktop ? 'Computer Files' : 'Gallery / Files' }}
-        </button>
-
-    </mat-card-content>
-</mat-card>
+        </mat-card-content>
+    </mat-card>
 
     <!-- Attached Media Overview -->
     <div class="added-summary-section" *ngIf="mediaItems.length > 0">
