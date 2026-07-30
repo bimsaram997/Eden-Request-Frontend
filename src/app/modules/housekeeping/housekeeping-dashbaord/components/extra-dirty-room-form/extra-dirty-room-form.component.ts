@@ -122,68 +122,75 @@ export class ExtraDirtyRoomFormComponent implements OnInit, OnDestroy {
   }
 
   onSubmit(): void {
-    if (this.requestForm.invalid) {
-      this.requestForm.markAllAsTouched();
-      return;
-    }
-
-    // Client-side guard check restored
-    if (!this.mediaItems || this.mediaItems.length === 0) {
-      alert('At least one photo or video evidence is required.');
-      return;
-    }
-
-    this.isSubmitting = true;
-
-    const sessionStr = localStorage.getItem('scandic_eden_session');
-    let loggedInHousekeeperId = 1;
-    if (sessionStr) {
-      try {
-        const session = JSON.parse(sessionStr);
-        loggedInHousekeeperId = session.id || session.employeeId || 1;
-      } catch {
-        loggedInHousekeeperId = 1;
-      }
-    }
-
-    const formData = new FormData();
-    formData.append('roomNumber', this.requestForm.value.roomNumber);
-    formData.append('notes', this.requestForm.value.notes || '');
-    formData.append('reportedById', loggedInHousekeeperId.toString());
-
-    // Cleanly reconstruct File objects so iOS Safari doesn't strip binary headers
-    this.mediaItems.forEach((item, index) => {
-      const rawFile = item.file;
-      const isVideo = item.type === 'video';
-
-      const fallbackExt = isVideo ? 'mp4' : 'jpg';
-      const fallbackMime = isVideo ? 'video/mp4' : 'image/jpeg';
-
-      const cleanFileName = rawFile.name && rawFile.name.includes('.')
-        ? rawFile.name
-        : `mobile_upload_${index + 1}.${fallbackExt}`;
-
-      const cleanBlob = new File([rawFile], cleanFileName, {
-        type: rawFile.type || fallbackMime
-      });
-
-      formData.append('files', cleanBlob, cleanFileName);
-    });
-
-    this.extraDirtyRoomService.placeExtraDiryRoom(formData).subscribe({
-      next: (response: ExtraDirtyReportResponse) => {
-        this.isSubmitting = false;
-        alert(response.message || 'Extra dirty report submitted successfully!');
-        this.backToDashboard();
-      },
-      error: (err) => {
-        console.error('Submission failed:', err);
-        this.isSubmitting = false;
-        alert(err.error?.message || 'Failed to submit report. Please try again.');
-      }
-    });
+  if (this.requestForm.invalid) {
+    this.requestForm.markAllAsTouched();
+    return;
   }
 
+  if (!this.mediaItems || this.mediaItems.length === 0) {
+    alert('At least one photo or video evidence is required.');
+    return;
+  }
+
+  // 💡 GET LOGGED IN USER ID FROM SESSION
+  const sessionStr = localStorage.getItem('scandic_eden_session');
+  let loggedInHousekeeperId: number | null = null;
+
+  if (sessionStr) {
+    try {
+      const session = JSON.parse(sessionStr);
+      // Check all possible property names for the employee ID
+      loggedInHousekeeperId = session.employeeId || session.id || session.userId || null;
+    } catch {
+      loggedInHousekeeperId = null;
+    }
+  }
+
+  // 🛑 BLOCK SUBMISSION IF NOT LOGGED IN
+  if (!loggedInHousekeeperId) {
+    alert('Your session has expired on this iPhone. Please log in again to submit reports.');
+    this.router.navigate(['/login']);
+    return;
+  }
+
+  this.isSubmitting = true;
+
+  const formData = new FormData();
+  formData.append('roomNumber', this.requestForm.value.roomNumber);
+  formData.append('notes', this.requestForm.value.notes || '');
+  formData.append('reportedById', loggedInHousekeeperId.toString());
+
+  this.mediaItems.forEach((item, index) => {
+    const rawFile = item.file;
+    const isVideo = item.type === 'video';
+    
+    const fallbackExt = isVideo ? 'mp4' : 'jpg';
+    const fallbackMime = isVideo ? 'video/mp4' : 'image/jpeg';
+    
+    const cleanFileName = rawFile.name && rawFile.name.includes('.') 
+      ? rawFile.name 
+      : `mobile_upload_${index + 1}.${fallbackExt}`;
+
+    const cleanBlob = new File([rawFile], cleanFileName, {
+      type: rawFile.type || fallbackMime
+    });
+
+    formData.append('files', cleanBlob, cleanFileName);
+  });
+
+  this.extraDirtyRoomService.placeExtraDiryRoom(formData).subscribe({
+    next: (response: ExtraDirtyReportResponse) => {
+      this.isSubmitting = false;
+      alert(response.message || 'Extra dirty report submitted successfully!');
+      this.backToDashboard();
+    },
+    error: (err) => {
+      console.error('Submission failed:', err);
+      this.isSubmitting = false;
+      alert(err.error?.message || 'Failed to submit report. Please try again.');
+    }
+  });
+}
   ngOnDestroy(): void {
     this.mediaItems = [];
   }
