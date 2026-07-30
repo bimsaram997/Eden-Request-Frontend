@@ -128,10 +128,10 @@ export class ExtraDirtyRoomFormComponent implements OnInit, OnDestroy {
     return;
   }
 
-  if (!this.mediaItems || this.mediaItems.length === 0) {
-    alert('At least one photo or video evidence is required.');
-    return;
-  }
+  // if (!this.mediaItems || this.mediaItems.length === 0) {
+  //   alert('At least one photo or video evidence is required.');
+  //   return;
+  // }
 
   this.isSubmitting = true;
 
