@@ -145,7 +145,7 @@ export class ExtraDirtyRoomFormComponent implements OnInit, OnDestroy {
       loggedInHousekeeperId = null;
     }
   }
-
+alert(`Submitting with ReportedById: ${loggedInHousekeeperId}`);
   // 🛑 BLOCK SUBMISSION IF NOT LOGGED IN
   if (!loggedInHousekeeperId) {
     alert('Your session has expired on this iPhone. Please log in again to submit reports.');
