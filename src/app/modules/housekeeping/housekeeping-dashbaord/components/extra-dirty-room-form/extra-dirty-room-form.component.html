@@ -53,9 +53,9 @@
         </mat-card>
 
         <!-- Native Hidden Inputs -->
-        <input #photoCameraInput type="file" accept="image/*,.heic,.heif" capture="environment" (change)="onFilesSelected($event)" class="d-none" />
-        <input #videoCameraInput type="file" accept="video/*,.mov,.mp4" capture="environment" (change)="onFilesSelected($event)" class="d-none" />
-        <input #fileStorageInput type="file" accept="image/*,video/*,.heic,.heif,.mov,.mp4" multiple (change)="onFilesSelected($event)" class="d-none" />
+        <input #photoCameraInput type="file" accept="image/*,.heic,.heif" capture="environment" (change)="onFileSelected($event)" class="d-none" />
+        <input #videoCameraInput type="file" accept="video/*,.mov,.mp4" capture="environment" (change)="onFileSelected($event)" class="d-none" />
+        <input #fileStorageInput type="file" accept="image/*,video/*,.heic,.heif,.mov,.mp4" multiple (change)="onFileSelected($event)" class="d-none" />
 
         <!-- Media Capture Box -->
         <mat-card class="input-card item-picker-box">
