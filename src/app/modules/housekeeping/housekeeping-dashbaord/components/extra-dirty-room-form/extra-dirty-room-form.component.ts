@@ -185,33 +185,46 @@ async onSubmit(): Promise<void> {
     // -------------------------------------------------------------
     // STEP 2: Upload Media Files Linked to `newReportId`
     // -------------------------------------------------------------
-   const filesFormData = new FormData();
+ // -------------------------------------------------------------
+// STEP 2: Upload Media Files Linked to `newReportId`
+// -------------------------------------------------------------
+const filesFormData = new FormData();
 
 for (let i = 0; i < validMediaItems.length; i++) {
   const item = validMediaItems[i];
   const rawFile = item.file;
   const isVideo = item.type === 'video';
-  const extension = isVideo ? 'mp4' : 'jpg';
+  const extension = isVideo ? 'mp4' : 'jpeg';
 
   const fileName = (rawFile.name && rawFile.name.includes('.')) 
     ? rawFile.name 
     : `upload_${Date.now()}_${i + 1}.${extension}`;
 
-  const mimeType = rawFile.type || (isVideo ? 'video/mp4' : 'image/jpeg');
-
   try {
-    // FORCE iOS WebKit to read the file bytes into memory before uploading!
-    // This resolves zero-byte Safari camera buffers.
-    const buffer = await rawFile.arrayBuffer();
-    const blob = new Blob([buffer], { type: mimeType });
+    // 1. Force FileReader to extract the actual bytes from iOS storage
+    const validBlob = await this.readFileAsBlob(rawFile);
     
-    filesFormData.append('files', blob, fileName);
+    // 2. Double-check that we didn't end up with an empty Blob
+    console.log(`[iOS Upload Debug] File ${fileName} size: ${validBlob.size} bytes`);
+    
+    if (validBlob.size === 0) {
+      console.warn(`File ${fileName} has 0 bytes after FileReader processing.`);
+      continue;
+    }
+
+    // 3. Append the valid Blob to FormData
+    filesFormData.append('files', validBlob, fileName);
   } catch (err) {
-    console.error(`Error reading file buffer for ${fileName}:`, err);
-    // Fallback if arrayBuffer fails
-    filesFormData.append('files', rawFile, fileName);
+    console.error(`Failed to read file ${fileName} on iOS:`, err);
   }
 }
+
+// Ensure we actually have populated files before making the network request
+if (!filesFormData.has('files')) {
+  throw new Error('Could not read image data from your device. Please select the photo again.');
+}
+
+
 
 // Verification check in console:
 console.log('Files inside FormData payload:', filesFormData.getAll('files'));
@@ -232,7 +245,29 @@ console.log('Files inside FormData payload:', filesFormData.getAll('files'));
     alert(serverMsg);
   }
 }
+private readFileAsBlob(file: File): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      try {
+        const arrayBuffer = reader.result as ArrayBuffer;
+        const mimeType = file.type || 'image/jpeg';
+        const blob = new Blob([arrayBuffer], { type: mimeType });
+        resolve(blob);
+      } catch (e) {
+        reject(e);
+      }
+    };
+
+    reader.onerror = (error) => reject(error);
+
+    // readAsArrayBuffer is supported across all iOS versions
+    reader.readAsArrayBuffer(file);
+  });
+}
   ngOnDestroy(): void {
     this.mediaItems = [];
   }
 }
+
