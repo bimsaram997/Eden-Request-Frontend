@@ -88,28 +88,33 @@ export class ExtraDirtyRoomFormComponent implements OnInit, OnDestroy {
     }
   }
 
-  onFilesSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (!input.files || input.files.length === 0) return;
+onFileSelected(event: Event): void {
+  const input = event.target as HTMLInputElement;
+  if (!input.files || input.files.length === 0) {
+    return;
+  }
 
-    const selectedFiles = Array.from(input.files);
+  const files = Array.from(input.files);
 
-    for (const file of selectedFiles) {
-      if (this.mediaItems.length >= 5) break;
-
-      const mediaType = this.determineMediaType(file);
-      const previewUrl = this.createSafePreviewUrl(file);
-
-      this.mediaItems.push({
-        file: file,
-        type: mediaType,
-        previewUrl: previewUrl
-      });
+  files.forEach((file) => {
+    // iOS Safari validation: ensure file has valid size
+    if (file.size === 0) {
+      console.warn('iOS File captured with zero bytes, skipping:', file.name);
+      return;
     }
 
-    // Reset input value so user can select the same file again if removed
-    input.value = '';
-  }
+    const isVideo = file.type.startsWith('video/') || file.name.endsWith('.mov') || file.name.endsWith('.mp4');
+
+    this.mediaItems.push({
+      file: file,
+      type: isVideo ? 'video' : 'image',
+      previewUrl: URL.createObjectURL(file) // For preview in UI
+    });
+  });
+
+  // Clear file input value so user can re-select if needed on iOS
+  input.value = '';
+}
 
   removeMedia(index: number): void {
     if (index >= 0 && index < this.mediaItems.length) {
@@ -127,8 +132,11 @@ async onSubmit(): Promise<void> {
     return;
   }
 
-  if (!this.mediaItems || this.mediaItems.length === 0) {
-    alert('At least one photo or video evidence is required.');
+  // Filter out any invalid/corrupted files captured by iOS
+  const validMediaItems = this.mediaItems.filter(item => item.file && item.file.size > 0);
+
+  if (validMediaItems.length === 0) {
+    alert('At least one photo or video evidence is required. If using iPhone camera, please wait a moment for the photo to process.');
     return;
   }
 
@@ -179,13 +187,22 @@ async onSubmit(): Promise<void> {
     // -------------------------------------------------------------
     const filesFormData = new FormData();
 
-    this.mediaItems.forEach((item, index) => {
+    validMediaItems.forEach((item, index) => {
       const rawFile = item.file;
       const isVideo = item.type === 'video';
-      const mimeType = rawFile.type && rawFile.type.length > 0 ? rawFile.type : (isVideo ? 'video/mp4' : 'image/jpeg');
-      const extension = isVideo ? 'mp4' : 'jpg';
-      const fileName = rawFile.name && rawFile.name.includes('.') ? rawFile.name : `upload_${Date.now()}_${index + 1}.${extension}`;
+      
+      // Fallback types specifically for iOS HEIC/MOV captures
+      let mimeType = rawFile.type;
+      if (!mimeType || mimeType.length === 0) {
+        mimeType = isVideo ? 'video/mp4' : 'image/jpeg';
+      }
 
+      const extension = isVideo ? 'mp4' : 'jpg';
+      const fileName = rawFile.name && rawFile.name.includes('.') 
+        ? rawFile.name 
+        : `upload_${Date.now()}_${index + 1}.${extension}`;
+
+      // Construct a fresh File object to ensure Safari streams the buffer properly
       const cleanFile = new File([rawFile], fileName, { type: mimeType });
       filesFormData.append('files', cleanFile, fileName);
     });
@@ -202,7 +219,7 @@ async onSubmit(): Promise<void> {
   } catch (err: any) {
     console.error('Submission failed:', err);
     this.isSubmitting = false;
-    const serverMsg = err.error?.message || err.message || 'Failed to submit report. Please try again.';
+    const serverMsg = err.error?.message || err.message || 'Failed to submit report or media. Please try again.';
     alert(serverMsg);
   }
 }
