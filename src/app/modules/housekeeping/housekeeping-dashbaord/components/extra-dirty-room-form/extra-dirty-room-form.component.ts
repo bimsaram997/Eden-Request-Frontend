@@ -132,10 +132,9 @@ onSubmit(): void {
     return;
   }
 
-  // 1. Extract Session & Employee ID
+  // Session retrieval logic...
   const sessionStr = localStorage.getItem('scandic_eden_session');
   let loggedInHousekeeperId: number | null = null;
-
   if (sessionStr) {
     try {
       const session = JSON.parse(sessionStr);
@@ -151,50 +150,42 @@ onSubmit(): void {
     return;
   }
 
-  // 2. EXTRACT ROOM NUMBER SAFELY
+  // 1. EXTRACT ROOM VALUE
   const roomValue = this.requestForm.get('roomNumber')?.value;
-  let rawRoomNumber = '';
+  let rawRoomNumber = typeof roomValue === 'object' && roomValue !== null
+    ? (roomValue.roomNumber || roomValue.name || roomValue.id || roomValue.value || '')
+    : String(roomValue || '');
 
-  if (typeof roomValue === 'object' && roomValue !== null) {
-    rawRoomNumber = String(roomValue.roomNumber || roomValue.name || roomValue.id || roomValue.value || '');
-  } else if (roomValue !== null && roomValue !== undefined) {
-    rawRoomNumber = String(roomValue);
-  }
-
-  // Clean raw room string
   rawRoomNumber = rawRoomNumber.replace(/Room\s+/i, '').trim();
-
-  if (!rawRoomNumber) {
-    alert('Please select a valid room number.');
-    return;
-  }
 
   this.isSubmitting = true;
 
-  // 3. Build FormData
   const formData = new FormData();
 
+  // 2. APPEND TEXT FIELDS FIRST (Crucial for iOS WebKit)
   formData.append('roomNumber', rawRoomNumber);
+  formData.append('RoomNumber', rawRoomNumber); // Duplicate key for legacy .NET casing fallback
   formData.append('reportedById', loggedInHousekeeperId.toString());
+  formData.append('ReportedById', loggedInHousekeeperId.toString());
   formData.append('notes', (this.requestForm.value.notes || '').toString().trim());
 
-  // 4. Append media files
+  // 3. APPEND BINARY FILES WITH iOS SAFE MIME TYPES
   this.mediaItems.forEach((item, index) => {
     const rawFile = item.file;
     const isVideo = item.type === 'video';
 
-    const fallbackExt = isVideo ? 'mp4' : 'jpg';
-    const fallbackMime = isVideo ? 'video/mp4' : 'image/jpeg';
-
-    const cleanFileName = rawFile.name && rawFile.name.includes('.')
+    // Force explicit fallback MIME types for iOS Safari
+    const mimeType = rawFile.type || (isVideo ? 'video/mp4' : 'image/jpeg');
+    const extension = isVideo ? 'mp4' : 'jpg';
+    
+    const fileName = rawFile.name && rawFile.name.includes('.')
       ? rawFile.name
-      : `ios_upload_${index + 1}.${fallbackExt}`;
+      : `iphone_upload_${Date.now()}_${index + 1}.${extension}`;
 
-    const cleanBlob = new File([rawFile], cleanFileName, {
-      type: rawFile.type || fallbackMime
-    });
+    // Re-wrap Blob into clean File object for WebKit compatibility
+    const iosSafeFile = new File([rawFile], fileName, { type: mimeType });
 
-    formData.append('files', cleanBlob, cleanFileName);
+    formData.append('files', iosSafeFile, fileName);
   });
 
   this.extraDirtyRoomService.placeExtraDiryRoom(formData).subscribe({
