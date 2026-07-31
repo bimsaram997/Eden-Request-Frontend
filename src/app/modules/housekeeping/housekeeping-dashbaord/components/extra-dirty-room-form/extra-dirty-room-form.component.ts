@@ -121,7 +121,7 @@ export class ExtraDirtyRoomFormComponent implements OnInit, OnDestroy {
     this.router.navigate(['/workspace/extra-dirty-rooms']);
   }
 
-onSubmit(): void {
+async onSubmit(): Promise<void> {
   if (this.requestForm.invalid) {
     this.requestForm.markAllAsTouched();
     return;
@@ -149,60 +149,62 @@ onSubmit(): void {
     return;
   }
 
-  // 1. EXTRACT CLEAN ROOM NUMBER
   const roomValue = this.requestForm.get('roomNumber')?.value;
   let rawRoomNumber = typeof roomValue === 'object' && roomValue !== null
     ? (roomValue.roomNumber || roomValue.name || roomValue.id || roomValue.value || '')
     : String(roomValue || '');
-
   rawRoomNumber = rawRoomNumber.replace(/Room\s+/i, '').trim();
 
   this.isSubmitting = true;
 
-  const formData = new FormData();
+  try {
+    // -------------------------------------------------------------
+    // STEP 1: Post JSON Metadata (Never drops fields on iPhone)
+    // -------------------------------------------------------------
+    const metadataPayload = {
+      roomNumber: rawRoomNumber,
+      reportedById: loggedInHousekeeperId,
+      notes: (this.requestForm.value.notes || '').toString().trim()
+    };
 
-  // 2. ALWAYS APPEND TEXT FIELDS FIRST FOR IOS WEBKIT
-  formData.append('roomNumber', rawRoomNumber);
-  formData.append('reportedById', loggedInHousekeeperId.toString());
-  formData.append('notes', (this.requestForm.value.notes || '').toString().trim());
+    const metaResponse = await this.extraDirtyRoomService.createReportMetadata(metadataPayload).toPromise();
+    const newReportId = metaResponse?.reportId;
 
-  // 3. RE-WRAP FILES WITH EXPLICIT MIME TYPES FOR IPHONE
-  this.mediaItems.forEach((item, index) => {
-    const rawFile = item.file;
-    const isVideo = item.type === 'video';
-
-    // Force explicit standard fallback MIME type for iOS camera Blobs
-    const mimeType = rawFile.type && rawFile.type.length > 0 
-      ? rawFile.type 
-      : (isVideo ? 'video/mp4' : 'image/jpeg');
-
-    const extension = isVideo ? 'mp4' : 'jpg';
-    
-    const fileName = rawFile.name && rawFile.name.includes('.')
-      ? rawFile.name
-      : `ios_capture_${Date.now()}_${index + 1}.${extension}`;
-
-    // Reconstruct file blob to ensure WebKit sets proper multipart boundaries
-    const cleanIosFile = new File([rawFile], fileName, { type: mimeType });
-
-    formData.append('files', cleanIosFile, fileName);
-  });
-
-  this.extraDirtyRoomService.placeExtraDiryRoom(formData).subscribe({
-    next: (response: ExtraDirtyReportResponse) => {
-      this.isSubmitting = false;
-      alert(response.message || 'Extra dirty report submitted successfully!');
-      this.backToDashboard();
-    },
-    error: (err) => {
-      console.error('Submission failed:', err);
-      this.isSubmitting = false;
-      const serverMsg = err.error?.errors 
-        ? JSON.stringify(err.error.errors) 
-        : (err.error?.message || 'Failed to submit report. Please try again.');
-      alert(serverMsg);
+    if (!newReportId) {
+      throw new Error('Server did not return a valid Report ID.');
     }
-  });
+
+    // -------------------------------------------------------------
+    // STEP 2: Upload Media Files Linked to `newReportId`
+    // -------------------------------------------------------------
+    const filesFormData = new FormData();
+
+    this.mediaItems.forEach((item, index) => {
+      const rawFile = item.file;
+      const isVideo = item.type === 'video';
+      const mimeType = rawFile.type && rawFile.type.length > 0 ? rawFile.type : (isVideo ? 'video/mp4' : 'image/jpeg');
+      const extension = isVideo ? 'mp4' : 'jpg';
+      const fileName = rawFile.name && rawFile.name.includes('.') ? rawFile.name : `upload_${Date.now()}_${index + 1}.${extension}`;
+
+      const cleanFile = new File([rawFile], fileName, { type: mimeType });
+      filesFormData.append('files', cleanFile, fileName);
+    });
+
+    await this.extraDirtyRoomService.uploadReportMedia(newReportId, filesFormData).toPromise();
+
+    // -------------------------------------------------------------
+    // SUCCESS
+    // -------------------------------------------------------------
+    this.isSubmitting = false;
+    alert('Report and media submitted successfully!');
+    this.backToDashboard();
+
+  } catch (err: any) {
+    console.error('Submission failed:', err);
+    this.isSubmitting = false;
+    const serverMsg = err.error?.message || err.message || 'Failed to submit report. Please try again.';
+    alert(serverMsg);
+  }
 }
   ngOnDestroy(): void {
     this.mediaItems = [];

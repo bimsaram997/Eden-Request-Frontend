@@ -31,3 +31,14 @@ export interface ExtraDirtyFilterPayload {
   toDate?: string | null;
   toTime?: string | null;
 }
+
+export interface CreateReportMetadataDto {
+  roomNumber: string;
+  reportedById: number;
+  notes?: string;
+}
+
+export interface MetadataResponse {
+  reportId: number;
+  message: string;
+}
