@@ -42,3 +42,11 @@ export interface MetadataResponse {
   reportId: number;
   message: string;
 }
+
+export interface MediaFile {
+  id?: number;
+  url?: string;
+  fileUrl?: string;
+  mediaType?: string;
+  type?: string;
+}

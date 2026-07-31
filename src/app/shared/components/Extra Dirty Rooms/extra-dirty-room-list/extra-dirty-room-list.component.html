@@ -73,3 +73,10 @@
   </mat-paginator>
   </div>
 </div>
+
+<app-medial-viewer-modal
+  [isOpen]="isMediaModalOpen"       
+  [mediaFiles]="selectedMediaFiles" 
+  [roomNumber]="selectedRoomNumber"  
+  (closeModal)="closeMediaModal()">  
+</app-medial-viewer-modal>

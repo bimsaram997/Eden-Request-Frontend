@@ -9,11 +9,12 @@ import { PagedResponse } from '../../../../models/request.model';
 import { ExtraDirtyRoomService } from '../../../../services/extra-dirty-room.service';
 import { ExtraDirtyRoomTableComponent } from '../extra-dirty-room-table/extra-dirty-room-table.component';
 import { A11yModule } from "@angular/cdk/a11y";
+import { MedialViewerModalComponent } from '../medial-viewer-modal/medial-viewer-modal.component';
 
 @Component({
   selector: 'app-extra-dirty-room-list',
   standalone: true,
-  imports: [MATERIAL_COMPONENTS, ExtraDirtRommSearchComponent, ExtraDirtyRoomTableComponent, A11yModule],
+  imports: [MATERIAL_COMPONENTS, ExtraDirtRommSearchComponent, ExtraDirtyRoomTableComponent, A11yModule, MedialViewerModalComponent],
   templateUrl: './extra-dirty-room-list.component.html',
   styleUrl: './extra-dirty-room-list.component.css'
 })
@@ -44,6 +45,11 @@ export class ExtraDirtyRoomListComponent implements OnInit, OnDestroy {
   fromStr!: string | null;
   toStr!: string | null;
   todayStr!: string;
+
+  isMediaModalOpen = false;
+  selectedMediaFiles: any[] = [];
+  selectedRoomNumber: string = '';
+
 
   constructor(
     private router: Router,
@@ -219,9 +225,20 @@ this.fetchHistoryPage();
     console.log('Viewing report details:', report);
   }
 
+
   handleOpenMediaModal(report: ExtraDirtyReportDto): void {
-    console.log('Open popup for report media:', report.mediaFiles);
+    if (report?.mediaFiles && report.mediaFiles.length > 0) {
+      this.selectedMediaFiles = report.mediaFiles;
+      this.selectedRoomNumber = report.roomNumber || 'N/A';
+      this.isMediaModalOpen = true;
+    }
   }
+
+  closeMediaModal(): void {
+    this.isMediaModalOpen = false;
+  }
+  
+
 
   routeToCreateReport() {
     this.router.navigate(['/workspace/extra-dirty-report-form']);

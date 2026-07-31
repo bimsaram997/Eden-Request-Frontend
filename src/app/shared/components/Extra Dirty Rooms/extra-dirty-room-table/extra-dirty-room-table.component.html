@@ -4,13 +4,13 @@
     <!-- ID -->
     <ng-container matColumnDef="id">
       <th mat-header-cell *matHeaderCellDef> # </th>
-      <td mat-cell *matCellDef="let report"> {{ report.id }} </td>
+      <td mat-cell *matCellDef="let report" data-label="ID"> {{ report.id }} </td>
     </ng-container>
 
     <!-- Room Number -->
     <ng-container matColumnDef="roomNumber">
       <th mat-header-cell *matHeaderCellDef> Room </th>
-      <td mat-cell *matCellDef="let report"> 
+      <td mat-cell *matCellDef="let report" data-label="Room"> 
         <strong class="text-primary">{{ report.roomNumber || 'N/A' }}</strong> 
       </td>
     </ng-container>
@@ -18,19 +18,19 @@
     <!-- Reported By -->
     <ng-container matColumnDef="reportedBy">
       <th mat-header-cell *matHeaderCellDef> Reported By </th>
-      <td mat-cell *matCellDef="let report"> {{ report.reportedByEmployee || 'Unknown' }} </td>
+      <td mat-cell *matCellDef="let report" data-label="Reported By"> {{ report.reportedByEmployee || 'Unknown' }} </td>
     </ng-container>
 
     <!-- Created At -->
     <ng-container matColumnDef="createdAt">
       <th mat-header-cell *matHeaderCellDef> Date & Time </th>
-      <td mat-cell *matCellDef="let report"> {{ report.createdAt | date:'medium' }} </td>
+      <td mat-cell *matCellDef="let report" data-label="Date"> {{ report.createdAt | date:'short' }} </td>
     </ng-container>
 
     <!-- Notes -->
     <ng-container matColumnDef="notes">
       <th mat-header-cell *matHeaderCellDef> Notes </th>
-      <td mat-cell *matCellDef="let report" class="text-truncate" style="max-width: 250px;"> 
+      <td mat-cell *matCellDef="let report" data-label="Notes" class="text-truncate" style="max-width: 250px;"> 
         {{ report.notes || '-' }} 
       </td>
     </ng-container>
@@ -38,16 +38,15 @@
     <!-- Actions -->
     <ng-container matColumnDef="actions">
       <th mat-header-cell *matHeaderCellDef class="text-end"> Actions </th>
-      <td mat-cell *matCellDef="let report" class="text-end">
+      <td mat-cell *matCellDef="let report" class="text-end" data-label="Actions">
         <div class="d-flex align-items-center justify-content-end gap-1">
           
-          <!-- Media Attachment Trigger -->
           <button 
             mat-icon-button 
             color="accent"
             [disabled]="!report.mediaFiles || report.mediaFiles.length === 0"
             (click)="onOpenMedia(report)"
-            matTooltip="View Media Attachments">
+            matTooltip="View Media">
             <mat-icon 
               [matBadge]="report.mediaFiles?.length" 
               [matBadgeHidden]="!report.mediaFiles?.length" 
@@ -57,7 +56,6 @@
             </mat-icon>
           </button>
 
-          <!-- View Details Trigger -->
           <button 
             mat-icon-button 
             color="primary" 
@@ -71,11 +69,9 @@
       </td>
     </ng-container>
 
-    <!-- Table Header & Rows -->
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 
-    <!-- Empty State -->
     <tr class="mat-row" *matNoDataRow>
       <td class="mat-cell text-center py-4" [attr.colspan]="displayedColumns.length">
         No dirty room reports found.
@@ -83,3 +79,4 @@
     </tr>
   </table>
 </div>
+
