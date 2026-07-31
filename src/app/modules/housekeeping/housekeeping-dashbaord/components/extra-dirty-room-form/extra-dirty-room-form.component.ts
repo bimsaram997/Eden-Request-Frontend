@@ -185,21 +185,25 @@ async onSubmit(): Promise<void> {
     // -------------------------------------------------------------
     // STEP 2: Upload Media Files Linked to `newReportId`
     // -------------------------------------------------------------
-    const filesFormData = new FormData();
+   const filesFormData = new FormData();
 
-    validMediaItems.forEach((item, index) => {
+this.mediaItems.forEach((item, index) => {
   const rawFile = item.file;
   const isVideo = item.type === 'video';
   const extension = isVideo ? 'mp4' : 'jpg';
-  
-  // Use original name or generate one
-  const fileName = rawFile.name && rawFile.name.includes('.') 
+
+  // Use existing file name or fall back to a timestamped string
+  const fileName = (rawFile.name && rawFile.name.includes('.')) 
     ? rawFile.name 
     : `upload_${Date.now()}_${index + 1}.${extension}`;
 
-  // Pass rawFile DIRECTLY to append (Do NOT wrap in new File([rawFile]))
+  // IMPORTANT: Append rawFile directly! 
+  // DO NOT use: new File([rawFile], fileName, ...)
   filesFormData.append('files', rawFile, fileName);
 });
+
+// Send via your service
+await this.extraDirtyRoomService.uploadReportMedia(newReportId, filesFormData).toPromise();
 
 // Verification check in console:
 console.log('Files inside FormData payload:', filesFormData.getAll('files'));
