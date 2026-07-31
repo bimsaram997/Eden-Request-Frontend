@@ -132,7 +132,6 @@ onSubmit(): void {
     return;
   }
 
-  // Session retrieval logic...
   const sessionStr = localStorage.getItem('scandic_eden_session');
   let loggedInHousekeeperId: number | null = null;
   if (sessionStr) {
@@ -150,7 +149,7 @@ onSubmit(): void {
     return;
   }
 
-  // 1. EXTRACT ROOM VALUE
+  // 1. EXTRACT CLEAN ROOM NUMBER
   const roomValue = this.requestForm.get('roomNumber')?.value;
   let rawRoomNumber = typeof roomValue === 'object' && roomValue !== null
     ? (roomValue.roomNumber || roomValue.name || roomValue.id || roomValue.value || '')
@@ -162,30 +161,31 @@ onSubmit(): void {
 
   const formData = new FormData();
 
-  // 2. APPEND TEXT FIELDS FIRST (Crucial for iOS WebKit)
+  // 2. ALWAYS APPEND TEXT FIELDS FIRST FOR IOS WEBKIT
   formData.append('roomNumber', rawRoomNumber);
-  formData.append('RoomNumber', rawRoomNumber); // Duplicate key for legacy .NET casing fallback
   formData.append('reportedById', loggedInHousekeeperId.toString());
-  formData.append('ReportedById', loggedInHousekeeperId.toString());
   formData.append('notes', (this.requestForm.value.notes || '').toString().trim());
 
-  // 3. APPEND BINARY FILES WITH iOS SAFE MIME TYPES
+  // 3. RE-WRAP FILES WITH EXPLICIT MIME TYPES FOR IPHONE
   this.mediaItems.forEach((item, index) => {
     const rawFile = item.file;
     const isVideo = item.type === 'video';
 
-    // Force explicit fallback MIME types for iOS Safari
-    const mimeType = rawFile.type || (isVideo ? 'video/mp4' : 'image/jpeg');
+    // Force explicit standard fallback MIME type for iOS camera Blobs
+    const mimeType = rawFile.type && rawFile.type.length > 0 
+      ? rawFile.type 
+      : (isVideo ? 'video/mp4' : 'image/jpeg');
+
     const extension = isVideo ? 'mp4' : 'jpg';
     
     const fileName = rawFile.name && rawFile.name.includes('.')
       ? rawFile.name
-      : `iphone_upload_${Date.now()}_${index + 1}.${extension}`;
+      : `ios_capture_${Date.now()}_${index + 1}.${extension}`;
 
-    // Re-wrap Blob into clean File object for WebKit compatibility
-    const iosSafeFile = new File([rawFile], fileName, { type: mimeType });
+    // Reconstruct file blob to ensure WebKit sets proper multipart boundaries
+    const cleanIosFile = new File([rawFile], fileName, { type: mimeType });
 
-    formData.append('files', iosSafeFile, fileName);
+    formData.append('files', cleanIosFile, fileName);
   });
 
   this.extraDirtyRoomService.placeExtraDiryRoom(formData).subscribe({
