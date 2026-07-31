@@ -1,5 +1,4 @@
 <div class="mobile-form-container">
-
     <!-- Header Section -->
     <div class="form-header">
         <h2>🧹 Report Extra Dirty Rooms</h2>
@@ -8,8 +7,9 @@
         </button>
     </div>
 
-    <!-- Main Request Details Form -->
+    <!-- WRAP EVERYTHING IN THE FORM TAG -->
     <form [formGroup]="requestForm" (ngSubmit)="onSubmit()">
+        
         <mat-card class="input-card">
             <mat-card-content class="p-3"> 
                 
@@ -41,91 +41,82 @@
                     </mat-form-field>
                 </div>
 
-                <!-- Special Instructions / Notes Row -->
+                <!-- Notes Row -->
                 <div class="w-100">
                     <mat-form-field appearance="outline" class="w-100">
                         <mat-label>Notes / Special Observations</mat-label>
-                        <textarea matInput rows="3" formControlName="notes" placeholder="Describe room condition (e.g., heavy staining, excessive trash)..."></textarea> 
+                        <textarea matInput rows="3" formControlName="notes" placeholder="Describe room condition..."></textarea> 
                     </mat-form-field>
                 </div>
 
             </mat-card-content>
         </mat-card>
-    </form>
 
-    <!-- Native Hidden Inputs cross-compatible with Desktop, iOS (HEIC/MOV), and Android -->
-    <input #photoCameraInput type="file" accept="image/*,.heic,.heif" capture="environment" (change)="onFilesSelected($event)" class="d-none" />
-    <input #videoCameraInput type="file" accept="video/*,.mov,.mp4" capture="environment" (change)="onFilesSelected($event)" class="d-none" />
-    <input #fileStorageInput type="file" accept="image/*,video/*,.heic,.heif,.mov,.mp4" multiple (change)="onFilesSelected($event)" class="d-none" />
+        <!-- Native Hidden Inputs -->
+        <input #photoCameraInput type="file" accept="image/*,.heic,.heif" capture="environment" (change)="onFilesSelected($event)" class="d-none" />
+        <input #videoCameraInput type="file" accept="video/*,.mov,.mp4" capture="environment" (change)="onFilesSelected($event)" class="d-none" />
+        <input #fileStorageInput type="file" accept="image/*,video/*,.heic,.heif,.mov,.mp4" multiple (change)="onFilesSelected($event)" class="d-none" />
 
-    <!-- Media Capture Box -->
-    <mat-card class="input-card item-picker-box">
-        <mat-card-header>
-            <mat-card-title style="font-size: 16px;">Attach Photos & Videos</mat-card-title>
-        </mat-card-header>
+        <!-- Media Capture Box -->
+        <mat-card class="input-card item-picker-box">
+            <mat-card-header>
+                <mat-card-title style="font-size: 16px;">Attach Photos & Videos</mat-card-title>
+            </mat-card-header>
 
-        <mat-card-content class="item-picker-content">
-            
-            <!-- Direct Camera Triggers (Mobile Devices) -->
-            <div class="picker-fields-grid" *ngIf="!isDesktop">
-                <button type="button" mat-flat-button color="primary" class="w-100 add-btn" (click)="photoCameraInput.click()">
-                    <mat-icon>photo_camera</mat-icon> Take Photo
-                </button>
-
-                <button type="button" mat-flat-button color="accent" class="w-100 add-btn" (click)="videoCameraInput.click()">
-                    <mat-icon>videocam</mat-icon> Record Video
-                </button>
-            </div>
-
-            <!-- Gallery/File Picker (Desktop and Mobile) -->
-            <button type="button" mat-stroked-button class="w-100 py-2 mt-1" (click)="fileStorageInput.click()">
-                <mat-icon>folder_open</mat-icon> Choose from {{ isDesktop ? 'Computer Files' : 'Gallery / Files' }}
-            </button>
-
-        </mat-card-content>
-    </mat-card>
-
-    <!-- Attached Media Overview -->
-    <div class="added-summary-section" *ngIf="mediaItems.length > 0">
-        <h3>Attached Media Overview ({{ mediaItems.length }}/5)</h3>
-
-        <div class="summary-card-grid">
-            <mat-card *ngFor="let item of mediaItems; let i = index" class="mobile-item-card">
-                <mat-card-content class="card-layout-split">
-                    
-                    <div class="item-details d-flex align-items-center gap-3">
-                        <!-- Image Thumbnail Preview -->
-                        <img *ngIf="item.type === 'image'" [src]="item.previewUrl" class="rounded border" style="width: 50px; height: 50px; object-fit: cover;" alt="Preview" />
-                        
-                        <!-- Video Placeholder Preview -->
-                        <div *ngIf="item.type === 'video'" class="bg-dark text-white rounded d-flex flex-column align-items-center justify-content-center border" style="width: 50px; height: 50px;">
-                            <mat-icon style="font-size: 18px; width: 18px; height: 18px;">play_circle</mat-icon>
-                            <span style="font-size: 8px; font-weight: bold;">VIDEO</span>
-                        </div>
-
-                        <div>
-                            <span class="category-badge">{{ item.type }}</span>
-                            <h4 class="text-truncate" style="max-width: 140px;">{{ item.file.name }}</h4>
-                            <p class="amount-label">Size: <strong>{{ (item.file.size / 1024 / 1024) | number:'1.1-2' }} MB</strong></p>
-                        </div>
-                    </div>
-
-                    <button type="button" mat-icon-button color="warn" (click)="removeMedia(i)">
-                        <mat-icon>delete_outline</mat-icon>
+            <mat-card-content class="item-picker-content">
+                <div class="picker-fields-grid" *ngIf="!isDesktop">
+                    <button type="button" mat-flat-button color="primary" class="w-100 add-btn" (click)="photoCameraInput.click()">
+                        <mat-icon>photo_camera</mat-icon> Take Photo
                     </button>
 
-                </mat-card-content>
-            </mat-card>
+                    <button type="button" mat-flat-button color="accent" class="w-100 add-btn" (click)="videoCameraInput.click()">
+                        <mat-icon>videocam</mat-icon> Record Video
+                    </button>
+                </div>
+
+                <button type="button" mat-stroked-button class="w-100 py-2 mt-1" (click)="fileStorageInput.click()">
+                    <mat-icon>folder_open</mat-icon> Choose from {{ isDesktop ? 'Computer Files' : 'Gallery / Files' }}
+                </button>
+            </mat-card-content>
+        </mat-card>
+
+        <!-- Attached Media Overview -->
+        <div class="added-summary-section" *ngIf="mediaItems.length > 0">
+            <h3>Attached Media Overview ({{ mediaItems.length }}/5)</h3>
+
+            <div class="summary-card-grid">
+                <mat-card *ngFor="let item of mediaItems; let i = index" class="mobile-item-card">
+                    <mat-card-content class="card-layout-split">
+                        <div class="item-details d-flex align-items-center gap-3">
+                            <img *ngIf="item.type === 'image'" [src]="item.previewUrl" class="rounded border" style="width: 50px; height: 50px; object-fit: cover;" alt="Preview" />
+                            
+                            <div *ngIf="item.type === 'video'" class="bg-dark text-white rounded d-flex flex-column align-items-center justify-content-center border" style="width: 50px; height: 50px;">
+                                <mat-icon style="font-size: 18px; width: 18px; height: 18px;">play_circle</mat-icon>
+                                <span style="font-size: 8px; font-weight: bold;">VIDEO</span>
+                            </div>
+
+                            <div>
+                                <span class="category-badge">{{ item.type }}</span>
+                                <h4 class="text-truncate" style="max-width: 140px;">{{ item.file.name }}</h4>
+                                <p class="amount-label">Size: <strong>{{ (item.file.size / 1024 / 1024) | number:'1.1-2' }} MB</strong></p>
+                            </div>
+                        </div>
+
+                        <button type="button" mat-icon-button color="warn" (click)="removeMedia(i)">
+                            <mat-icon>delete_outline</mat-icon>
+                        </button>
+                    </mat-card-content>
+                </mat-card>
+            </div>
         </div>
-    </div>
 
-    <!-- Fixed Action Footer -->
-    <div class="sticky-action-footer">
-        <button mat-raised-button color="primary" class="submit-btn"
-            [disabled]="requestForm.invalid || isSubmitting" (click)="onSubmit()">
-            <mat-spinner *ngIf="isSubmitting" diameter="20" class="me-2 d-inline-block"></mat-spinner>
-            🚀 {{ isSubmitting ? 'Dispatching...' : 'Dispatch Extra Dirty Report' }}
-        </button>
-    </div>
+        <!-- Sticky Footer inside <form> -->
+        <div class="sticky-action-footer">
+            <button type="submit" mat-raised-button color="primary" class="submit-btn" [disabled]="requestForm.invalid || isSubmitting">
+                <mat-spinner *ngIf="isSubmitting" diameter="20" class="me-2 d-inline-block"></mat-spinner>
+                🚀 {{ isSubmitting ? 'Dispatching...' : 'Dispatch Extra Dirty Report' }}
+            </button>
+        </div>
 
+    </form>
 </div>

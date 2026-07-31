@@ -151,21 +151,34 @@ onSubmit(): void {
     return;
   }
 
+  // 2. EXTRACT ROOM NUMBER SAFELY
   const roomValue = this.requestForm.get('roomNumber')?.value;
-  const rawRoomNumber = typeof roomValue === 'object' && roomValue !== null
-    ? (roomValue.roomNumber || roomValue.name || roomValue.id || '')
-    : String(roomValue || '');
+  let rawRoomNumber = '';
+
+  if (typeof roomValue === 'object' && roomValue !== null) {
+    rawRoomNumber = String(roomValue.roomNumber || roomValue.name || roomValue.id || roomValue.value || '');
+  } else if (roomValue !== null && roomValue !== undefined) {
+    rawRoomNumber = String(roomValue);
+  }
+
+  // Clean raw room string
+  rawRoomNumber = rawRoomNumber.replace(/Room\s+/i, '').trim();
+
+  if (!rawRoomNumber) {
+    alert('Please select a valid room number.');
+    return;
+  }
 
   this.isSubmitting = true;
 
-  // 2. Build FormData - Use SINGLE camelCase keys!
+  // 3. Build FormData
   const formData = new FormData();
 
-  formData.append('roomNumber', rawRoomNumber.trim());
+  formData.append('roomNumber', rawRoomNumber);
   formData.append('reportedById', loggedInHousekeeperId.toString());
   formData.append('notes', (this.requestForm.value.notes || '').toString().trim());
 
-  // 3. Append media files
+  // 4. Append media files
   this.mediaItems.forEach((item, index) => {
     const rawFile = item.file;
     const isVideo = item.type === 'video';
@@ -193,7 +206,6 @@ onSubmit(): void {
     error: (err) => {
       console.error('Submission failed:', err);
       this.isSubmitting = false;
-      // Expand error response to see exact validation messages if any occur
       const serverMsg = err.error?.errors 
         ? JSON.stringify(err.error.errors) 
         : (err.error?.message || 'Failed to submit report. Please try again.');
