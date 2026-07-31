@@ -187,23 +187,31 @@ async onSubmit(): Promise<void> {
     // -------------------------------------------------------------
    const filesFormData = new FormData();
 
-this.mediaItems.forEach((item, index) => {
+for (let i = 0; i < validMediaItems.length; i++) {
+  const item = validMediaItems[i];
   const rawFile = item.file;
   const isVideo = item.type === 'video';
   const extension = isVideo ? 'mp4' : 'jpg';
 
-  // Use existing file name or fall back to a timestamped string
   const fileName = (rawFile.name && rawFile.name.includes('.')) 
     ? rawFile.name 
-    : `upload_${Date.now()}_${index + 1}.${extension}`;
+    : `upload_${Date.now()}_${i + 1}.${extension}`;
 
-  // IMPORTANT: Append rawFile directly! 
-  // DO NOT use: new File([rawFile], fileName, ...)
-  filesFormData.append('files', rawFile, fileName);
-});
+  const mimeType = rawFile.type || (isVideo ? 'video/mp4' : 'image/jpeg');
 
-// Send via your service
-await this.extraDirtyRoomService.uploadReportMedia(newReportId, filesFormData).toPromise();
+  try {
+    // FORCE iOS WebKit to read the file bytes into memory before uploading!
+    // This resolves zero-byte Safari camera buffers.
+    const buffer = await rawFile.arrayBuffer();
+    const blob = new Blob([buffer], { type: mimeType });
+    
+    filesFormData.append('files', blob, fileName);
+  } catch (err) {
+    console.error(`Error reading file buffer for ${fileName}:`, err);
+    // Fallback if arrayBuffer fails
+    filesFormData.append('files', rawFile, fileName);
+  }
+}
 
 // Verification check in console:
 console.log('Files inside FormData payload:', filesFormData.getAll('files'));
