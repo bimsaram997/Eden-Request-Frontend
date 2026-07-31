@@ -188,24 +188,21 @@ async onSubmit(): Promise<void> {
     const filesFormData = new FormData();
 
     validMediaItems.forEach((item, index) => {
-      const rawFile = item.file;
-      const isVideo = item.type === 'video';
-      
-      // Fallback types specifically for iOS HEIC/MOV captures
-      let mimeType = rawFile.type;
-      if (!mimeType || mimeType.length === 0) {
-        mimeType = isVideo ? 'video/mp4' : 'image/jpeg';
-      }
+  const rawFile = item.file;
+  const isVideo = item.type === 'video';
+  const extension = isVideo ? 'mp4' : 'jpg';
+  
+  // Use original name or generate one
+  const fileName = rawFile.name && rawFile.name.includes('.') 
+    ? rawFile.name 
+    : `upload_${Date.now()}_${index + 1}.${extension}`;
 
-      const extension = isVideo ? 'mp4' : 'jpg';
-      const fileName = rawFile.name && rawFile.name.includes('.') 
-        ? rawFile.name 
-        : `upload_${Date.now()}_${index + 1}.${extension}`;
+  // Pass rawFile DIRECTLY to append (Do NOT wrap in new File([rawFile]))
+  filesFormData.append('files', rawFile, fileName);
+});
 
-      // Construct a fresh File object to ensure Safari streams the buffer properly
-      const cleanFile = new File([rawFile], fileName, { type: mimeType });
-      filesFormData.append('files', cleanFile, fileName);
-    });
+// Verification check in console:
+console.log('Files inside FormData payload:', filesFormData.getAll('files'));
 
     await this.extraDirtyRoomService.uploadReportMedia(newReportId, filesFormData).toPromise();
 
