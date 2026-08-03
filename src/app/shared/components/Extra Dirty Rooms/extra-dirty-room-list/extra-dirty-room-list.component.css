@@ -1,11 +1,7 @@
-/* ==========================================
-   1. CONTAINER & FLEXIBLE TOP BAR
-   ========================================== */
+
 .history-container {
-  /* Percentage width allows it to use available space on wide laptops */
   width: min(96%, 1700px); 
   margin: 0 auto;
-  /* Fluid padding scales between 12px and 24px automatically */
   padding: clamp(12px, 2vw, 24px); 
   box-sizing: border-box;
 }
@@ -14,12 +10,10 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  /* flex-wrap ensures items drop down naturally on tiny screens */
   flex-wrap: wrap; 
   gap: 12px;
 }
 
-/* Flex-grow allows the button wrapper to fill space when wrapped */
 .history-top-bar > div {
   flex-grow: 1;
   display: flex;
@@ -27,12 +21,9 @@
 }
 
 .add-request-btn {
-  /* On wide screens it stays fit-content, on mobile it expands */
   width: clamp(auto, 100%, fit-content);
 }
-/* ==========================================
-   2. CONTROLS BAR (TOGGLE & COUNTER)
-   ========================================== */
+
 .controls-bar-wrapper {
   display: flex;
   justify-content: space-between;
@@ -47,7 +38,7 @@
   color: #212529;
 }
 
-/* Controls container: Aligns right, wraps naturally on small screens */
+
 .controls-group {
   display: flex;
   align-items: center;
@@ -56,10 +47,9 @@
   justify-content: flex-end;
 }
 
-/* Toggle group: Compact fixed size on desktop, fluid on mobile */
 .filter-toggle-group {
   display: inline-flex;
-  width: min(100%, 220px); /* 👈 Prevents the toggle from stretching endlessly */
+  width: min(100%, 220px); 
 }
 
 .filter-toggle-group .btn {
@@ -86,7 +76,7 @@
   border-bottom-right-radius: 8px;
 }
 
-/* Counter Badge: Clean padding and explicit border */
+
 .total-count-badge {
   background-color: #ffffff;
   color: #6c757d;
@@ -97,27 +87,17 @@
   padding: 6px 12px;
 }
 
-/* ==========================================
-   3. AUTO-FIT RESPONSIVE GRID (NO MEDIA QUERIES)
-   ========================================== */
 .cards-grid-wrapper {
   width: 100%;
 }
 
 .request-accordion {
   display: grid;
-  /* 
-     Creates 1 column on Mobile, 2 on Tablet, 3 on Standard Laptops, 
-     and 4+ on Widescreen monitors without hardcoded breakpoints!
-  */
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
   gap: clamp(12px, 1.5vw, 20px);
   align-items: start;
 }
 
-/* ==========================================
-   4. EXPANSION PANEL CARD DESIGN
-   ========================================== */
 .history-panel {
   background: #ffffff;
   border-radius: 12px !important;
@@ -179,9 +159,7 @@
 .status-badge.delivered { background-color: #d1e7dd; color: #0f5132; }
 .status-badge.rejected { background-color: #f8d7da; color: #842029; }
 
-/* ==========================================
-   5. EXPANDED CONTENT DETAILS
-   ========================================== */
+
 .expanded-detail-content {
   padding: 12px 4px 4px 4px;
   border-top: 1px dashed #e9ecef;

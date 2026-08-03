@@ -7,7 +7,7 @@
                 <div class="req-meta">
                     List {{ req.listNumber }} • {{ req.addedDate | date:'dd/MM/yyyy hh:mm a' }}
 
-                    <div  class="employee-name-block">
+                    <div class="employee-name-block">
                         Assigned to : <strong>{{ req.
                             assignedToEmployee }}</strong>
                     </div>
@@ -25,7 +25,6 @@
         </mat-panel-description>
     </mat-expansion-panel-header>
 
-    <!-- Expanded quick look contents -->
     <div class="expanded-detail-content">
         <h5 class="items-title">Extra Work Item Summary</h5>
         <ul class="detail-item-list">
@@ -40,16 +39,11 @@
         </div>
 
         <div class="tl-action-footer" *ngIf="!isTeamLeader">
-            <!-- Disable the button and change behavior dynamically when isLoading is true -->
             <button mat-flat-button color="accent" [disabled]="isLoading || req.status === 'Done'"
                 [matMenuTriggerFor]="isLoading ? null : statusMenu">
-
-                <!-- Show spinner when loading, otherwise show the edit icon -->
                 <mat-spinner *ngIf="isLoading" diameter="20" class="button-spinner-inline me-2 d-inline-block">
                 </mat-spinner>
                 <mat-icon *ngIf="!isLoading">edit</mat-icon>
-
-                <!-- Dynamically update button text -->
                 <span>{{ isLoading ? 'Updating...' : 'Change Status' }}</span>
             </button>
 

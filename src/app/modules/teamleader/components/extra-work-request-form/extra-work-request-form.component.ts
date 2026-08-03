@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MATERIAL_COMPONENTS } from '../../../../shared/utils/material-imports';
 import { Subscription } from 'rxjs';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -17,9 +17,7 @@ import { CreateExtraRequestLineDto, CreateExtraWorkRequestDto } from '../../../.
   templateUrl: './extra-work-request-form.component.html',
   styleUrl: './extra-work-request-form.component.css'
 })
-export class ExtraWorkRequestFormComponent {
-
- 
+export class ExtraWorkRequestFormComponent implements OnInit, OnDestroy {
   listRoomsMap: { [key: number]: string[] } = {
     10: ['101', '102', '103'],
     20: ['201', '202', '203']
@@ -27,10 +25,8 @@ export class ExtraWorkRequestFormComponent {
 
   listNumbers: number[] = [10, 20];
   availableRooms: string[] = [];
-
   extraItemSearchQuery: string = '';
   nameSearchQuery: string = '';
-
   requestForm!: FormGroup;
   extraItemSelectionForm!: FormGroup;
   private subs: any[] = [];
@@ -75,15 +71,14 @@ export class ExtraWorkRequestFormComponent {
   loadEmployee(): void {
     const emSub = this.authService.loadAllEmployees().subscribe({
       next: (data) => {
-        // Filter the data array to only include Housekeepers
+
         this.housekeepersList = data.filter((emp: EmployeeDto) => emp.role === 'Housekeeper');
         this.teamLeaderList = data.filter((emp: EmployeeDto) => emp.role === 'TeamLeader');
-        // Moving the log inside the next block because subscribe is asynchronous
+
         console.log('Housekeepers list loaded:', this.housekeepersList);
       },
       error: (err) => console.error('Error fetching employees:', err)
     });
-
     this.subs.push(emSub);
   }
 
@@ -94,7 +89,6 @@ export class ExtraWorkRequestFormComponent {
       },
       error: (err) => console.error('Error fetching extra work items:', err)
     });
-
     this.subs.push(itemSub);
   }
 
@@ -108,7 +102,6 @@ export class ExtraWorkRequestFormComponent {
       this.availableRooms = [];
     }
   }
-
 
   getFilteredAvailableItems(): any[] {
     if (!this.extraItemSearchQuery.trim()) {
@@ -137,19 +130,15 @@ export class ExtraWorkRequestFormComponent {
       this.extraItemSelectionForm.markAllAsTouched();
       return;
     }
-
     if (this.requestedItems.length >= 5) {
       alert('Maximum limit reached. You can only request up to 5 items.');
       return;
     }
-
     const staged = this.extraItemSelectionForm.value;
-
     const isDuplicate = this.requestedItems.controls.some(
       control => control.get('extraWorkItemId')?.value === staged.extraWorkItem.id
 
     );
-
     if (isDuplicate) {
       alert('This item is already in your request list.');
       return;
@@ -173,57 +162,48 @@ export class ExtraWorkRequestFormComponent {
 
   onSubmit() {
     Object.values(this.requestForm.controls).forEach((control) => {
-          control.markAsTouched();
-        });
-    
-        if (this.requestForm.invalid) {
-          this.requestForm.markAllAsTouched();
-          return;
-        }
-    
-        if (this.requestedItems.length === 0) {
-          alert('Please add at least one item to your list before dispatching.');
-          return;
-        }
-    
-        const sessionData = localStorage.getItem('scandic_eden_session');
-        if (!sessionData) {
-          alert('Your session has expired. Please log in again.');
-          this.router.navigate(['/login']);
-          return;
-        }
-    
-        const currentUser = JSON.parse(sessionData);
-        const employeeId = currentUser.id || currentUser.employeeId;
-    
-        const masterFormValue = this.requestForm.value;
-    
-        const itemsPayload: CreateExtraRequestLineDto[] = this.requestedItems.controls.map(control => {
-          return {
-            extraWorkItemId: Number(control.get('extraWorkItemId')?.value),
-            quantity: Number(control.get('quantity')?.value),
-            
-          };
-        });
-    
-        const submissionPayload: CreateExtraWorkRequestDto = {
-          roomNumber: masterFormValue.roomNumber,
-          requestedById: Number(employeeId),
-          listNumber: Number(masterFormValue.listNumber),
-          assignedToId: Number(masterFormValue.assignedToId.id),
-          notes: masterFormValue.notes ? String(masterFormValue.notes) : "",
-          lines: itemsPayload,
-          
-        };
+      control.markAsTouched();
+    });
 
-        console.log(itemsPayload)
-        console.log('Sending compiled payload to C# endpoint structure:', submissionPayload);
+    if (this.requestForm.invalid) {
+      this.requestForm.markAllAsTouched();
+      return;
+    }
+    if (this.requestedItems.length === 0) {
+      alert('Please add at least one item to your list before dispatching.');
+      return;
+    }
+    const sessionData = localStorage.getItem('scandic_eden_session');
+    if (!sessionData) {
+      alert('Your session has expired. Please log in again.');
+      this.router.navigate(['/login']);
+      return;
+    }
+    const currentUser = JSON.parse(sessionData);
+    const employeeId = currentUser.id || currentUser.employeeId;
+    const masterFormValue = this.requestForm.value;
+    const itemsPayload: CreateExtraRequestLineDto[] = this.requestedItems.controls.map(control => {
+      return {
+        extraWorkItemId: Number(control.get('extraWorkItemId')?.value),
+        quantity: Number(control.get('quantity')?.value),
+
+      };
+    });
+
+    const submissionPayload: CreateExtraWorkRequestDto = {
+      roomNumber: masterFormValue.roomNumber,
+      requestedById: Number(employeeId),
+      listNumber: Number(masterFormValue.listNumber),
+      assignedToId: Number(masterFormValue.assignedToId.id),
+      notes: masterFormValue.notes ? String(masterFormValue.notes) : "",
+      lines: itemsPayload,
+
+    };
 
     this.extraWorkRequestService.placExtraWorkRequest(submissionPayload).subscribe({
       next: (response) => {
         console.log('Backend successfully tracked request:', response);
         alert('Extra work request has been successfully dispatched to the Housekeeper!');
-
         this.router.navigate(['/workspace/extra-work-requests']);
       },
       error: (err) => {
@@ -231,16 +211,22 @@ export class ExtraWorkRequestFormComponent {
         alert(err.error || 'Failed to dispatch request. Please try again.');
       }
     });
-    
   }
 
   removeItemFromList(index: number): void {
     this.requestedItems.removeAt(index);
   }
 
-   backToDashboard() {
+  backToDashboard() {
     this.router.navigate(['/workspace/extra-work-requests']);
   }
 
-
+   ngOnDestroy(): void {
+    this.subs.forEach(sub => {
+      if (sub && typeof sub.unsubscribe === 'function') {
+        sub.unsubscribe();
+      }
+    });
+   
+  }
 }

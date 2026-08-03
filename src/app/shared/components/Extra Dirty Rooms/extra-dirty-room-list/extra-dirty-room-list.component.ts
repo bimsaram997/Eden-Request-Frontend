@@ -26,10 +26,10 @@ export class ExtraDirtyRoomListComponent implements OnInit, OnDestroy {
     reportedById: null,
     fromDate: null,
     toDate: null,
-    fromTime: null, 
-    toTime: null, 
+    fromTime: null,
+    toTime: null,
     isToday: true,
- 
+
   };
   private subs: any[] = [];
   session: any;
@@ -39,7 +39,7 @@ export class ExtraDirtyRoomListComponent implements OnInit, OnDestroy {
   pageSize = 6;
   totalRecords: number = 0;
   isToday: boolean = true;
-  
+
   extraDirtyReports: ExtraDirtyReportDto[] = [];
   updatingReportIds = new Set<number>();
   fromStr!: string | null;
@@ -53,32 +53,20 @@ export class ExtraDirtyRoomListComponent implements OnInit, OnDestroy {
 
   constructor(
     private router: Router,
-    private notificationService: NotificationServiceService,
-    private extraDirtyReportService: ExtraDirtyRoomService // Replace 'any' with the actual service type
+    private extraDirtyReportService: ExtraDirtyRoomService
   ) { }
 
   ngOnInit(): void {
     this.session = JSON.parse(localStorage.getItem('scandic_eden_session') || '{}');
     this.isTeamLeaderUser = (this.session.role || this.session.userRole) === 'TeamLeader';
-this.fetchHistoryPage();
-    this.changeDetection();
+    this.fetchHistoryPage();
     this.selectTodayTab();
   }
 
-  changeDetection(): void {
-    // if (this.notificationService.housekeeperNewExtraDirty$) {
-    //   const reportSub = this.notificationService.housekeeperNewExtraDirty$.subscribe({
-    //     next: () => this.fetchHistoryPage(),
-    //     error: (err: any) => console.error('SignalR stream error:', err)
-    //   });
-    //   this.subs.push(reportSub);
-    // }
-  }
 
   fetchHistoryPage() {
     const session = JSON.parse(localStorage.getItem('scandic_eden_session') || '{}');
     const employeeId = session.id || session.employeeId;
-
     if (!employeeId) {
       this.isSearching = false;
       return;
@@ -113,7 +101,7 @@ this.fetchHistoryPage();
       .getPagedExtraDirtyReports(requestPayload)
       .subscribe({
         next: (response: PagedResponse<ExtraDirtyReportDto>) => {
-          this.extraDirtyReports = response.data || []; 
+          this.extraDirtyReports = response.data || [];
           this.totalRecords = response.totalCount || 0;
           this.isSearching = false;
         },
@@ -122,7 +110,6 @@ this.fetchHistoryPage();
           this.isSearching = false;
         }
       });
-
     this.subs.push(historySub);
   }
 
@@ -135,7 +122,6 @@ this.fetchHistoryPage();
 
   onFilterCriteriaChanged(payload: ExtraDirtyFilterPayload): void {
     this.activeFilters = payload;
-    
     const formatLocalDateText = (dateInput: any): string | null => {
       if (!dateInput) return null;
       const d = new Date(dateInput);
@@ -149,7 +135,6 @@ this.fetchHistoryPage();
     };
 
     this.todayStr = new Date().toLocaleDateString('en-CA');
-
     this.fromStr = this.activeFilters?.fromDate ? formatLocalDateText(this.activeFilters.fromDate) : null;
     this.toStr = this.activeFilters?.toDate ? formatLocalDateText(this.activeFilters.toDate) : null;
 
@@ -163,21 +148,20 @@ this.fetchHistoryPage();
     } else {
       this.isToday = false;
     }
-
     this.resetPaginationToFirstPage();
     this.isSearching = true;
     this.fetchHistoryPage();
   }
 
   onPageChange(event: PageEvent): void {
-    this.currentPage = event.pageIndex + 1; 
+    this.currentPage = event.pageIndex + 1;
     this.fetchHistoryPage();
   }
 
   private syncCurrentSearchFilters(): void {
     if (this.searchComponent && this.searchComponent.filterForm) {
       const currentFormValue = this.searchComponent.filterForm.value;
-      
+
       this.activeFilters = {
         ...this.activeFilters,
         roomNumber: currentFormValue.roomId || null,
@@ -193,21 +177,17 @@ this.fetchHistoryPage();
   selectTodayTab(): void {
     this.isSearching = true;
     this.isToday = true;
-    
     this.syncCurrentSearchFilters();
-    
     this.activeFilters.fromDate = null;
     this.activeFilters.toDate = null;
     this.fromStr = null;
     this.toStr = null;
-
     if (this.searchComponent && this.searchComponent.filterForm) {
       this.searchComponent.filterForm.patchValue({
         fromDate: null,
         toDate: null
       }, { emitEvent: false });
     }
-
     this.resetPaginationToFirstPage();
     this.fetchHistoryPage();
   }
@@ -215,7 +195,6 @@ this.fetchHistoryPage();
   selectPastTab(): void {
     this.isSearching = true;
     this.isToday = false;
-
     this.syncCurrentSearchFilters();
     this.resetPaginationToFirstPage();
     this.fetchHistoryPage();
@@ -237,14 +216,10 @@ this.fetchHistoryPage();
   closeMediaModal(): void {
     this.isMediaModalOpen = false;
   }
-  
-
 
   routeToCreateReport() {
     this.router.navigate(['/workspace/extra-dirty-report-form']);
   }
-
-
 
   routeToExtraDirtyRoom() {
     this.router.navigate(['/workspace/extra-dirty-room-form']);

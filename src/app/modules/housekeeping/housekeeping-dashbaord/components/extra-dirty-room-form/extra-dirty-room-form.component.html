@@ -1,5 +1,5 @@
 <div class="mobile-form-container">
-    <!-- Header Section -->
+
     <div class="form-header">
         <h2>🧹 Report Extra Dirty Rooms</h2>
         <button mat-icon-button color="warn" (click)="backToDashboard()" type="button">
@@ -7,13 +7,10 @@
         </button>
     </div>
 
-    <!-- WRAP EVERYTHING IN THE FORM TAG -->
     <form [formGroup]="requestForm" (ngSubmit)="onSubmit()">
-        
         <mat-card class="input-card">
             <mat-card-content class="p-3"> 
-                
-                <!-- Room Selection Row -->
+    
                 <div class="form-fields-grid mb-3"> 
                     <mat-form-field appearance="outline" class="w-100">
                         <mat-label>Room Number</mat-label>
@@ -28,7 +25,6 @@
                                     <mat-icon>close</mat-icon>
                                 </button>
                             </div>
-
                             <mat-option *ngFor="let room of getFilteredRooms()" [value]="room">
                                 Room {{ room }}
                             </mat-option>
@@ -41,28 +37,26 @@
                     </mat-form-field>
                 </div>
 
-                <!-- Notes Row -->
+               
                 <div class="w-100">
                     <mat-form-field appearance="outline" class="w-100">
                         <mat-label>Notes / Special Observations</mat-label>
                         <textarea matInput rows="3" formControlName="notes" placeholder="Describe room condition..."></textarea> 
                     </mat-form-field>
                 </div>
-
             </mat-card-content>
         </mat-card>
 
-        <!-- Native Hidden Inputs -->
+     
         <input #photoCameraInput type="file" accept="image/*,.heic,.heif" (change)="onFileSelected($event)" class="d-none" />
         <input #videoCameraInput type="file" accept="video/*,.mov,.mp4" (change)="onFileSelected($event)" class="d-none" />
         <input #fileStorageInput type="file" accept="image/*,video/*,.heic,.heif,.mov,.mp4" multiple (change)="onFileSelected($event)" class="d-none" />
 
-        <!-- Media Capture Box -->
+       
         <mat-card class="input-card item-picker-box">
             <mat-card-header>
                 <mat-card-title style="font-size: 16px;">Attach Photos & Videos</mat-card-title>
             </mat-card-header>
-
             <mat-card-content class="item-picker-content">
                 <div class="picker-fields-grid" *ngIf="!isDesktop">
                     <button type="button" mat-flat-button color="primary" class="w-100 add-btn" (click)="photoCameraInput.click()">
@@ -73,17 +67,15 @@
                         <mat-icon>videocam</mat-icon> Record Video
                     </button>
                 </div>
-
                 <button type="button" mat-stroked-button class="w-100 py-2 mt-1" (click)="fileStorageInput.click()">
                     <mat-icon>folder_open</mat-icon> Choose from {{ isDesktop ? 'Computer Files' : 'Gallery / Files' }}
                 </button>
             </mat-card-content>
         </mat-card>
 
-        <!-- Attached Media Overview -->
+        
         <div class="added-summary-section" *ngIf="mediaItems.length > 0">
             <h3>Attached Media Overview ({{ mediaItems.length }}/5)</h3>
-
             <div class="summary-card-grid">
                 <mat-card *ngFor="let item of mediaItems; let i = index" class="mobile-item-card">
                     <mat-card-content class="card-layout-split">
@@ -110,7 +102,6 @@
             </div>
         </div>
 
-        <!-- Sticky Footer inside <form> -->
         <div class="sticky-action-footer">
             <button type="submit" mat-raised-button color="primary" class="submit-btn" [disabled]="requestForm.invalid || isSubmitting">
                 <mat-spinner *ngIf="isSubmitting" diameter="20" class="me-2 d-inline-block"></mat-spinner>

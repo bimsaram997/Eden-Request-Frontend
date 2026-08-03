@@ -13,7 +13,6 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'housekeeper-dashboard', pathMatch: 'full' },
 
-      // 🧹 Housekeeper Landing Dashboard (Lists past items)
       {
         path: 'housekeeper-dashboard',
         loadComponent: () => import('./modules/housekeeping/housekeeping-dashbaord/housekeeping-dashbaord.component').then(m => m.HousekeepingDashbaordComponent)
@@ -24,9 +23,6 @@ export const routes: Routes = [
           import('./modules/housekeeping/housekeeping-dashbaord/components/request-form/request-form.component')
             .then(m => m.RequestFormComponent)
       },
-
-
-      //Team Leader Control Panel Dashboard (Disabled for now)
       {
         path: 'leader-dashboard',
         loadComponent: () => import('./modules/teamleader/team-leader-dash-board/team-leader-dash-board.component').then(m => m.TeamLeaderDashBoardComponent)
@@ -59,10 +55,6 @@ export const routes: Routes = [
         path: 'extra-dirty-room-form',
         loadComponent: () => import('./modules/housekeeping/housekeeping-dashbaord/components/extra-dirty-room-form/extra-dirty-room-form.component').then(m => m.ExtraDirtyRoomFormComponent )
       },
-      
-
-    
-
     ]
   },
   { path: '', redirectTo: 'login', pathMatch: 'full' },

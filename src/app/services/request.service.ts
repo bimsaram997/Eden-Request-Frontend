@@ -9,24 +9,22 @@ import { environment } from '../../environments/environment.development';
 })
 export class RequestService {
   myUrl = environment.baseUrl;
-  constructor(private http: HttpClient) { }
   
-  public placeBulkRequest( placeBulkRequest:PlaceBulkRequest ): Observable<any> {
-    return this.http.post(`${this.myUrl}/Request/placeBulkRequest`, placeBulkRequest );
-}
-public getPagedHistory(employeeId: number, isTeamLeader: boolean, filterQuery: any): Observable<any> {
-    // 🚥 Passes the security flag through the URL query string mapping as required by [FromQuery] in C#
-    const urlString = `${this.myUrl}/Request/employee/${employeeId}/history?isTeamLeader=${isTeamLeader}`;
+  constructor(private http: HttpClient) { }
 
-    // 📦 Sends the combined pagination parameters and search arrays down in the request body payload
+  public placeBulkRequest(placeBulkRequest: PlaceBulkRequest): Observable<any> {
+    return this.http.post(`${this.myUrl}/Request/placeBulkRequest`, placeBulkRequest);
+  }
+  public getPagedHistory(employeeId: number, isTeamLeader: boolean, filterQuery: any): Observable<any> {
+    const urlString = `${this.myUrl}/Request/employee/${employeeId}/history?isTeamLeader=${isTeamLeader}`;
     return this.http.post<any>(urlString, filterQuery);
   }
 
-  public updateRequestStatus(id: number, payload:  UpdateRquestHeaderRequest): Observable<any> {
+  public updateRequestStatus(id: number, payload: UpdateRquestHeaderRequest): Observable<any> {
     return this.http.put(`${this.myUrl}/Request/${id}`, payload);
   }
 
-   public getRequestById(id: number): Observable<any> {
+  public getRequestById(id: number): Observable<any> {
     return this.http.get(`${this.myUrl}/Request/${id}`);
   }
 }

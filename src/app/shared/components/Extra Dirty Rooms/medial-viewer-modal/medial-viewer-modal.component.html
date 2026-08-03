@@ -1,64 +1,41 @@
-<!-- Modal Backdrop -->
 <div class="custom-modal-backdrop" *ngIf="isOpen" (click)="close()"></div>
-
-<!-- Responsive Modal -->
 <div class="custom-modal d-block" *ngIf="isOpen" tabindex="-1" role="dialog">
-  <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
-    <div class="modal-content bg-dark text-white border-0 shadow-lg">
-      
-      <!-- Header -->
-      <div class="modal-header border-bottom border-secondary py-2 px-3">
-        <h5 class="modal-title fs-6 fw-bold">
-          📷 Room {{ roomNumber || 'N/A' }} Media ({{ currentIndex + 1 }}/{{ mediaFiles.length }})
-        </h5>
-        <button type="button" class="btn-close btn-close-white" aria-label="Close" (click)="close()"></button>
-      </div>
+    <div class="modal-dialog modal-dialog-centered modal-lg modal-fullscreen-sm-down">
+        <div class="modal-content bg-dark text-white border-0 shadow-lg">
 
-      <!-- Main Media Container -->
-      <div class="modal-body p-2 d-flex align-items-center justify-content-center position-relative media-viewport">
-        
-        <!-- Video Rendering -->
-        <video 
-          *ngIf="isVideo(currentMedia)" 
-          [src]="currentUrl" 
-          controls 
-          autoplay 
-          playsinline 
-          class="img-fluid rounded media-item">
-        </video>
+            <div class="modal-header border-bottom border-secondary py-2 px-3">
+                <h5 class="modal-title fs-6 fw-bold">
+                    📷 Room {{ roomNumber || 'N/A' }} Media ({{ currentIndex + 1 }}/{{ mediaFiles.length }})
+                </h5>
+                <button type="button" class="btn-close btn-close-white" aria-label="Close" (click)="close()"></button>
+            </div>
 
-        <!-- Image Rendering -->
-        <img 
-          *ngIf="!isVideo(currentMedia)" 
-          [src]="currentUrl" 
-          alt="Dirty Room Photo" 
-          class="img-fluid rounded media-item" />
+            <div
+                class="modal-body p-2 d-flex align-items-center justify-content-center position-relative media-viewport">
 
-        <!-- Floating Left/Right Arrows for Mobile/Desktop -->
-        <button 
-          *ngIf="mediaFiles.length > 1" 
-          class="btn btn-dark btn-sm rounded-circle position-absolute start-0 ms-2 nav-btn" 
-          (click)="prev()">
-          ❮
-        </button>
-        <button 
-          *ngIf="mediaFiles.length > 1" 
-          class="btn btn-dark btn-sm rounded-circle position-absolute end-0 me-2 nav-btn" 
-          (click)="next()">
-          ❯
-        </button>
-      </div>
+                <video *ngIf="isVideo(currentMedia)" [src]="currentUrl" controls autoplay playsinline
+                    class="img-fluid rounded media-item">
+                </video>
 
-      <!-- Footer Thumbnails -->
-      <div class="modal-footer border-top border-secondary py-2 justify-content-center overflow-auto flex-nowrap gap-2" *ngIf="mediaFiles.length > 1">
-        <img 
-          *ngFor="let item of mediaFiles; let i = index" 
-          [src]="item.url || item.fileUrl" 
-          [class.active-thumb]="i === currentIndex" 
-          class="rounded thumb-img" 
-          (click)="currentIndex = i" />
-      </div>
+                <img *ngIf="!isVideo(currentMedia)" [src]="currentUrl" alt="Dirty Room Photo"
+                    class="img-fluid rounded media-item" />
 
+                <button *ngIf="mediaFiles.length > 1"
+                    class="btn btn-dark btn-sm rounded-circle position-absolute start-0 ms-2 nav-btn" (click)="prev()">
+                    ❮
+                </button>
+                <button *ngIf="mediaFiles.length > 1"
+                    class="btn btn-dark btn-sm rounded-circle position-absolute end-0 me-2 nav-btn" (click)="next()">
+                    ❯
+                </button>
+            </div>
+
+            <div class="modal-footer border-top border-secondary py-2 justify-content-center overflow-auto flex-nowrap gap-2"
+                *ngIf="mediaFiles.length > 1">
+                <img *ngFor="let item of mediaFiles; let i = index" [src]="item.url || item.fileUrl"
+                    [class.active-thumb]="i === currentIndex" class="rounded thumb-img" (click)="currentIndex = i" />
+            </div>
+
+        </div>
     </div>
-  </div>
 </div>

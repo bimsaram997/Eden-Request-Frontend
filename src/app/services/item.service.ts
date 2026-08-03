@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-// Adjust path if needed to find your environment.ts
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment.development';
@@ -9,6 +8,7 @@ import { environment } from '../../environments/environment.development';
 })
 export class ItemService {
   baseUrl = environment.baseUrl;
+  
   constructor(private http: HttpClient) { }
 
   public getItemsByCategory(categoryId: number): Observable<any> {

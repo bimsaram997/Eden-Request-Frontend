@@ -1,193 +1,188 @@
 <div class="container-fluid p-2 p-md-4 teamleader-dashboard">
-  
-  <!-- 👑 HEADER BANNER -->
-  <mat-card class="banner-card mb-4 border-0 shadow-sm">
-    <mat-card-content class="p-3 p-md-4">
-      <div class="row align-items-center g-3">
-        <div class="col-auto">
-          <div class="icon-avatar bg-primary text-white d-flex align-items-center justify-content-center rounded-circle">
-            <mat-icon class="fs-3">supervisor_account</mat-icon>
-          </div>
-        </div>
-        <div class="col">
-          <h3 class="m-0 fw-bold text-dark">Team Leader Operational Command</h3>
-          <p class="text-muted m-0 small">Real-time floor productivity, staff workloads, and inventory demand</p>
-        </div>
-        <div class="col-12 col-md-auto text-end">
-          <button mat-flat-button color="primary" class="w-100 w-md-auto" (click)="fetchReportData()" [disabled]="isLoading">
-            <mat-icon>refresh</mat-icon> Refresh Floor Data
-          </button>
-        </div>
-      </div>
-    </mat-card-content>
-  </mat-card>
+    <mat-card class="banner-card mb-4 border-0 shadow-sm">
+        <mat-card-content class="p-3 p-md-4">
+            <div class="row align-items-center g-3">
+                <div class="col-auto">
+                    <div
+                        class="icon-avatar bg-primary text-white d-flex align-items-center justify-content-center rounded-circle">
+                        <mat-icon class="fs-3">supervisor_account</mat-icon>
+                    </div>
+                </div>
+                <div class="col">
+                    <h3 class="m-0 fw-bold text-dark">Team Leader Operational Command</h3>
+                    <p class="text-muted m-0 small">Real-time floor productivity, staff workloads, and inventory demand
+                    </p>
+                </div>
+                <div class="col-12 col-md-auto text-end">
+                    <button mat-flat-button color="primary" class="w-100 w-md-auto" (click)="fetchReportData()"
+                        [disabled]="isLoading">
+                        <mat-icon>refresh</mat-icon> Refresh Floor Data
+                    </button>
+                </div>
+            </div>
+        </mat-card-content>
+    </mat-card>
 
-  <!-- ⌛ LOADING SPINNER -->
-  <div *ngIf="isLoading" class="text-center my-5 py-5">
-    <mat-spinner diameter="48" class="mx-auto"></mat-spinner>
-    <p class="mt-3 text-muted">Compiling hotel analytics...</p>
-  </div>
-
-  <div *ngIf="!isLoading && reportData">
-    
-    <!-- 📊 KPI CARDS GRID -->
-    <div class="row g-3 mb-4">
-      <div class="col-12 col-sm-6 col-xl-3">
-        <div class="card border-0 shadow-sm h-100">
-          <div class="card-body d-flex justify-content-between align-items-center">
-            <div>
-              <span class="text-uppercase fw-semibold text-muted small">Extra Work Progress</span>
-              <h2 class="fw-bold my-1 text-primary">
-                {{ reportData.kpis.completedExtraWorkToday }} <small class="fs-6 text-muted">/ {{ reportData.kpis.totalExtraWorkToday }}</small>
-              </h2>
-              <span class="small text-muted">Tasks completed today</span>
-            </div>
-            <div class="kpi-icon-wrapper bg-primary-subtle text-primary">
-              <mat-icon>king_bed</mat-icon>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-12 col-sm-6 col-xl-3">
-        <div class="card border-0 shadow-sm h-100">
-          <div class="card-body d-flex justify-content-between align-items-center">
-            <div>
-              <span class="text-uppercase fw-semibold text-muted small">Supply Orders</span>
-              <h2 class="fw-bold my-1 text-info">{{ reportData.kpis.totalSupplyRequestsToday }}</h2>
-              <span class="small text-muted">Requests submitted today</span>
-            </div>
-            <div class="kpi-icon-wrapper bg-info-subtle text-info">
-              <mat-icon>inventory_2</mat-icon>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-12 col-sm-6 col-xl-3">
-        <div class="card border-0 shadow-sm h-100">
-          <div class="card-body d-flex justify-content-between align-items-center">
-            <div>
-              <span class="text-uppercase fw-semibold text-muted small">Avg Setup Time</span>
-              <h2 class="fw-bold my-1 text-success">{{ reportData.kpis.avgFulfillmentSpeedMinutes }} <small class="fs-6 text-muted">min</small></h2>
-              <span class="small text-muted">Across all housekeepers</span>
-            </div>
-            <div class="kpi-icon-wrapper bg-success-subtle text-success">
-              <mat-icon>timer</mat-icon>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-12 col-sm-6 col-xl-3">
-        <div class="card border-0 shadow-sm h-100">
-          <div class="card-body d-flex justify-content-between align-items-center">
-            <div>
-              <span class="text-uppercase fw-semibold text-muted small">Active Staff</span>
-              <h2 class="fw-bold my-1 text-warning">{{ reportData.kpis.activeHousekeepersCount }}</h2>
-              <span class="small text-muted">Housekeepers on shift</span>
-            </div>
-            <div class="kpi-icon-wrapper bg-warning-subtle text-warning">
-              <mat-icon>groups</mat-icon>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div *ngIf="isLoading" class="text-center my-5 py-5">
+        <mat-spinner diameter="48" class="mx-auto"></mat-spinner>
+        <p class="mt-3 text-muted">Compiling hotel analytics...</p>
     </div>
 
-    <!-- 📈 CHARTS ROW -->
-    <div class="row g-4 mb-4">
-      <!-- Housekeeper Leaderboard Chart -->
-      <div class="col-12 col-lg-7">
-        <div class="card border-0 shadow-sm h-100">
-          <div class="card-header bg-white border-0 pt-3 px-3 px-md-4">
-            <h5 class="fw-bold m-0 text-dark">Staff Productivity Leaderboard</h5>
-            <small class="text-muted">Completed extra work  per housekeeper</small>
-          </div>
-          <div class="card-body px-3 px-md-4">
-            <div style="position: relative; height: 280px;">
-              <canvas id="staffChart"></canvas>
+    <div *ngIf="!isLoading && reportData">
+        <div class="row g-3 mb-4">
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-uppercase fw-semibold text-muted small">Extra Work Progress</span>
+                            <h2 class="fw-bold my-1 text-primary">
+                                {{ reportData.kpis.completedExtraWorkToday }} <small class="fs-6 text-muted">/ {{
+                                    reportData.kpis.totalExtraWorkToday }}</small>
+                            </h2>
+                            <span class="small text-muted">Tasks completed today</span>
+                        </div>
+                        <div class="kpi-icon-wrapper bg-primary-subtle text-primary">
+                            <mat-icon>king_bed</mat-icon>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
 
-      <!-- Top Requested Items Chart -->
-      <div class="col-12 col-lg-5">
-        <div class="card border-0 shadow-sm h-100">
-          <div class="card-header bg-white border-0 pt-3 px-3 px-md-4">
-            <h5 class="fw-bold m-0 text-dark">Top Consumed Inventory Items</h5>
-            <small class="text-muted">Most requested amenities and linen supplies</small>
-          </div>
-          <div class="card-body px-3 px-md-4">
-            <div style="position: relative; height: 280px;">
-              <canvas id="itemsChart"></canvas>
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-uppercase fw-semibold text-muted small">Supply Orders</span>
+                            <h2 class="fw-bold my-1 text-info">{{ reportData.kpis.totalSupplyRequestsToday }}</h2>
+                            <span class="small text-muted">Requests submitted today</span>
+                        </div>
+                        <div class="kpi-icon-wrapper bg-info-subtle text-info">
+                            <mat-icon>inventory_2</mat-icon>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
 
-    <!-- 📋 MASTER AUDIT LOG TABLE -->
-    <div class="row">
-      <div class="col-12">
-        <div class="card border-0 shadow-sm">
-          <div class="card-header bg-white border-0 pt-3 px-3 px-md-4">
-            <h5 class="fw-bold m-0 text-dark">Real-Time Floor Activity Ledger</h5>
-            <small class="text-muted">All active and completed tasks across all rooms today</small>
-          </div>
-          <div class="card-body p-0">
-            <div class="table-responsive">
-              <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
-                  <tr>
-                    <th class="ps-3 ps-md-4">Room</th>
-                    <th>Type</th>
-                    <th>Assigned / Creator</th>
-                    <th>Details</th>
-                    <th>Status</th>
-                    <th class="text-end pe-3 pe-md-4">Time</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let log of reportData.masterTaskLog">
-                    <td class="ps-3 ps-md-4">
-                      <span class="fw-bold text-dark">Room {{ log.roomNumber }}</span>
-                    </td>
-                    <td>
-                      <span class="badge rounded-pill px-2 py-1"
-                            [ngClass]="log.category === 'Extra Work' ? 'bg-primary-subtle text-primary border border-primary-subtle' : 'bg-info-subtle text-info border border-info-subtle'">
-                        {{ log.category }}
-                      </span>
-                    </td>
-                    <td class="fw-semibold text-dark">{{ log.assignedToOrRequestedBy }}</td>
-                    <td class="text-secondary">{{ log.details }}</td>
-                    <td>
-                      <span class="badge px-2 py-1"
-                            [ngClass]="{
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-uppercase fw-semibold text-muted small">Avg Setup Time</span>
+                            <h2 class="fw-bold my-1 text-success">{{ reportData.kpis.avgFulfillmentSpeedMinutes }}
+                                <small class="fs-6 text-muted">min</small></h2>
+                            <span class="small text-muted">Across all housekeepers</span>
+                        </div>
+                        <div class="kpi-icon-wrapper bg-success-subtle text-success">
+                            <mat-icon>timer</mat-icon>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-sm-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-uppercase fw-semibold text-muted small">Active Staff</span>
+                            <h2 class="fw-bold my-1 text-warning">{{ reportData.kpis.activeHousekeepersCount }}</h2>
+                            <span class="small text-muted">Housekeepers on shift</span>
+                        </div>
+                        <div class="kpi-icon-wrapper bg-warning-subtle text-warning">
+                            <mat-icon>groups</mat-icon>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-12 col-lg-7">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-0 pt-3 px-3 px-md-4">
+                        <h5 class="fw-bold m-0 text-dark">Staff Productivity Leaderboard</h5>
+                        <small class="text-muted">Completed extra work per housekeeper</small>
+                    </div>
+                    <div class="card-body px-3 px-md-4">
+                        <div style="position: relative; height: 280px;">
+                            <canvas id="staffChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-5">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-0 pt-3 px-3 px-md-4">
+                        <h5 class="fw-bold m-0 text-dark">Top Consumed Inventory Items</h5>
+                        <small class="text-muted">Most requested amenities and linen supplies</small>
+                    </div>
+                    <div class="card-body px-3 px-md-4">
+                        <div style="position: relative; height: 280px;">
+                            <canvas id="itemsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-0 pt-3 px-3 px-md-4">
+                        <h5 class="fw-bold m-0 text-dark">Real-Time Floor Activity Ledger</h5>
+                        <small class="text-muted">All active and completed tasks across all rooms today</small>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="ps-3 ps-md-4">Room</th>
+                                        <th>Type</th>
+                                        <th>Assigned / Creator</th>
+                                        <th>Details</th>
+                                        <th>Status</th>
+                                        <th class="text-end pe-3 pe-md-4">Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let log of reportData.masterTaskLog">
+                                        <td class="ps-3 ps-md-4">
+                                            <span class="fw-bold text-dark">Room {{ log.roomNumber }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge rounded-pill px-2 py-1"
+                                                [ngClass]="log.category === 'Extra Work' ? 'bg-primary-subtle text-primary border border-primary-subtle' : 'bg-info-subtle text-info border border-info-subtle'">
+                                                {{ log.category }}
+                                            </span>
+                                        </td>
+                                        <td class="fw-semibold text-dark">{{ log.assignedToOrRequestedBy }}</td>
+                                        <td class="text-secondary">{{ log.details }}</td>
+                                        <td>
+                                            <span class="badge px-2 py-1" [ngClass]="{
                               'bg-success': log.status === 'Done' || log.status === 'Delivered',
                               'bg-warning text-dark': log.status === 'Pending',
                               'bg-info text-dark': log.status === 'Acknowledged'
                             }">
-                        {{ log.status }}
-                      </span>
-                    </td>
-                    <td class="text-end pe-3 pe-md-4 text-muted small">
-                      {{ log.timestamp | date:'hh:mm a' }}
-                    </td>
-                  </tr>
-                  <tr *ngIf="reportData.masterTaskLog.length === 0">
-                    <td colspan="6" class="text-center py-4 text-muted">
-                      No floor activity recorded for today yet.
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                                                {{ log.status }}
+                                            </span>
+                                        </td>
+                                        <td class="text-end pe-3 pe-md-4 text-muted small">
+                                            {{ log.timestamp | date:'hh:mm a' }}
+                                        </td>
+                                    </tr>
+                                    <tr *ngIf="reportData.masterTaskLog.length === 0">
+                                        <td colspan="6" class="text-center py-4 text-muted">
+                                            No floor activity recorded for today yet.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
-    </div>
 
-  </div>
+    </div>
 </div>

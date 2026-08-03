@@ -46,10 +46,10 @@ export class ExtraDirtyRoomTableComponent {
     }
 
   }
+  
   onView(report: ExtraDirtyReportDto): void {
     this.viewDetails.emit(report);
   }
-
 
   handleOpenMediaModal(report: ExtraDirtyReportDto): void {
     if (report?.mediaFiles && report.mediaFiles.length > 0) {

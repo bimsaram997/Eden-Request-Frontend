@@ -34,7 +34,7 @@ export class RequestDetailComponent implements OnInit, OnDestroy {
   requestId!: number;
   isLoading: boolean = false;
   session: any;
-  loading: boolean = true; // Initial loading state
+  loading: boolean = true;
 
   constructor(
     private requestService: RequestService,
@@ -46,8 +46,6 @@ export class RequestDetailComponent implements OnInit, OnDestroy {
     this.session = JSON.parse(localStorage.getItem('scandic_eden_session') || '{}');
     const userRole = this.session.role || this.session.Role;
     this.isTeamLeader = userRole === 'TeamLeader';
-
-    // Normal routing setup when component initializes fresh
     const routeSub = this.route.paramMap.subscribe(params => {
       const idStr = params.get('id');
       if (idStr) {
@@ -58,20 +56,14 @@ export class RequestDetailComponent implements OnInit, OnDestroy {
     this.subs.push(routeSub);
   }
 
-  // 🚀 INTERCEPT BACKGROUND PUSH MESSAGES
   @HostListener('window:message', ['$event'])
   onServiceWorkerMessage(event: MessageEvent) {
     if (event.data && event.data.type === 'NOTIFICATION_CLICKED') {
       const newId = event.data.requestId;
       console.log(`Active session push intercepted for request ID: ${newId}`);
-
       if (newId && newId !== this.requestId) {
         this.requestId = newId;
-
-        // 1. Fetch data for the new request ID directly
         this.loadRequestDetails(this.requestId);
-
-        // 2. Cleanly update the browser URL path without triggering a hard reload or guard check
         this.router.navigate(['/workspace/requests-list', this.requestId], {
           replaceUrl: true
         });
@@ -94,13 +86,11 @@ export class RequestDetailComponent implements OnInit, OnDestroy {
 
 
   handleStatusUpdate(status: string): void {
-    this.isLoading = true; // Show loading indicator while processing
+    this.isLoading = true;
     const payload = {
       status: status,
       updatedBy: this.session.id || this.session.employeeId
     };
-
-    // 3. LOCK: Drop this request ID into our tracking set to shut down ghost events
 
     this.requestService.updateRequestStatus(this.requestId, payload).subscribe({
       next: (response: RequestHeader) => {
@@ -117,9 +107,7 @@ export class RequestDetailComponent implements OnInit, OnDestroy {
 
   onBack(): void {
     this.closeDetail.emit();
-
-      this.router.navigate(['/workspace/requests-list']);
-   
+    this.router.navigate(['/workspace/requests-list']);
   }
 
   ngOnDestroy(): void {

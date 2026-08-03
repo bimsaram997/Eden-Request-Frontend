@@ -8,20 +8,19 @@ import { environment } from '../../environments/environment.development';
   providedIn: 'root'
 })
 export class AuthService {
-baseUrl = environment.baseUrl;
-
+  baseUrl = environment.baseUrl;
+  
   constructor(private http: HttpClient) { }
 
- public login(loginPayload: LoginRequest): Observable<any> {
-  // 🚀 Pass payload directly as the POST body object. Cleaner, safer, and Firefox friendly!
-  return this.http.post<any>(`${this.baseUrl}/Employee/login`, loginPayload);
-}
+  public login(loginPayload: LoginRequest): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/Employee/login`, loginPayload);
+  }
 
-   public loadAllEmployees(): Observable<any> {
+  public loadAllEmployees(): Observable<any> {
     return this.http.get(`${this.baseUrl}/Employee/getAllEmployee`);
   }
 
-   public getEmployeeGenericDataById(id: number): Observable<any> {
+  public getEmployeeGenericDataById(id: number): Observable<any> {
     return this.http.get(`${this.baseUrl}/Employee/${id}`);
   }
 }

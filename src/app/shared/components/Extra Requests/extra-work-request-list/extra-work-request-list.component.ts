@@ -18,21 +18,19 @@ import { Router } from '@angular/router';
   styleUrl: './extra-work-request-list.component.css'
 })
 export class ExtraWorkRequestListComponent implements OnInit, OnDestroy {
-  // 🟢 1. Bind query references for both the search child component and the MatPaginator
   @ViewChild(ExtraWorkRequestSearchComponent) searchComponent!: ExtraWorkRequestSearchComponent;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
-
   activeFilters: ExtraWorkRequestFilterPayload = {
     roomNumber: null,
     listNumber: null,
     extraWorkItemIds: [],
     status: 'All',
     requestedById: null,
-    assignedToId:  null,
+    assignedToId: null,
     fromDate: null,
     toDate: null,
-    fromTime: null, 
-    toTime: null, 
+    fromTime: null,
+    toTime: null,
     isToday: null,
   }
   isSearching = false;
@@ -121,7 +119,7 @@ export class ExtraWorkRequestListComponent implements OnInit, OnDestroy {
       .getPagedExtraWorkRequests(requestPayload)
       .subscribe({
         next: (response: PagedResponse<ExtraWorkRequestDto>) => {
-          this.extrWorkRequests = response.data || []; 
+          this.extrWorkRequests = response.data || [];
           this.totalRecords = response.totalCount || 0;
           this.isSearching = false;
         },
@@ -134,7 +132,6 @@ export class ExtraWorkRequestListComponent implements OnInit, OnDestroy {
     this.subs.push(historySub);
   }
 
-  // 🟢 HELPER: Safely reset pagination back to Page 1 on both component state and UI control
   private resetPaginationToFirstPage(): void {
     this.currentPage = 1;
     if (this.paginator) {
@@ -144,7 +141,7 @@ export class ExtraWorkRequestListComponent implements OnInit, OnDestroy {
 
   onFilterCriteriaChanged(payload: ExtraWorkRequestFilterPayload): void {
     this.activeFilters = payload;
-    
+
     const formatLocalDateText = (dateInput: any): string | null => {
       if (!dateInput) return null;
       const d = new Date(dateInput);
@@ -173,22 +170,21 @@ export class ExtraWorkRequestListComponent implements OnInit, OnDestroy {
       this.isToday = false;
     }
 
-    // 🟢 Reset both page counter and MatPaginator UI
     this.resetPaginationToFirstPage();
     this.isSearching = true;
     this.fetchHistoryPage();
   }
 
   onPageChange(event: PageEvent): void {
-    this.currentPage = event.pageIndex + 1; 
+    this.currentPage = event.pageIndex + 1;
     this.fetchHistoryPage();
   }
 
-  // 🟢 HELPER: Read current form states directly from UI component context safely
+
   private syncCurrentSearchFilters(): void {
     if (this.searchComponent && this.searchComponent.filterForm) {
       const currentFormValue = this.searchComponent.filterForm.value;
-      
+
       this.activeFilters = {
         ...this.activeFilters,
         roomNumber: currentFormValue.roomId || null,
@@ -208,17 +204,12 @@ export class ExtraWorkRequestListComponent implements OnInit, OnDestroy {
   selectTodayTab(): void {
     this.isSearching = true;
     this.isToday = true;
-    
-    // Sync active parameters so filter inputs are preserved
     this.syncCurrentSearchFilters();
-    
-    // Clear date range properties since context is moving strictly to Today tab
     this.activeFilters.fromDate = null;
     this.activeFilters.toDate = null;
     this.fromStr = null;
     this.toStr = null;
 
-    // Reset date picker input boxes visually inside search control UI if present
     if (this.searchComponent && this.searchComponent.filterForm) {
       this.searchComponent.filterForm.patchValue({
         fromDate: null,
@@ -226,7 +217,6 @@ export class ExtraWorkRequestListComponent implements OnInit, OnDestroy {
       }, { emitEvent: false });
     }
 
-    // 🟢 Reset both page counter and MatPaginator UI
     this.resetPaginationToFirstPage();
     this.fetchHistoryPage();
   }
@@ -234,11 +224,7 @@ export class ExtraWorkRequestListComponent implements OnInit, OnDestroy {
   selectPastTab(): void {
     this.isSearching = true;
     this.isToday = false;
-
-    // Preserve selection states across tabs
     this.syncCurrentSearchFilters();
-
-    // 🟢 Reset both page counter and MatPaginator UI
     this.resetPaginationToFirstPage();
     this.fetchHistoryPage();
   }

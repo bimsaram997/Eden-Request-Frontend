@@ -7,13 +7,11 @@
   overflow: hidden;
 }
 
-/* Ensure your navbar component doesn't shrink or collapse */
 app-navbar {
   flex-shrink: 0;
-  z-index: 10; /* Keeps it layered correctly if needed */
+  z-index: 10; 
 }
 
-/* This is the magic rule: Tells the sidenav container to fill ALL remaining space below the navbar */
 .sidenav-container {
   flex: 1; 
   width: 100%;

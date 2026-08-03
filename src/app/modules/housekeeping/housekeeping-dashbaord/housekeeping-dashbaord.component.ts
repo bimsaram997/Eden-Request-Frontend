@@ -3,9 +3,6 @@ import { RequestListComponent } from "./components/request-list/request-list.com
 import { Router } from '@angular/router';
 import { MATERIAL_COMPONENTS } from '../../../shared/utils/material-imports';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { NotificationServiceService } from '../../../services/notification-service.service';
-import { Subscription } from 'rxjs';
-import { PushNotificationService } from '../../../services/push-notification.service';
 import { EmployeeDto } from '../../../models/employee';
 import { AuthService } from '../../../services/auth.service';
 import { ReportsService } from '../../../services/reports.service';
@@ -29,24 +26,17 @@ export class HousekeepingDashbaordComponent implements OnInit, OnDestroy   {
     role: 'Housekeeper',
 
   };
-
   isLoading = true;
   reportData: any = null;
   chart: any;
 
   constructor(private router: Router,
-  
     private snackBar: MatSnackBar,
     private authService: AuthService,
     private reportsService: ReportsService,
   ) { }
 
-
-  routeToRequest() {
-    this.router.navigate(['/workspace/request-form']);
-  }
-
-
+  
   ngOnInit(): void {
    const session = JSON.parse(localStorage.getItem('scandic_eden_session') || '{}');
     this.employeeDetails.id = session.id || session.employeeId || 1;
@@ -54,6 +44,10 @@ export class HousekeepingDashbaordComponent implements OnInit, OnDestroy   {
       this.loadEmpoyeeDetails();
     }
     
+  }
+
+  routeToRequest() {
+    this.router.navigate(['/workspace/request-form']);
   }
 
   loadEmpoyeeDetails() {
@@ -143,9 +137,7 @@ export class HousekeepingDashbaordComponent implements OnInit, OnDestroy   {
     });
   }
 
- 
  ngOnDestroy(): void {
-    // 🟢 4. FIX: Safely loop and unsubscribe individually without throwing errors
     this.activeSubscriptions.forEach(sub => {
       if (sub && typeof sub.unsubscribe === 'function') {
         sub.unsubscribe();

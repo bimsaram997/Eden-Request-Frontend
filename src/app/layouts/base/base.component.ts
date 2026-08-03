@@ -18,7 +18,6 @@ export class BaseComponent implements OnInit, OnDestroy {
   isTeamLeaderUser: boolean = false;
   public isSidenavOpen = false;
 
-  // Grab the sidebar elements out of the layout template dynamically
   @ViewChild('sidebarDesktop', { static: false }) sidebarDesktop!: ElementRef;
   @ViewChild('sidebarMobile', { static: false }) sidebarMobile!: ElementRef;
 
@@ -42,9 +41,8 @@ this.notificationService.startConnection(email, role);
             this.snackBar.open(`⚡ A Team Leader updated your Room ${update.roomNumber} request to: ${update.status}`, 'OK', {
               duration: 6000
             });
-            //this.refreshMyTasks();
           },
-          // Add these two lines to satisfy the IStreamSubscriber interface requirements:
+       
           error: (err) => console.error('SignalR Stream Error:', err),
           complete: () => console.log('SignalR Stream Completed')
         }) as any;
@@ -54,9 +52,7 @@ this.notificationService.startConnection(email, role);
             this.snackBar.open(`⚡ You have a new extra work request for Room ${extraWork.roomNumber}!`, 'OK', {
               duration: 6000
             });
-            //this.refreshMyTasks();
           },
-          // Add these two lines to satisfy the IStreamSubscriber interface requirements:
           error: (err) => console.error('SignalR Stream Error:', err),
           complete: () => console.log('SignalR Stream Completed')
         }) as any;
@@ -80,9 +76,7 @@ this.notificationService.startConnection(email, role);
             this.snackBar.open(`⚡ Your extra work request for Room ${extraWork.roomNumber} has been updated!`, 'OK', {
               duration: 6000
             });
-            //this.refreshMyTasks();
           },
-          // Add these two lines to satisfy the IStreamSubscriber interface requirements:
           error: (err) => console.error('SignalR Stream Error:', err),
           complete: () => console.log('SignalR Stream Completed')
         }) as any;
@@ -97,30 +91,25 @@ this.notificationService.startConnection(email, role);
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
-    // If the sidebar is already shut, ignore clicks completely
     if (!this.isSidenavOpen) {
       return;
     }
 
     const clickedElement = event.target as HTMLElement;
-
-    // Check if the click landing pad falls within the panels
     const clickedInsideDesktop = this.sidebarDesktop?.nativeElement?.contains(clickedElement);
     const clickedInsideMobile = this.sidebarMobile?.nativeElement?.contains(clickedElement);
 
-    // Identify navbar elements/triggers to make sure toggle buttons don't cross-cancel
     const clickedNavbarToggle = clickedElement.closest('.navbar-toggler') ||
       clickedElement.closest('.bi-list') ||
       clickedElement.closest('app-navbar');
 
-    // If the user clicked outside the side bars, and didn't touch the toggle trigger, close it!
+   
     if (!clickedInsideDesktop && !clickedInsideMobile && !clickedNavbarToggle) {
       this.isSidenavOpen = false;
     }
   }
 
   ngOnDestroy(): void {
-    // 🟢 4. FIX: Safely loop and unsubscribe individually without throwing errors
     this.activeSubscriptions.forEach(sub => {
       if (sub && typeof sub.unsubscribe === 'function') {
         sub.unsubscribe();

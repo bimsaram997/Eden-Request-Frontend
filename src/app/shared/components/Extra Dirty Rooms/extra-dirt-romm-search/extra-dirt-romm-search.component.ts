@@ -1,11 +1,9 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { MATERIAL_COMPONENTS } from '../../../utils/material-imports';
-import { ExtraWorkRequestFilterPayload } from '../../../../models/DTO';
 import { ExtraDirtyFilterPayload } from '../../../../models/extra-dirty-rooms';
 import { Employee, EmployeeDto } from '../../../../models/employee';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ExtraWorkItemService } from '../../../../services/extra-work-item.service';
 import { AuthService } from '../../../../services/auth.service';
 import { setupDateTimeSync } from '../../../utils/date-time-filter.utils';
 
@@ -23,18 +21,12 @@ export class ExtraDirtRommSearchComponent implements OnInit, OnDestroy {
   availableRooms: string[] = ['101', '102', '103', '201', '202', '304', '305', '401'];
   housekeepersList: Employee[] = [];
   teamLeaderList: Employee[] = [];
-
-  isTeamLeader: boolean = false; // Placeholder for team leader status, adjust as needed
-
+  isTeamLeader: boolean = false;
   filterForm!: FormGroup;
-
   private subs: any[] = [];
 
   constructor(
     private fb: FormBuilder,
-    private router: Router,
-
-
     private authService: AuthService
   ) { }
 
@@ -46,10 +38,7 @@ export class ExtraDirtRommSearchComponent implements OnInit, OnDestroy {
     this.createRequestSearchForm();
     setupDateTimeSync(this.filterForm, this.subs);
     this.loadEmployee();
-
   }
-
-
 
   createRequestSearchForm() {
     this.filterForm = this.fb.group({
@@ -62,36 +51,27 @@ export class ExtraDirtRommSearchComponent implements OnInit, OnDestroy {
     });
   }
 
-
-
   loadEmployee(): void {
     const emSub = this.authService.loadAllEmployees().subscribe({
       next: (data) => {
-        // Filter the data array to only include Housekeepers
         this.housekeepersList = data.filter((emp: EmployeeDto) => emp.role === 'Housekeeper');
         this.teamLeaderList = data.filter((emp: EmployeeDto) => emp.role === 'TeamLeader');
-        // Moving the log inside the next block because subscribe is asynchronous
-        console.log('Housekeepers list loaded:', this.housekeepersList);
       },
       error: (err) => console.error('Error fetching employees:', err)
     });
-
     this.subs.push(emSub);
   }
 
   applyFilters(): void {
     const values = this.filterForm.value;
-
-    // 2. Map properties strictly to match the ExtendedFilterPayload layout rules
     const payload: ExtraDirtyFilterPayload = {
       roomNumber: values.roomNumber || null,
       reportedById: values.reportedById || null,
-
       fromDate: values.fromDate || null,
       toDate: values.toDate || null,
       fromTime: values.fromTime || null,
       toTime: values.toTime || null,
-      isToday: null // This can be set based on your specific logic or UI input 
+      isToday: null
     };
 
     this.filtersChanged.emit(payload);
@@ -108,7 +88,7 @@ export class ExtraDirtRommSearchComponent implements OnInit, OnDestroy {
   }
 
   private setupDateRangeListener(): void {
-    // Watch for changes on both fromDate and toDate
+
     this.filterForm.valueChanges.subscribe(() => {
       const { fromDate, toDate } = this.filterForm.value;
       const hasDateSelected = !!fromDate || !!toDate;
@@ -117,11 +97,11 @@ export class ExtraDirtRommSearchComponent implements OnInit, OnDestroy {
       const toTimeCtrl = this.filterForm.get('toTime');
 
       if (hasDateSelected) {
-        // Enable time inputs if a date is selected
+
         if (fromTimeCtrl?.disabled) fromTimeCtrl.enable({ emitEvent: false });
         if (toTimeCtrl?.disabled) toTimeCtrl.enable({ emitEvent: false });
       } else {
-        // Disable and reset time inputs if dates are cleared
+
         if (fromTimeCtrl?.enabled) {
           fromTimeCtrl.reset('', { emitEvent: false });
           fromTimeCtrl.disable({ emitEvent: false });
@@ -133,7 +113,6 @@ export class ExtraDirtRommSearchComponent implements OnInit, OnDestroy {
       }
     });
   }
-
 
   ngOnDestroy(): void {
     this.subs.forEach((sub: any) => {

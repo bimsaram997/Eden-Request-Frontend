@@ -1,6 +1,4 @@
 <div class="history-container py-3">
-  
-  <!-- Header Row: Title & Add Action -->
   <div class="history-top-bar mb-4">
     <h2 class="m-0 fs-4 fw-bold text-secondary">Extra Dirty Rooms</h2>
     <div *ngIf="!isTeamLeaderUser">
@@ -13,8 +11,6 @@
       </button>
     </div>
   </div>
-
-  <!-- Search Filter Component -->
   <div class="mb-4">
    <app-extra-dirt-romm-search 
       (filtersChanged)="onFilterCriteriaChanged($event)" 
@@ -22,14 +18,12 @@
     </app-extra-dirt-romm-search>
   </div>
 
-  <!-- Section Control Bar (Title, Today/Past Toggle, Total Count) -->
      <div class="controls-bar-wrapper mb-4">
     <h3 class="m-0 page-section-title">
       📋 {{ isToday ? "Today's Requests" : "Past Requests" }}
     </h3>
     
     <div class="controls-group">
-      <!-- Toggle Buttons -->
       <div class="btn-group filter-toggle-group" role="group" aria-label="Request Time Period">
         <button 
           type="button" 
@@ -47,7 +41,6 @@
         </button>
       </div>
 
-      <!-- Total Count Badge -->
       <span class="badge total-count-badge p-2 fs-6">
         Total: {{ totalRecords }}
       </span>
@@ -62,7 +55,7 @@
     </app-extra-dirty-room-table>
   </div>
 
-  <!-- Paginator -->
+ 
   <div class="paginator-wrapper mt-4 d-flex justify-content-center">
     <mat-paginator 
       [length]="totalRecords"

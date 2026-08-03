@@ -9,23 +9,22 @@ import { environment } from '../../environments/environment.development';
   providedIn: 'root'
 })
 export class ExtraDirtyRoomService {
+  myUrl = environment.baseUrl;
+  constructor(private http: HttpClient) { }
 
-   myUrl = environment.baseUrl;
-     constructor(private http: HttpClient) { }
-   
-placeExtraDiryRoom(placeExtraWorkRequest: FormData): Observable<ExtraDirtyReportResponse> {
+  placeExtraDiryRoom(placeExtraWorkRequest: FormData): Observable<ExtraDirtyReportResponse> {
     return this.http.post<ExtraDirtyReportResponse>(
       `${this.myUrl}/ExtraDirtyReports`, placeExtraWorkRequest
     );
   }
 
-   public getPagedExtraDirtyReports( filterQuery: ExtraDirtyFilterPayload ): Observable<any> {
-      // 🚥 Passes the security flag through the URL query string mapping as required by [FromQuery] in C#
-      const urlString = `${this.myUrl}/ExtraDirtyReports/getAll`;
-      return this.http.post<any>(urlString, filterQuery);
-    }
+  public getPagedExtraDirtyReports(filterQuery: ExtraDirtyFilterPayload): Observable<any> {
 
-   createReportMetadata(metadata: { roomNumber: string; reportedById: number; notes?: string }): Observable<{ reportId: number; message: string }> {
+    const urlString = `${this.myUrl}/ExtraDirtyReports/getAll`;
+    return this.http.post<any>(urlString, filterQuery);
+  }
+
+  createReportMetadata(metadata: { roomNumber: string; reportedById: number; notes?: string }): Observable<{ reportId: number; message: string }> {
     return this.http.post<{ reportId: number; message: string }>(
       `${this.myUrl}/ExtraDirtyReports/metadata`, metadata
     );
@@ -36,5 +35,5 @@ placeExtraDiryRoom(placeExtraWorkRequest: FormData): Observable<ExtraDirtyReport
       `${this.myUrl}/ExtraDirtyReports/${reportId}/media`, filesFormData
     );
   }
-    
+
 }

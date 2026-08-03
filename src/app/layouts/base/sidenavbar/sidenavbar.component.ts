@@ -30,11 +30,7 @@ export class SidenavbarComponent {
   }
 
   onMenuClick(menu: any): void {
-    // 1. Call your navigation logic
     this.navigateTo(menu.routePath);
-
-    // 2. If screen width is less than 768px (Bootstrap's 'md' breakpoint),
-    // automatically notify the parent layout to close the mobile drawer.
     if (window.innerWidth < 768) {
       this.sidenavClose.emit();
     }
@@ -48,7 +44,6 @@ export class SidenavbarComponent {
 
  navigateTo(path: string): void {
     if (path) {
-      // Navigates to absolute context route: /workspace/request-list
       this.router.navigate([`/workspace/${path}`]);
     }
   }

@@ -1,5 +1,4 @@
 <div class="mobile-form-container">
-
     <div class="form-header">
         <h2>🧹 New Extra Work Request</h2>
         <button mat-icon-button color="warn" (click)="backToDashboard()">
@@ -7,12 +6,10 @@
         </button>
     </div>
 
-    <!-- Main Request Form -->
+
     <form [formGroup]="requestForm" (ngSubmit)="onSubmit()">
         <mat-card class="input-card">
             <mat-card-content class="p-3">
-
-                <!-- Lists and Rooms Grid -->
                 <div class="form-fields-grid mb-2">
                     <mat-form-field appearance="outline" class="w-100">
                         <mat-label>List Number</mat-label>
@@ -35,7 +32,7 @@
                     </mat-form-field>
                 </div>
 
-                <!-- Assignment and Notes Grid -->
+
                 <div class="form-fields-grid">
                     <mat-form-field appearance="outline" class="w-100">
                         <mat-label>Assigned To</mat-label>
@@ -45,8 +42,7 @@
                                 <input placeholder="Type to filter items..." (keyup)="$event.stopPropagation()"
                                     [(ngModel)]="nameSearchQuery" [ngModelOptions]="{standalone: true}"
                                     class="search-input-element">
-                                <button *ngIf="nameSearchQuery" mat-icon-button type="button"
-                                    class="clear-search-btn"
+                                <button *ngIf="nameSearchQuery" mat-icon-button type="button" class="clear-search-btn"
                                     (click)="$event.stopPropagation(); nameSearchQuery = ''">
                                     <mat-icon>close</mat-icon>
                                 </button>
@@ -71,7 +67,6 @@
         </mat-card>
     </form>
 
-    <!-- Item Selection Box -->
     <mat-card class="input-card item-picker-box" [formGroup]="extraItemSelectionForm">
         <mat-card-header>
             <mat-card-title style="font-size: 16px;">Add Item Line</mat-card-title>
@@ -79,7 +74,6 @@
 
         <mat-card-content class="item-picker-content">
             <div class="picker-fields-grid">
-                <!-- Item Select -->
                 <mat-form-field appearance="outline" class="w-100">
                     <mat-label>Select Work Item</mat-label>
                     <mat-select formControlName="extraWorkItem" [disabled]="extraWorkItems.length === 0">
@@ -102,7 +96,6 @@
                     </mat-select>
                 </mat-form-field>
 
-                <!-- Quantity (only visible when an item is chosen) -->
                 <mat-form-field appearance="outline" class="w-100"
                     *ngIf="extraItemSelectionForm.get('extraWorkItem')?.value">
                     <mat-label>Quantity</mat-label>
@@ -110,7 +103,7 @@
                 </mat-form-field>
             </div>
 
-            <!-- Add Button -->
+
             <button type="button" mat-flat-button color="accent" class="w-100 add-btn" (click)="addItemToList()"
                 [disabled]="requestedItems.length >= 5">
                 <mat-icon>add_shopping_cart</mat-icon> Add To Extra Work List ({{requestedItems.length}}/5)
@@ -118,7 +111,6 @@
         </mat-card-content>
     </mat-card>
 
-    <!-- Summary Overview -->
     <div class="added-summary-section" *ngIf="requestedItems.length > 0">
         <h3>Added Items Overview</h3>
         <div class="summary-card-grid">
@@ -137,12 +129,10 @@
         </div>
     </div>
 
-    <!-- Fixed Action Footer -->
     <div class="sticky-action-footer">
         <button mat-raised-button color="primary" class="submit-btn"
             [disabled]="requestForm.invalid || requestedItems.length === 0" (click)="onSubmit()">
             🚀 Dispatch Order Request
         </button>
     </div>
-
 </div>

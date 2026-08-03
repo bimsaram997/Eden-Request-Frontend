@@ -9,7 +9,7 @@ export interface BulkLine {
 export interface PlaceBulkRequest {
     employeeId: number;
     roomListId: number;
-    roomNumber: string | null; // string? in C# translates to allowing null
+    roomNumber: string | null; 
     items: BulkLine[];
     notes?: string ;
 }

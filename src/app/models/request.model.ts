@@ -9,9 +9,9 @@ export interface RequestModel {
   roomNumber: string;
   roomListId: number;
   status: string;
-  createdAt: string; // ISO Date String
+  createdAt: string; 
   employeeId: number;
-  name: string;      // "James Anderson"
+  name: string;      
   notes: string;
   items: RequestItemLine[];
 }

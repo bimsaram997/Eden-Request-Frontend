@@ -1,13 +1,10 @@
 <div class="table-responsive mat-elevation-z2 rounded overflow-hidden">
   <table mat-table [dataSource]="reports" class="w-100">
-
-    <!-- ID -->
     <ng-container matColumnDef="id">
       <th mat-header-cell *matHeaderCellDef> # </th>
       <td mat-cell *matCellDef="let report" data-label="ID"> {{ report.id }} </td>
     </ng-container>
 
-    <!-- Room Number -->
     <ng-container matColumnDef="roomNumber">
       <th mat-header-cell *matHeaderCellDef> Room </th>
       <td mat-cell *matCellDef="let report" data-label="Room"> 
@@ -15,19 +12,16 @@
       </td>
     </ng-container>
 
-    <!-- Reported By -->
     <ng-container matColumnDef="reportedBy">
       <th mat-header-cell *matHeaderCellDef> Reported By </th>
       <td mat-cell *matCellDef="let report" data-label="Reported By"> {{ report.reportedByEmployee || 'Unknown' }} </td>
     </ng-container>
 
-    <!-- Created At -->
     <ng-container matColumnDef="createdAt">
       <th mat-header-cell *matHeaderCellDef> Date & Time </th>
       <td mat-cell *matCellDef="let report" data-label="Date"> {{ report.createdAt | date:'short' }} </td>
     </ng-container>
 
-    <!-- Notes -->
     <ng-container matColumnDef="notes">
       <th mat-header-cell *matHeaderCellDef> Notes </th>
       <td mat-cell *matCellDef="let report" data-label="Notes" class="text-truncate" style="max-width: 250px;"> 
@@ -35,7 +29,6 @@
       </td>
     </ng-container>
 
-    <!-- Actions -->
     <ng-container matColumnDef="actions">
       <th mat-header-cell *matHeaderCellDef class="text-end"> Actions </th>
       <td mat-cell *matCellDef="let report" class="text-end" data-label="Actions">

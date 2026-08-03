@@ -1,8 +1,5 @@
-/* ==========================================
-   1. GLOBAL WRAPPER & CONTAINER
-   ========================================== */
+
 .mobile-form-container {
-  /* Fluid width uses up to 1200px on laptops without oversized margins */
   width: min(96%, 1200px);
   margin: 0 auto;
   padding: clamp(12px, 2vw, 24px) clamp(12px, 2vw, 24px) 120px clamp(12px, 2vw, 24px);
@@ -29,16 +26,13 @@
   overflow: hidden;
 }
 
-/* Fluid Form Field Layout */
 .form-fields-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
   gap: 16px;
 }
 
-/* ==========================================
-   2. EXTRA ITEM PICKER COMPONENT
-   ========================================== */
+
 .item-picker-content {
   display: flex;
   flex-direction: column;
@@ -59,9 +53,6 @@
   border-radius: 8px;
 }
 
-/* ==========================================
-   3. REUSABLE ITEM SUMMARY CARDS
-   ========================================== */
 .added-summary-section h3 {
   margin: 28px 0 16px 4px;
   font-size: 18px;
@@ -71,7 +62,6 @@
 
 .summary-card-grid {
   display: grid;
-  /* Automatically shifts from 1 to 2 to 3 columns depending on device width */
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
   gap: 12px;
 }
@@ -118,9 +108,7 @@
   color: #3f51b5;
 }
 
-/* ==========================================
-   4. STICKY BOTTOM ACTION FOOTER
-   ========================================== */
+
 .sticky-action-footer {
   position: fixed;
   bottom: 0;
@@ -143,9 +131,6 @@
   border-radius: 8px;
 }
 
-/* ==========================================
-   5. DROPDOWN SEARCH ELEMENT
-   ========================================== */
 .dropdown-search-box {
   display: flex;
   align-items: center;

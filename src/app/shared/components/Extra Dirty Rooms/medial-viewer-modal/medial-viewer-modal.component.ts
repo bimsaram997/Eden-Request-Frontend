@@ -2,8 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
 import { MediaFile } from '../../../../models/extra-dirty-rooms';
 
-
-
 @Component({
   selector: 'app-medial-viewer-modal',
   standalone: true,
@@ -16,7 +14,6 @@ export class MedialViewerModalComponent {
   @Input() roomNumber: string = '';
   @Input() isOpen: boolean = false;
   @Output() closeModal = new EventEmitter<void>();
-
   currentIndex: number = 0;
 
   get currentMedia(): MediaFile | null {
@@ -51,7 +48,7 @@ export class MedialViewerModalComponent {
     this.closeModal.emit();
   }
 
-  // Keyboard navigation support
+  
   @HostListener('window:keydown', ['$event'])
   handleKeyDown(event: KeyboardEvent): void {
     if (!this.isOpen) return;

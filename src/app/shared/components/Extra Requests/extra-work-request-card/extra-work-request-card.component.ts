@@ -27,22 +27,18 @@ export class ExtraWorkRequestCardComponent {
   constructor(private router: Router) { }
 
   ngOnInit(): void {
-    // Check user role from session storage
     const session = JSON.parse(localStorage.getItem('scandic_eden_session') || '{}');
     const userRole = session.role || session.Role;
-
-    // Strict evaluation guard: button only shows if they match the exact TeamLeader role string
     this.isTeamLeader = userRole === 'TeamLeader';
   }
 
-  // Simple handler method to broadcast action events upward
   emitStatusUpdate(status: string): void {
     this.statusChanged.emit({ requestId: this.req.id, currentStatus: this.req.status, newStatus: status });
   }
   
 
   navigateToDetails(event: Event): void {
-    event.stopPropagation(); // Stops the expansion panel from expanding/collapsing when clicking the button
+    event.stopPropagation(); 
     this.viewDetails.emit(this.req);
     this.router.navigate(['/workspace/extra-work-request-detail', this.req.id]);
   }

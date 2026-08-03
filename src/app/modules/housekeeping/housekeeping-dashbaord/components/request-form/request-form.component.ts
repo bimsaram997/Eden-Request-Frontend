@@ -17,7 +17,7 @@ import { RequestService } from '../../../../../services/request.service';
 })
 export class RequestFormComponent implements OnInit, OnDestroy {
 
-  // Hardcoded Floor Lists mapping exactly to  backend dictionary structure
+  
   listRoomsMap: { [key: number]: string[] } = {
     10: ['101', '102', '103'], 
     20: ['201', '202', '203']  

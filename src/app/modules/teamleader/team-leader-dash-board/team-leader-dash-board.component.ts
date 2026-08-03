@@ -1,8 +1,4 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { NotificationServiceService } from '../../../services/notification-service.service';
-import { PushNotificationService } from '../../../services/push-notification.service';
 import { HttpClient } from '@angular/common/http';
 import { ReportsService } from '../../../services/reports.service';
 import Chart from 'chart.js/auto';
@@ -56,9 +52,7 @@ export class TeamLeaderDashBoardComponent implements OnInit, OnDestroy {
   private renderStaffChart(): void {
     const canvas = document.getElementById('staffChart') as HTMLCanvasElement;
     if (!canvas || !this.reportData?.staffPerformance) return;
-
     if (this.staffChart) this.staffChart.destroy();
-
     const labels = this.reportData.staffPerformance.map((s: any) => s.housekeeperName);
     const data = this.reportData.staffPerformance.map((s: any) => s.completedExtraWork);
 
@@ -88,12 +82,9 @@ export class TeamLeaderDashBoardComponent implements OnInit, OnDestroy {
   private renderItemsChart(): void {
     const canvas = document.getElementById('itemsChart') as HTMLCanvasElement;
     if (!canvas || !this.reportData?.topItems) return;
-
     if (this.itemsChart) this.itemsChart.destroy();
-
     const labels = this.reportData.topItems.map((i: any) => i.itemName);
     const data = this.reportData.topItems.map((i: any) => i.totalQuantity);
-
     this.itemsChart = new Chart(canvas, {
       type: 'doughnut',
       data: {
@@ -117,7 +108,6 @@ export class TeamLeaderDashBoardComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     if (this.staffChart) this.staffChart.destroy();
     if (this.itemsChart) this.itemsChart.destroy();
-    //  4. FIX: Safely loop and unsubscribe individually without throwing errors
     this.activeSubscriptions.forEach(sub => {
       if (sub && typeof sub.unsubscribe === 'function') {
         sub.unsubscribe();

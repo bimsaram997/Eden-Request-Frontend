@@ -1,27 +1,34 @@
-/* ==========================================
-   3. EXPANSION PANEL DESIGN MODIFICATIONS
-   ========================================== */
 .history-panel {
   background: #ffffff;
   border-radius: 12px !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
-  border-left: 6px solid #dee2e6; /* Left indicator status accent bar */
+  border-left: 6px solid #dee2e6;
   overflow: hidden;
 }
 
-/* Color codes mapping across your C# data statuses */
-.history-panel.pending { border-left-color: #ffc107; }
-.history-panel.approved { border-left-color: #0d6efd; }
-.history-panel.delivered { border-left-color: #198754; }
-.history-panel.rejected { border-left-color: #dc3545; }
-
-/* Flex adjustment inside the Angular Material header layout block */
-.panel-header-grid {
-  padding: 16px !important;
-  height: auto !important; 
+.history-panel.pending {
+  border-left-color: #ffc107;
 }
 
-/* 🚨 THIS EXACT LINE IN YOUR REQUEST-HISTORY-CARD CSS IS THE CULPRIT: */
+.history-panel.approved {
+  border-left-color: #0d6efd;
+}
+
+.history-panel.delivered {
+  border-left-color: #198754;
+}
+
+.history-panel.rejected {
+  border-left-color: #dc3545;
+}
+
+
+.panel-header-grid {
+  padding: 16px !important;
+  height: auto !important;
+}
+
+
 ::ng-deep .panel-header-grid .mat-content {
   display: flex !important;
   justify-content: space-between !important;
@@ -47,7 +54,7 @@
   margin-left: 12px;
 }
 
-/* Status Badges styling adjustments */
+
 .status-badge {
   font-size: 11px;
   font-weight: 700;
@@ -58,15 +65,32 @@
   white-space: nowrap;
 }
 
-.status-badge.pending { background-color: #fff3cd; color: #664d03; }
-.status-badge.approved { background-color: #cfe2ff; color: #084298; }
-.status-badge.delivered { background-color: #d1e7dd; color: #0f5132; }
-.status-badge.rejected { background-color: #f8d7da; color: #842029; }
-.status-badge.acknowledge { background-color: #f8d7da; color: #572084; }
+.status-badge.pending {
+  background-color: #fff3cd;
+  color: #664d03;
+}
 
-/* ==========================================
-   4. INTERIOR EXPANDED PANEL DETAILS
-   ========================================== */
+.status-badge.approved {
+  background-color: #cfe2ff;
+  color: #084298;
+}
+
+.status-badge.delivered {
+  background-color: #d1e7dd;
+  color: #0f5132;
+}
+
+.status-badge.rejected {
+  background-color: #f8d7da;
+  color: #842029;
+}
+
+.status-badge.acknowledge {
+  background-color: #f8d7da;
+  color: #572084;
+}
+
+
 .expanded-detail-content {
   padding: 12px 4px 4px 4px;
   border-top: 1px dashed #e9ecef;
@@ -129,12 +153,12 @@
   letter-spacing: 0.3px;
 }
 
-/* Styling for the new-line employee display */
+
 .employee-name-block {
-  margin-top: 4px;       
-  color: #495057;         
-  font-size: 13px;        
-  white-space: normal; /* Allow text to drop to a new line gracefully */
+  margin-top: 4px;
+  color: #495057;
+  font-size: 13px;
+  white-space: normal;
   word-break: break-word;
 }
 
@@ -151,12 +175,11 @@
   gap: 12px;
 }
 
-/* 🚀 Navigation Link Button Layout rules */
 .details-nav-btn {
   width: 36px !important;
   height: 36px !important;
   line-height: 36px !important;
-  color: #3f51b5; /* Primary accent theme visibility */
+  color: #3f51b5;
   margin-top: -10px;
 }
 
@@ -170,6 +193,7 @@
   .status-wrapper {
     gap: 6px;
   }
+
   .details-nav-btn {
     width: 32px !important;
     height: 32px !important;
@@ -180,6 +204,7 @@
   vertical-align: middle;
   display: inline-block;
 }
+
 ::v-deep .button-spinner-inline circle {
-  stroke: currentColor !important; /* Forces the spinner color to match the button text text color */
+  stroke: currentColor !important;
 }

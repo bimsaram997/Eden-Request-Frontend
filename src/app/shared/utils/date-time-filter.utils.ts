@@ -6,8 +6,8 @@ import { FormGroup } from '@angular/forms';
  */
 export function setupDateTimeSync(
   form: FormGroup,
-  subsArray: any[],             // <-- Position 2: accepts your this.subs array
-  fromDateKey = 'fromDate',      // Position 3: optional custom key names
+  subsArray: any[],             
+  fromDateKey = 'fromDate',     
   toDateKey = 'toDate',
   fromTimeKey = 'fromTime',
   toTimeKey = 'toTime'
