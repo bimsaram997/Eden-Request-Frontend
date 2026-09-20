@@ -25,7 +25,7 @@ export class RequestDetailComponent implements OnInit, OnDestroy {
   ];
 
   private subs: Subscription[] = [];
-requestItem: RequestHeader | null = null;
+  requestItem: RequestHeader | null = null;
 
   @Input() req!: any;
   @Output() closeDetail = new EventEmitter<void>();
@@ -34,7 +34,7 @@ requestItem: RequestHeader | null = null;
   requestId!: number;
   isLoading: boolean = false;
   session: any;
-loading: boolean = true; // Initial loading state
+  loading: boolean = true;
 
   constructor(
     private requestService: RequestService,
@@ -46,8 +46,6 @@ loading: boolean = true; // Initial loading state
     this.session = JSON.parse(localStorage.getItem('scandic_eden_session') || '{}');
     const userRole = this.session.role || this.session.Role;
     this.isTeamLeader = userRole === 'TeamLeader';
-
-    // Normal routing setup when component initializes fresh
     const routeSub = this.route.paramMap.subscribe(params => {
       const idStr = params.get('id');
       if (idStr) {
@@ -58,20 +56,14 @@ loading: boolean = true; // Initial loading state
     this.subs.push(routeSub);
   }
 
-  // 🚀 INTERCEPT BACKGROUND PUSH MESSAGES
   @HostListener('window:message', ['$event'])
   onServiceWorkerMessage(event: MessageEvent) {
     if (event.data && event.data.type === 'NOTIFICATION_CLICKED') {
       const newId = event.data.requestId;
       console.log(`Active session push intercepted for request ID: ${newId}`);
-
       if (newId && newId !== this.requestId) {
         this.requestId = newId;
-
-        // 1. Fetch data for the new request ID directly
         this.loadRequestDetails(this.requestId);
-
-        // 2. Cleanly update the browser URL path without triggering a hard reload or guard check
         this.router.navigate(['/workspace/requests-list', this.requestId], {
           replaceUrl: true
         });
@@ -91,18 +83,14 @@ loading: boolean = true; // Initial loading state
     this.subs.push(reqSub);
   }
 
-  emitStatusUpdate(status: string): void {
 
-  }
 
   handleStatusUpdate(status: string): void {
-    this.isLoading = true; // Show loading indicator while processing
+    this.isLoading = true;
     const payload = {
       status: status,
       updatedBy: this.session.id || this.session.employeeId
     };
-
-    // 3. LOCK: Drop this request ID into our tracking set to shut down ghost events
 
     this.requestService.updateRequestStatus(this.requestId, payload).subscribe({
       next: (response: RequestHeader) => {
@@ -119,11 +107,7 @@ loading: boolean = true; // Initial loading state
 
   onBack(): void {
     this.closeDetail.emit();
-    if (this.isTeamLeader) {
-      this.router.navigate(['/workspace/requests-list']);
-    } else {
-      this.router.navigate(['/workspace/housekeeper-dashboard']);
-    }
+    this.router.navigate(['/workspace/requests-list']);
   }
 
   ngOnDestroy(): void {

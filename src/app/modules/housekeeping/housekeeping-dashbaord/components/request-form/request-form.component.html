@@ -1,17 +1,21 @@
 <div class="mobile-form-container">
 
+    <!-- Header Section -->
     <div class="form-header">
-        <h2>🧹 New Material Request</h2>
+        <h2>🧹 New Supply Request</h2>
         <button mat-icon-button color="warn" (click)="backToDashboard()">
             <mat-icon>close</mat-icon>
         </button>
     </div>
 
+    <!-- Main Request Details Form -->
     <form [formGroup]="requestForm" (ngSubmit)="onSubmit()">
-    <mat-card class="input-card">
-        <mat-card-content class="p-3"> 
-            
-            <div class="row g-2 mb-3"> <div class="col-6"> <mat-form-field appearance="outline" class="w-100">
+        <mat-card class="input-card">
+            <mat-card-content class="p-3"> 
+                
+                <!-- Room & List Numbers Grid -->
+                <div class="form-fields-grid mb-3"> 
+                    <mat-form-field appearance="outline" class="w-100">
                         <mat-label>List Number</mat-label>
                         <mat-select formControlName="listNumber" (selectionChange)="onListChange()">
                             <mat-option *ngFor="let num of listNumbers" [value]="num">
@@ -20,9 +24,7 @@
                         </mat-select>
                         <mat-error *ngIf="requestForm.get('listNumber')?.hasError('required')">Required</mat-error>
                     </mat-form-field>
-                </div>
-                
-                <div class="col-6">
+                    
                     <mat-form-field appearance="outline" class="w-100">
                         <mat-label>Room Number</mat-label>
                         <mat-select formControlName="roomNumber" [disabled]="availableRooms.length === 0">
@@ -33,84 +35,88 @@
                         <mat-error *ngIf="requestForm.get('roomNumber')?.hasError('required')">Required</mat-error>
                     </mat-form-field>
                 </div>
-            </div>
 
-            <div class="row">
-                <div class="col-12">
+                <!-- Special Instructions Row -->
+                <div class="w-100">
                     <mat-form-field appearance="outline" class="w-100">
                         <mat-label>Notes / Special Instructions</mat-label>
                         <textarea matInput rows="3" formControlName="notes"></textarea> 
                     </mat-form-field>
                 </div>
-            </div>
 
-        </mat-card-content>
-    </mat-card>
-</form>
+            </mat-card-content>
+        </mat-card>
+    </form>
 
+    <!-- Item Selection Box -->
     <mat-card class="input-card item-picker-box" [formGroup]="itemSelectionForm">
         <mat-card-header>
             <mat-card-title style="font-size: 16px;">Add Item Line</mat-card-title>
         </mat-card-header>
 
-        <mat-card-content class="vertical-stack">
-            <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Item Category</mat-label>
-                <mat-select formControlName="categoryName" (selectionChange)="onCategoryChange()">
-                    <mat-option *ngFor="let cat of categoriesList" [value]="cat.id || cat">{{ cat.name || cat
-                        }}</mat-option>
-                </mat-select>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" class="full-width"
-                *ngIf="itemSelectionForm.get('categoryName')?.value">
-                <mat-label>Select Item</mat-label>
-                <mat-select formControlName="item">
-
-                    <div class="dropdown-search-box">
-                        <mat-icon>search</mat-icon>
-                        <input placeholder="Type to filter items..." (keyup)="$event.stopPropagation()"
-                            [(ngModel)]="itemSearchQuery" [ngModelOptions]="{standalone: true}"
-                            class="search-input-element">
-                        <button *ngIf="itemSearchQuery" mat-icon-button type="button" class="clear-search-btn"
-                            (click)="$event.stopPropagation(); itemSearchQuery = ''">
-                            <mat-icon>close</mat-icon>
-                        </button>
-                    </div>
-
-                    <mat-option *ngFor="let prod of getFilteredAvailableItems()" [value]="prod">
-                        {{ prod.name }}
-                    </mat-option>
-
-                    <mat-option *ngIf="getFilteredAvailableItems().length === 0" disabled>
-                        No items match "{{ itemSearchQuery }}"
-                    </mat-option>
-
-                </mat-select>
-            </mat-form-field>
-
-            <div class="side-by-side-row" *ngIf="itemSelectionForm.get('item')?.value">
-                <mat-form-field appearance="outline" class="flex-2">
-                    <mat-label>Quantity</mat-label>
-                    <input matInput type="number" formControlName="quantity" min="1">
-                </mat-form-field>
-
-                <mat-form-field appearance="outline" class="flex-1">
-                    <mat-label>Unit</mat-label>
-                    <mat-select formControlName="unitType">
-                        <mat-option value="Pcs">Pcs</mat-option>
-                        <mat-option value="Trolley">trolley</mat-option>
+        <mat-card-content class="item-picker-content">
+            <div class="picker-fields-grid">
+                <!-- Category Select -->
+                <mat-form-field appearance="outline" class="w-100">
+                    <mat-label>Item Category</mat-label>
+                    <mat-select formControlName="categoryName" (selectionChange)="onCategoryChange()">
+                        <mat-option *ngFor="let cat of categoriesList" [value]="cat.id || cat">
+                            {{ cat.name || cat }}
+                        </mat-option>
                     </mat-select>
                 </mat-form-field>
+
+                <!-- Item Select (Visible when category is selected) -->
+                <mat-form-field appearance="outline" class="w-100" *ngIf="itemSelectionForm.get('categoryName')?.value">
+                    <mat-label>Select Item</mat-label>
+                    <mat-select formControlName="item">
+                        <div class="dropdown-search-box">
+                            <mat-icon>search</mat-icon>
+                            <input placeholder="Type to filter items..." (keyup)="$event.stopPropagation()"
+                                [(ngModel)]="itemSearchQuery" [ngModelOptions]="{standalone: true}"
+                                class="search-input-element">
+                            <button *ngIf="itemSearchQuery" mat-icon-button type="button" class="clear-search-btn"
+                                (click)="$event.stopPropagation(); itemSearchQuery = ''">
+                                <mat-icon>close</mat-icon>
+                            </button>
+                        </div>
+
+                        <mat-option *ngFor="let prod of getFilteredAvailableItems()" [value]="prod">
+                            {{ prod.name }}
+                        </mat-option>
+
+                        <mat-option *ngIf="getFilteredAvailableItems().length === 0" disabled>
+                            No items match "{{ itemSearchQuery }}"
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+                <!-- Quantity & Unit Row (Visible when item is selected) -->
+                <div class="quantity-unit-group" *ngIf="itemSelectionForm.get('item')?.value">
+                    <mat-form-field appearance="outline" class="qty-field">
+                        <mat-label>Quantity</mat-label>
+                        <input matInput type="number" formControlName="quantity" min="1">
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline" class="unit-field">
+                        <mat-label>Unit</mat-label>
+                        <mat-select formControlName="unitType">
+                            <mat-option value="Pcs">Pcs</mat-option>
+                            <mat-option value="Trolley">Trolley</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
             </div>
 
-            <button type="button" mat-flat-button color="accent" class="full-width add-btn" (click)="addItemToList()"
+            <!-- Add Button -->
+            <button type="button" mat-flat-button color="accent" class="w-100 add-btn" (click)="addItemToList()"
                 [disabled]="requestedItems.length >= 5">
                 <mat-icon>add_shopping_cart</mat-icon> Add To Request List ({{requestedItems.length}}/5)
             </button>
         </mat-card-content>
     </mat-card>
 
+    <!-- Summary Overview -->
     <div class="added-summary-section" *ngIf="requestedItems.length > 0">
         <h3>Added Items Overview</h3>
 
@@ -120,8 +126,7 @@
                     <div class="item-details">
                         <span class="category-badge">{{ control.get('categoryName')?.value }}</span>
                         <h4>{{ control.get('itemName')?.value }}</h4>
-                        <p class="amount-label">Amount: <strong>{{ control.get('quantity')?.value }} {{
-                                control.get('unitType')?.value }}</strong></p>
+                        <p class="amount-label">Amount: <strong>{{ control.get('quantity')?.value }} {{ control.get('unitType')?.value }}</strong></p>
                     </div>
 
                     <button type="button" mat-icon-button color="warn" (click)="removeItemFromList(i)">
@@ -132,6 +137,7 @@
         </div>
     </div>
 
+    <!-- Fixed Action Footer -->
     <div class="sticky-action-footer">
         <button mat-raised-button color="primary" class="submit-btn"
             [disabled]="requestForm.invalid || requestedItems.length === 0" (click)="onSubmit()">

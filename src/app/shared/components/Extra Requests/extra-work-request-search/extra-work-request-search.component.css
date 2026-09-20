@@ -1,0 +1,29 @@
+
+::ng-deep .compact-field .mat-mdc-form-field-subscript-wrapper {
+  display: none !important;
+}
+
+::ng-deep .compact-field .mat-mdc-text-field-wrapper {
+  padding-top: 4px;
+  padding-bottom: 4px;
+  background-color: #fdfdfd !important;
+}
+
+.responsive-btn {
+  height: 48px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  border-radius: 8px !important;
+}
+
+@media (max-width: 576px) {
+  ::ng-deep .compact-field .mat-mdc-text-field-wrapper {
+    height: 50px;
+  }
+}
+
+@media (min-width: 768px) {
+  .mt-md-0 {
+    margin-top: 10px !important;
+  }
+}

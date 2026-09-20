@@ -1,0 +1,40 @@
+.teamleader-dashboard {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+.banner-card {
+  border-radius: 16px !important;
+  background: #ffffff;
+}
+
+.icon-avatar {
+  width: 52px;
+  height: 52px;
+}
+
+.kpi-icon-wrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kpi-icon-wrapper mat-icon {
+  font-size: 26px;
+  width: 26px;
+  height: 26px;
+}
+
+.card {
+  border-radius: 14px;
+}
+
+.table th {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}

@@ -13,7 +13,6 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'housekeeper-dashboard', pathMatch: 'full' },
 
-      // 🧹 Housekeeper Landing Dashboard (Lists past items)
       {
         path: 'housekeeper-dashboard',
         loadComponent: () => import('./modules/housekeeping/housekeeping-dashbaord/housekeeping-dashbaord.component').then(m => m.HousekeepingDashbaordComponent)
@@ -24,22 +23,38 @@ export const routes: Routes = [
           import('./modules/housekeeping/housekeeping-dashbaord/components/request-form/request-form.component')
             .then(m => m.RequestFormComponent)
       },
-
-
-      //Team Leader Control Panel Dashboard (Disabled for now)
       {
         path: 'leader-dashboard',
         loadComponent: () => import('./modules/teamleader/team-leader-dash-board/team-leader-dash-board.component').then(m => m.TeamLeaderDashBoardComponent)
       },
-       {
+      {
         path: 'requests-list',
         loadComponent: () => import('./modules/housekeeping/housekeeping-dashbaord/components/request-list/request-list.component').then(m => m.RequestListComponent)
       },
       {
-      path: 'requests-component/:id',
-      loadComponent: () => import('./shared/components/request-detail/request-detail.component').then(m => m.RequestDetailComponent)
-      }
-      
+        path: 'extra-work-requests',
+        loadComponent: () => import('./shared/components/Extra Requests/extra-work-request-list/extra-work-request-list.component').then(m => m.ExtraWorkRequestListComponent)
+      },
+      {
+        path: 'requests-component/:id',
+        loadComponent: () => import('./shared/components/request-detail/request-detail.component').then(m => m.RequestDetailComponent)
+      },
+      {
+        path: 'extra-work-request-form',
+        loadComponent: () => import('./modules/teamleader/components/extra-work-request-form/extra-work-request-form.component').then(m => m.ExtraWorkRequestFormComponent)
+      },
+       {
+        path: 'extra-work-request-detail/:id',
+        loadComponent: () => import('./shared/components/Extra Requests/extra-request-detail/extra-request-detail.component').then(m => m.ExtraRequestDetailComponent)
+      },
+      {
+        path: 'extra-dirty-rooms',
+        loadComponent: () => import('./shared/components/Extra Dirty Rooms/extra-dirty-room-list/extra-dirty-room-list.component').then(m => m.ExtraDirtyRoomListComponent)
+      },
+       {
+        path: 'extra-dirty-room-form',
+        loadComponent: () => import('./modules/housekeeping/housekeeping-dashbaord/components/extra-dirty-room-form/extra-dirty-room-form.component').then(m => m.ExtraDirtyRoomFormComponent )
+      },
     ]
   },
   { path: '', redirectTo: 'login', pathMatch: 'full' },

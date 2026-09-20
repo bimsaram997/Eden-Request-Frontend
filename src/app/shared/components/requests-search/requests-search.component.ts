@@ -3,11 +3,11 @@ import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ItemService } from '../../../services/item.service';
 import { ItemCategoryService } from '../../../services/item-category.service';
-import { Subscription } from 'rxjs';
 import { MATERIAL_COMPONENTS } from '../../utils/material-imports';
 import { ExtendedFilterPayload } from '../../../models/DTO';
 import { AuthService } from '../../../services/auth.service';
 import { EmployeeDto } from '../../../models/class';
+import { setupDateTimeSync } from '../../utils/date-time-filter.utils';
 
 @Component({
   selector: 'app-requests-search',
@@ -16,7 +16,7 @@ import { EmployeeDto } from '../../../models/class';
   templateUrl: './requests-search.component.html',
   styleUrl: './requests-search.component.css'
 })
-export class RequestsSearchComponent implements OnInit {
+export class RequestsSearchComponent implements OnInit, OnDestroy {
   @Input() isSearching: boolean = false;
   @Output() filtersChanged = new EventEmitter<ExtendedFilterPayload>();
 
@@ -24,42 +24,34 @@ export class RequestsSearchComponent implements OnInit {
     10: ['101', '102', '103'],
     20: ['201', '202', '203']
   };
-
-  housekeepersList:EmployeeDto[] = [];  
-
+  housekeepersList: EmployeeDto[] = [];
   statusesList = ['All', 'Pending', 'Approved', 'Delivered', 'Rejected'];
-
   listNumbers: number[] = [10, 20];
   availableRooms: string[] = [];
   categoriesList: any[] = [];
   availableItems: any[] = [];
   itemSearchQuery: string = '';
-  isTeamLeader: boolean = false; // Placeholder for team leader status, adjust as needed
-
+  isTeamLeader: boolean = false;
   filterForm!: FormGroup;
-
-  private subs = new Subscription();
+  private subs: any[] = [];
 
   constructor(
     private fb: FormBuilder,
-    private router: Router,
     private itemService: ItemService,
     private itemCategoryService: ItemCategoryService,
     private authService: AuthService
   ) { }
 
-
-
   ngOnInit(): void {
     const session = JSON.parse(localStorage.getItem('scandic_eden_session') || '{}');
     this.isTeamLeader = (session.role || session.userRole) === 'TeamLeader';
     this.createRequestSearchForm();
+    setupDateTimeSync(this.filterForm, this.subs);
     this.loadCategories();
     this.loadEmployee();
-
   }
 
-  
+
 
   createRequestSearchForm() {
     this.filterForm = this.fb.group({
@@ -67,35 +59,27 @@ export class RequestsSearchComponent implements OnInit {
       roomNumber: [''],
       notes: [''],
       requestedItems: this.fb.array([]),
-
-      // Multi-select tracking form arrays are initialized with blank arrays [] instead of null strings
       status: [],
       categoryId: [],
       itemIds: [[]],
       targetEmployeeId: [],
       fromDate: [null],
       toDate: [null],
-      fromTime: [null],
-      toTime: [null]
+      fromTime: [{ value: '', disabled: true }],
+      toTime: [{ value: '', disabled: true }]
     });
   }
 
   loadEmployee(): void {
-  const emSub = this.authService.loadAllEmployees().subscribe({
-    next: (data) => {
-      // Filter the data array to only include Housekeepers
-      this.housekeepersList = data.filter((emp: EmployeeDto) => emp.role === 'Housekeeper');
-      
-      // Moving the log inside the next block because subscribe is asynchronous
-      console.log('Housekeepers list loaded:', this.housekeepersList);
-    },
-    error: (err) => console.error('Error fetching employees:', err)
-  });
-  
-  this.subs.add(emSub);
-}
+    const emSub = this.authService.loadAllEmployees().subscribe({
+      next: (data) => {
+        this.housekeepersList = data.filter((emp: EmployeeDto) => emp.role === 'Housekeeper');
+      },
+      error: (err) => console.error('Error fetching employees:', err)
+    });
+    this.subs.push(emSub);
+  }
 
-    
   onListChange(): void {
     const selectedList = this.filterForm.get('listNumber')?.value;
     this.filterForm.get('roomNumber')?.setValue('');
@@ -111,7 +95,7 @@ export class RequestsSearchComponent implements OnInit {
       next: (data) => this.categoriesList = data,
       error: (err) => console.error('Error fetching categories:', err)
     });
-    this.subs.add(catSub);
+    this.subs.push(catSub);
   }
 
   onCategoryChange(): void {
@@ -121,7 +105,6 @@ export class RequestsSearchComponent implements OnInit {
     this.itemSearchQuery = '';
 
     if (!chosenCategory) return;
-
     this.itemService.getItemsByCategory(chosenCategory).subscribe({
       next: (items) => this.availableItems = items,
       error: (err) => console.error('Error loading items:', err)
@@ -134,16 +117,14 @@ export class RequestsSearchComponent implements OnInit {
 
   applyFilters(): void {
     const values = this.filterForm.value;
-
-    // 2. Map properties strictly to match the ExtendedFilterPayload layout rules
     const payload: ExtendedFilterPayload = {
       roomSearch: values.roomNumber || null,
       roomListId: values.listNumber ? parseInt(values.listNumber, 10) : null,
       status: values.status || 'All',
       categoryId: values.categoryId || null,
-      targetEmployeeId: values.targetEmployeeId && (!Array.isArray(values.targetEmployeeId) || values.targetEmployeeId.length > 0) 
-      ? parseInt(values.targetEmployeeId.toString(), 10) 
-      : null,
+      targetEmployeeId: values.targetEmployeeId && (!Array.isArray(values.targetEmployeeId) || values.targetEmployeeId.length > 0)
+        ? parseInt(values.targetEmployeeId.toString(), 10)
+        : null,
       fromDate: values.fromDate || null,
       toDate: values.toDate || null,
       itemIds: values.itemIds && values.itemIds.length ? values.itemIds : [],
@@ -151,7 +132,6 @@ export class RequestsSearchComponent implements OnInit {
       toTime: values.toTime || null
 
     };
-
     this.filtersChanged.emit(payload);
   }
 
@@ -171,11 +151,13 @@ export class RequestsSearchComponent implements OnInit {
     this.applyFilters();
   }
 
-
-
-
-
-
+  ngOnDestroy(): void {
+    this.subs.forEach((sub: any) => {
+      if (sub && typeof sub.unsubscribe === 'function') {
+        sub.unsubscribe();
+      }
+    });
+  }
 
 
 }

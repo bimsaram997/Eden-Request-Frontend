@@ -17,7 +17,7 @@ import { RequestService } from '../../../../../services/request.service';
 })
 export class RequestFormComponent implements OnInit, OnDestroy {
 
-  // Hardcoded Floor Lists mapping exactly to  backend dictionary structure
+  
   listRoomsMap: { [key: number]: string[] } = {
     10: ['101', '102', '103'], 
     20: ['201', '202', '203']  
@@ -203,7 +203,7 @@ export class RequestFormComponent implements OnInit, OnDestroy {
         console.log('Backend successfully tracked request:', response);
         alert('Material request has been successfully dispatched to the Team Leader!');
 
-        this.router.navigate(['/workspace/housekeeper-dashboard']);
+        this.router.navigate(['/workspace/requests-list']);
       },
       error: (err) => {
         console.error('API endpoint rejected payload connection wrapper:', err);
@@ -213,7 +213,7 @@ export class RequestFormComponent implements OnInit, OnDestroy {
   }
 
   backToDashboard() {
-    this.router.navigate(['/workspace/housekeeper-dashboard']);
+    this.router.navigate(['/workspace/requests-list']);
   }
 
 

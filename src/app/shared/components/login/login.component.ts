@@ -18,22 +18,19 @@ import { PushNotificationService } from '../../../services/push-notification.ser
 export class LoginComponent implements OnInit, OnDestroy {
   loginForm!: FormGroup;
   subscription: Subscription[] = [];
-  returnUrl: string = ''; // 🚀 Track deep-link paths securely across login validation events
+  returnUrl: string = ''; 
 isLoading: boolean = false;
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private route: ActivatedRoute, // 👈 Inject ActivatedRoute here
+    private route: ActivatedRoute, 
     private authService: AuthService,
     private pushService: PushNotificationService,
-    private notificationService: NotificationServiceService
   ) {}
 
   ngOnInit() {
     this.createFormGroup();
-
-    // 🚀 Grab the returnUrl query parameter string if it was appended by the route guard
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '';
   }
 
@@ -48,7 +45,7 @@ isLoading: boolean = false;
     this.isLoading = true; 
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched(); 
-      this.isLoading = false; // Reset loading state
+      this.isLoading = false; 
       return;
     }
 
@@ -59,15 +56,9 @@ isLoading: boolean = false;
 
     this.authService.login(payload).subscribe({
       next: (employeeResponse) => {
-        this.isLoading = false; // Reset loading state
-        console.log('Backend verified profile payload:', employeeResponse);
-
+        this.isLoading = false;
         localStorage.setItem('scandic_eden_session', JSON.stringify(employeeResponse));
-        
-        // Links the browser token exclusively to this active user row
         this.pushService.subscribeUserDevice(employeeResponse.id);
-
-        // 🚀 THE REDIRECT FIX: Check if a dynamic target deep-link route is stored
         if (this.returnUrl) {
           console.log(`Redirecting user straight to original destination: ${this.returnUrl}`);
           this.router.navigateByUrl(this.returnUrl);

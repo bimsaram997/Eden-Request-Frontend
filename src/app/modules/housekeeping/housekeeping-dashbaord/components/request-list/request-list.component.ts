@@ -1,6 +1,6 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MATERIAL_COMPONENTS } from '../../../../../shared/utils/material-imports';
-import { PageEvent } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { RequestService } from '../../../../../services/request.service';
 import { Subscription } from 'rxjs';
 
@@ -8,6 +8,8 @@ import { RequestsSearchComponent } from '../../../../../shared/components/reques
 import { ExtendedFilterPayload } from '../../../../../models/DTO';
 import { RequestHistoryCardComponent } from '../../../../../shared/components/request-history-card/request-history-card.component';
 import { NotificationServiceService } from '../../../../../services/notification-service.service';
+import { Router } from '@angular/router';
+import { PagedResponse, RequestModel } from '../../../../../models/request.model';
 
 @Component({
   selector: 'app-request-list',
@@ -18,16 +20,18 @@ import { NotificationServiceService } from '../../../../../services/notification
 })
 export class RequestListComponent implements OnInit, OnDestroy {
   // Pagination State Tracking Flags
+
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
   currentPage = 1;
   pageSize = 6;
   totalRecords = 0;
-  userRequests: any[] = [];
+  userRequests: RequestModel[] = [];
 
   isTeamLeaderUser = false;
   private subs: any[] = [];
   updatingRequestIds = new Set<number>();
   isUpdating = false;
-  isSearching = false
+  isSearching = false;
   activeFilters: ExtendedFilterPayload = {
     roomSearch: null,
     roomListId: null,
@@ -45,8 +49,11 @@ export class RequestListComponent implements OnInit, OnDestroy {
 
 
 
+
+
   constructor(private requestService: RequestService,
-    private notificationService: NotificationServiceService
+    private notificationService: NotificationServiceService,
+    private router: Router,
   ) { }
 
   ngOnInit(): void {
@@ -76,72 +83,83 @@ export class RequestListComponent implements OnInit, OnDestroy {
     this.subs.push(statusSub);
   }
 
-  onFilterCriteriaChanged(payload: ExtendedFilterPayload): void {
+
+  onFilterCriteriaChanged(payload: any): void {
     this.activeFilters = payload;
-    this.currentPage = 1; //  Crucial: Reset back to page 1 whenever search criteria changes
+
+    //  1. Reset component state back to Page 1
+    this.currentPage = 1;
+
+    //  2. Reset the MatPaginator UI control back to first page index (0)
+    if (this.paginator) {
+      this.paginator.firstPage();
+    }
+
     this.isSearching = true;
     this.fetchHistoryPage();
   }
 
-
   onPageChange(event: PageEvent): void {
-    this.currentPage = event.pageIndex + 1; // Material uses 0-based indexing, C# API uses 1-based indexing
+    // Material Paginator uses 0-based index; C# API uses 1-based index
+    this.currentPage = event.pageIndex + 1; 
     this.fetchHistoryPage();
   }
 
-  fetchHistoryPage(): void {
-    const session = JSON.parse(localStorage.getItem('scandic_eden_session') || '{}');
-    const employeeId = session.id || session.employeeId;
+fetchHistoryPage(): void {
+  const session = JSON.parse(localStorage.getItem('scandic_eden_session') || '{}');
+  const employeeId = session.id || session.employeeId;
 
-    if (!employeeId) {
-      this.isSearching = false;
-      return;
-    }
-    const formatLocalDateText = (dateInput: any): string | null => {
-      if (!dateInput) return null;
-      const d = new Date(dateInput);
-
-      // Extracts calendar numbers directly, ignoring UTC conversions
-      const year = d.getFullYear();
-      const month = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
-
-      return `${year}-${month}-${day}`; // "2026-06-26"
-    };
-
-    // Bundle pagination settings along with  active multi-select filters layout
-    const requestPayload = {
-      page: this.currentPage,
-      pageSize: this.pageSize,
-      roomSearch: this.activeFilters.roomSearch,
-      roomListId: this.activeFilters.roomListId,
-      status: this.activeFilters.status,
-      categoryId: this.activeFilters.categoryId,
-      targetEmployeeId: this.activeFilters.targetEmployeeId,
-      itemIds: this.activeFilters.itemIds,
-      // Format date properties securely to ISO strings or null strings
-      fromDate: formatLocalDateText(this.activeFilters.fromDate),
-      toDate: formatLocalDateText(this.activeFilters.toDate),
-      fromTime: this.activeFilters.fromTime,
-      toTime: this.activeFilters.toTime
-    };
-
-    const historySub = this.requestService
-      .getPagedHistory(employeeId, this.isTeamLeaderUser, requestPayload)
-      .subscribe({
-        next: (response) => {
-          this.userRequests = response.data || [];
-          this.totalRecords = response.totalCount || 0;
-          this.isSearching = false;
-        },
-        error: (err) => {
-          console.error('Failed fetching filtered request registry streams:', err);
-          this.isSearching = false;
-        }
-      });
-
-    this.subs.push(historySub);
+  if (!employeeId) {
+    this.isSearching = false;
+    return;
   }
+  
+  const formatLocalDateText = (dateInput: any): string | null => {
+    if (!dateInput) return null;
+    const d = new Date(dateInput);
+
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+  };
+
+  // 📝 Explicit query filter setup matching backend payload property keys
+  const requestPayload = {
+    page: this.currentPage,
+    pageSize: this.pageSize,
+    roomListId: this.activeFilters.roomListId || null,
+    roomId: this.activeFilters.roomSearch || null,
+    categoryId: this.activeFilters.categoryId || null,
+    itemIds: this.activeFilters.itemIds || [],
+    requestedById: this.activeFilters.targetEmployeeId || null,
+    assignedToId:  null,
+    status: this.activeFilters.status || 'All',
+    fromDate: formatLocalDateText(this.activeFilters.fromDate),
+    toDate: formatLocalDateText(this.activeFilters.toDate),
+    fromTime: this.activeFilters.fromTime || null,
+    toTime: this.activeFilters.toTime || null
+  };
+
+  const historySub = this.requestService
+    .getPagedHistory(employeeId, this.isTeamLeaderUser, requestPayload)
+    .subscribe({
+      //  Apply Option A here: explicit type definition on the incoming stream response
+      next: (response: PagedResponse<RequestModel>) => {
+        // Now fully typed! compiler verifies data arrays layout and total fields
+        this.userRequests = response.data || []; // userRequests field must be defined as: RequestModel[]
+        this.totalRecords = response.totalCount || 0;
+        this.isSearching = false;
+      },
+      error: (err: any) => {
+        console.error('Failed fetching filtered request registry streams:', err);
+        this.isSearching = false;
+      }
+    });
+
+  this.subs.push(historySub);
+}
 
   handleStatusUpdate(event: { requestId: number, currentStatus: string, newStatus: string }): void {
     const current = event.currentStatus;
@@ -191,6 +209,10 @@ export class RequestListComponent implements OnInit, OnDestroy {
         this.updatingRequestIds.delete(event.requestId);
       }
     });
+  }
+
+  routeToRequest() {
+    this.router.navigate(['/workspace/request-form']);
   }
   ngOnDestroy(): void {
     this.subs.forEach((sub: any) => {
