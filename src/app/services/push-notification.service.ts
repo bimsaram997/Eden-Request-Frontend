@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { SwPush } from '@angular/service-worker';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router'; 
-import { environment } from '../../environments/environment.development';
+import { environment } from '../../environments/environment.dev';
 
 @Injectable({
   providedIn: 'root'

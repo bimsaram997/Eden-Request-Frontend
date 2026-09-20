@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { CreateReportMetadataDto, ExtraDirtyFilterPayload, ExtraDirtyReportResponse, MetadataResponse } from '../models/extra-dirty-rooms';
 import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment.development';
+import { environment } from '../../environments/environment.dev';
 
 @Injectable({
   providedIn: 'root'

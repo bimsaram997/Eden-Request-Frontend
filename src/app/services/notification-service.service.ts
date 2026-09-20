@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HubConnection, HubConnectionBuilder, Subject, HttpTransportType } from '@microsoft/signalr';
-import { environment } from '../../environments/environment.development';
+import { environment } from '../../environments/environment.dev';
 
 @Injectable({
   providedIn: 'root'
